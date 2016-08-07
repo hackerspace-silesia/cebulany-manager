@@ -4,19 +4,24 @@ from decimal import Decimal
 from datetime import datetime
 from re import compile as re_compile
 
-re_main = re_compile(
-    r'PRZELEW (?P<type>UZNANIOWY|OBCIĄŻENIOWY) '
-    r'(\(NADANO (?P<send_date>\d+-\d+-\d+)\) )?'
-    r'(?P<title>.+?)  +'
-    r'(?P<name>.+?)(  +|$)'
-    r'(?P<addr>.*)?'
-)
+import itertools
 
 TRANSACTION_TYPES = {
-    'PRZELEW UZNANIOWY': re_main,
-    'PRZELEW OBCIĄŻENIOWY': re_main,
+    'PRZELEW UZNANIOWY': re_compile(
+        r'(?P<type>PRZELEW UZNANIOWY) '
+        r'(\(NADANO (?P<send_date>\d+-\d+-\d+)\) )?'
+        r'(?P<title>.+?)  +'
+        r'(?P<name>.+?)(  +|$)'
+        r'(?P<addr>.*)?'
+    ),
+    'PRZELEW OBCIĄŻENIOWY': re_compile(
+        r'(?P<type>PRZELEW OBCIĄŻENIOWY) '
+        r'(\(NADANO (?P<send_date>\d+-\d+-\d+)\) )?'
+        r'(?P<title>.+?)  +'
+        r'(?P<addr>.*)?'
+    ),
     'WPŁATA GOTÓWKOWA': re_compile(
-        r'WPŁATA (?P<type>GOTÓWKOWA)'
+        r'(?P<type>WPŁATA GOTÓWKOWA)'
         r'(?P<name>.+?)  +'
         r'(?P<title>.+)'
     )
@@ -64,23 +69,29 @@ def get_data(main):
 
 def parse_main(main):
     data = get_data(main)
-    send_date = data.get('send_date')
+    send_date = data.get('send_date', '')
     send_date = send_date and datetime.strptime(send_date, REV_DATE_FORMAT)
     data_type = TRANSACTION_TYPES_SQL.get(data['type'], 'unknown')
+
     return dict(
         type=data_type,
         send_date=send_date,
         title=data['title'],
-        name=data['name'],
+        name=data.get('name', ''),
         address=data.get('addr'),
+        main_line=main,
     )
+
+def open_and_parse(arg):
+    with codecs_open(arg, encoding='windows-1250') as f:
+        return parse_lines(f.readlines()[1:-1])
     
 if __name__ == "__main__":
-    with codecs_open(argv[1], encoding='windows-1250') as f:
-        data = parse_lines(f.readlines()[1:-1])
+    data = list(itertools.chain.from_iterable(
+        open_and_parse(arg) for arg in argv[1:]
+    ))
     data.sort(key=lambda obj: obj['date'])
     t = Decimal('0')
     for x in data:
-        t += x['cost']
-        print(x['date'].date(), x['title'], x['name'], x['cost'])
-    print('TOTAL', t)
+        print(x['type'], x['date'].date(), x['title'], x['name'], x['cost'], sep='\t')
+
