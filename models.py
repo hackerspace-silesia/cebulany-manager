@@ -2,8 +2,17 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-class Transaction(db.Model):
+class Base(db.Model):
+    __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
+
+
+class BaseWithTransaction(Base):
+    __abstract__ = True
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
+
+
+class Transaction(Base):
     type = db.Column(db.String(20))
     date = db.Column(db.Date)
     send_date = db.Column(db.Date)
@@ -14,17 +23,12 @@ class Transaction(db.Model):
     cost = db.Column(db.Numeric(precision=2))
 
 
-class TransactionMixin(object):
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
-
-
-class Member(db.Model, TransactionMixin):
-    id = db.Column(db.Integer, primary_key=True)
+class Member(BaseWithTransaction):
     name = db.Column(db.String(300))
     active = db.Column(db.Boolean, default=True)
 
 
-class PayedMonth(db.Model, TransactionMixin):
+class PayedMonth(BaseWithTransaction):
     id = db.Column(db.Integer, primary_key=True)
     member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
     date = db.Column(db.Date)
@@ -32,13 +36,15 @@ class PayedMonth(db.Model, TransactionMixin):
     payed = db.Column(db.Boolean, default=False)
 
 
-class Donation(db.Model, TransactionMixin):
+class Donation(BaseWithTransaction):
     id = db.Column(db.Integer, primary_key=True)
     cost = db.Column(db.Numeric(precision=2))
     name = db.Column(db.String(300))
 
-class Bill(db.Model, TransactionMixin):
+
+class Bill(BaseWithTransaction):
     id = db.Column(db.Integer, primary_key=True)
     cost = db.Column(db.Numeric(precision=2))
     name = db.Column(db.String(300))
     frequency_months = db.Column(db.Integer, default=0)
+
