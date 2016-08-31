@@ -1,5 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import relationship
+from sqlalchemy import Table
+
 db = SQLAlchemy()
 
 
@@ -21,15 +24,15 @@ class BaseWithTransaction(Base):
         relationship(
             Transaction,
             secondary=cls.create_m2m_table(),
-            backref=name, 
+            backref='%ss' % name, 
         )
 
     @classmethod
     def create_m2m_table(cls):
         name = cls.__tablename__
         return Table('transaction_%s' % name, Base.metadata,
-            Column('transaction_id', Integer, ForeignKey('transaction.id')),
-            Column('%s_id' % name, Integer, ForeignKey('%s.id' % name)),
+            db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id')),
+            db.Column('%s_id' % name, db.Integer, db.ForeignKey('%s.id' % name)),
         )
 
 
