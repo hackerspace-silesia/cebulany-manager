@@ -46,6 +46,7 @@ class Transaction(Base):
     address = db.Column(db.String(300))
     main_line = db.Column(db.String(300))
     cost = db.Column(db.Numeric(precision=2))
+    iban = db.Column(db.String(300))
 
 
 class Member(Base):

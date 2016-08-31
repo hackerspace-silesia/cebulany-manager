@@ -8,6 +8,8 @@ from re import compile as re_compile
 
 import itertools
 
+re_iban = re_compile(ur'\d\d( *\d{4}){6}')
+
 TRANSACTION_TYPES = {
     u'PRZELEW UZNANIOWY': re_compile(
         ur'(?P<type>PRZELEW UZNANIOWY) '
@@ -67,9 +69,16 @@ def get_data(main):
     else:
         raise ValueError(main)
 
+def get_iban(main):
+    match = re_iban.search(main)
+    if match is None:
+        return main, ''
+    return main[:match.start(0)], match.group(0)
+
 
 def parse_main(main):
-    data = get_data(main)
+    without_iban, iban = get_iban(main)
+    data = get_data(without_iban)
     send_date = data.get('send_date')
     send_date = send_date and datetime.strptime(send_date, REV_DATE_FORMAT)
     data_type = TRANSACTION_TYPES_SQL.get(data['type'], 'unknown')
@@ -80,6 +89,7 @@ def parse_main(main):
         title=data['title'],
         name=data.get('name', ''),
         address=data.get('addr'),
+        iban=iban or None,
         main_line=main,
     )
 

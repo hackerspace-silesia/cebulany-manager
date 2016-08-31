@@ -1,21 +1,22 @@
 from flask_restful import Resource, fields, marshal_with
 from flask_restful.reqparse import RequestParser
+from sqlalchemy import or_
 from datetime import datetime
 
 from cebulany import models
 
-dt_type = lambda val: datetime.strptime('%Y-%m-%d')
+dt_type = lambda val: datetime.strptime(val, '%Y-%m-%d')
 
 
 transaction_parser = RequestParser()
 transaction_parser.add_argument('date_start', type=dt_type)
 transaction_parser.add_argument('date_end', type=dt_type)
-transaction_parser.add_argument('text', type=dt_type)
+transaction_parser.add_argument('text')
 transaction_parser.add_argument('negative')
 transaction_parser.add_argument('positive')
 transaction_parser.add_argument('cost_le', type=int)
 transaction_parser.add_argument('cost_ge', type=int)
-transaction_parser.add_argument('ordering', action='append')
+transaction_parser.add_argument('ordering')
 
 
 resource_fields = {
@@ -25,6 +26,7 @@ resource_fields = {
     'name': fields.String(),
     'address': fields.String(),
     'cost': fields.Price(decimals=2),
+    'iban': fields.String(),
 }
 
 
@@ -47,6 +49,13 @@ class TransactionResource(Resource):
             query = query.filter(model.cost <= args['cost_le'])
         if args['cost_ge']:
             query = query.filter(model.cost >= args['cost_ge'])
+        if args['text']:
+            query = query.filter(or_(
+                model.main_line.like('%%%s%%' %word.replace('%',r'\%'))
+                for word in args['text'].upper().split()
+            ))
+        if args['ordering']:
+            query = query.order_by(*args['ordering'].split(','))
 
         return query.limit(120).all()
 
