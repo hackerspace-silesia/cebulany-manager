@@ -18,7 +18,7 @@ TRANSACTION_TYPES = {
         r'(?P<type>PRZELEW OBCIĄŻENIOWY) '
         r'(\(NADANO (?P<send_date>\d+-\d+-\d+)\) )?'
         r'(?P<title>.+?)  +'
-        r'(?P<addr>.*)?'
+        r'(?P<name>.*)?'
     ),
     'WPŁATA GOTÓWKOWA': re_compile(
         r'(?P<type>WPŁATA GOTÓWKOWA)'

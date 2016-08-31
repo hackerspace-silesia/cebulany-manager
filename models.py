@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.declarative import declared_attr
 db = SQLAlchemy()
 
 
@@ -6,13 +7,34 @@ class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
 
+    @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
+
 
 class BaseWithTransaction(Base):
     __abstract__ = True
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
+
+    @declared_attr
+    def transactions(cls):
+        name = cls.__tablename__
+        relationship(
+            Transaction,
+            secondary=cls.create_m2m_table(),
+            backref=name, 
+        )
+
+    @classmethod
+    def create_m2m_table(cls):
+        name = cls.__tablename__
+        return Table('transaction_%s' % name, Base.metadata,
+            Column('transaction_id', Integer, ForeignKey('transaction.id')),
+            Column('%s_id' % name, Integer, ForeignKey('%s.id' % name)),
+        )
 
 
 class Transaction(Base):
+    __abstract__ = False
     type = db.Column(db.String(20))
     date = db.Column(db.Date)
     send_date = db.Column(db.Date)
@@ -23,28 +45,27 @@ class Transaction(Base):
     cost = db.Column(db.Numeric(precision=2))
 
 
-class Member(BaseWithTransaction):
+class Member(Base):
+    __abstract__ = False
     name = db.Column(db.String(300))
-    active = db.Column(db.Boolean, default=True)
+    email = db.Column(db.String(200))
+    is_active = db.Column(db.Boolean, default=True)
 
 
-class PayedMonth(BaseWithTransaction):
-    id = db.Column(db.Integer, primary_key=True)
+class PaidMonth(BaseWithTransaction):
+    __abstract__ = False
     member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
     date = db.Column(db.Date)
-    cost = db.Column(db.Numeric(precision=2))
-    payed = db.Column(db.Boolean, default=False)
+    is_paid = db.Column(db.Boolean, default=False)
 
 
 class Donation(BaseWithTransaction):
-    id = db.Column(db.Integer, primary_key=True)
-    cost = db.Column(db.Numeric(precision=2))
+    __abstract__ = False
     name = db.Column(db.String(300))
 
 
 class Bill(BaseWithTransaction):
-    id = db.Column(db.Integer, primary_key=True)
-    cost = db.Column(db.Numeric(precision=2))
+    __abstract__ = False
     name = db.Column(db.String(300))
-    frequency_months = db.Column(db.Integer, default=0)
+    frequency_months = db.Column(db.Integer, default=1)
 
