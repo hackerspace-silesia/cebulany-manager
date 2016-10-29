@@ -1,6 +1,6 @@
 from flask_restful import Resource, fields, marshal_with
 from flask_restful.reqparse import RequestParser
-from sqlalchemy import or_
+from sqlalchemy import or_, func as sql_func
 from datetime import datetime
 
 from cebulany import models
@@ -11,6 +11,7 @@ dt_type = lambda val: datetime.strptime(val, '%Y-%m-%d')
 transaction_parser = RequestParser()
 transaction_parser.add_argument('date_start', type=dt_type)
 transaction_parser.add_argument('date_end', type=dt_type)
+transaction_parser.add_argument('month')
 transaction_parser.add_argument('text')
 transaction_parser.add_argument('negative')
 transaction_parser.add_argument('positive')
@@ -37,10 +38,14 @@ class TransactionResource(Resource):
         args = transaction_parser.parse_args()
         model = models.Transaction
         query =  model.query
-        if args['date_start']:
+        if args['date_start'] and arg['date_end']:
             query = query.filter(model.date >= args['date_start'])
-        if args['date_end']:
             query = query.filter(model.date <= args['date_end'])
+        else:
+            month = args['month'] or datetime.today().strftime('%Y-%m')
+            query = query.filter(
+                sql_func.strftime('%Y-%m', model.date) == month
+            )
         if args['negative'] == 't':
             query = query.filter(model.cost < 0)
         if args['positive'] == 't':
@@ -51,7 +56,7 @@ class TransactionResource(Resource):
             query = query.filter(model.cost >= args['cost_ge'])
         if args['text']:
             query = query.filter(or_(
-                model.main_line.like('%%%s%%' %word.replace('%',r'\%'))
+                model.main_line.like('%%%s%%' % word.replace('%',r'\%'))
                 for word in args['text'].upper().split()
             ))
         if args['ordering']:
