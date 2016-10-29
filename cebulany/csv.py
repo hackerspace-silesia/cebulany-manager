@@ -8,7 +8,8 @@ from re import compile as re_compile
 
 import itertools
 
-re_iban = re_compile(ur'\d\d( *\d{4}){6}')
+re_iban = re_compile(ur'\d\d(\s*\d{4}){6}')
+
 
 TRANSACTION_TYPES = {
     u'PRZELEW UZNANIOWY': re_compile(
@@ -42,10 +43,13 @@ REV_DATE_FORMAT = '%d-%m-%Y'
 
 
 def parse_lines(lines):
-    return [parse_line(line.rstrip('\n')) for line in lines]
+    return [
+        parse_line(line.rstrip('\n'), line_num)
+        for line_num, line in enumerate(lines)
+    ]
 
 
-def parse_line(line):
+def parse_line(line, line_num=None):
     # problably main line has commas
     # unpacked as ((date, main), cost, total)
     date_main, cost, total = line.rsplit(',', 2)
@@ -55,6 +59,7 @@ def parse_line(line):
     data.update(
         date=datetime.strptime(date.strip(), DATE_FORMAT).date(),
         cost=Decimal(cost),
+        line_num=line_num,
     )
     return data
 
@@ -93,15 +98,22 @@ def parse_main(main):
         main_line=main,
     )
 
+
 def open_and_parse(arg):
     with codecs_open(arg, encoding='windows-1250') as f:
         return parse_lines(f.readlines()[1:-1])
     
+
 if __name__ == "__main__":
     data = list(itertools.chain.from_iterable(
         open_and_parse(arg) for arg in argv[1:]
     ))
     data.sort(key=lambda obj: obj['date'])
+    s = 0
     for x in data:
-        print(x['type'], x['date'], x['title'], x['name'], x['cost'], sep='\t')
-
+        s += x['cost']
+        line = u'\t'.join([
+            str(x['date']), x['title'], x['name'], str(x['cost'])
+        ])
+        print(line.encode('utf-8'))
+    print('SUM', str(s))

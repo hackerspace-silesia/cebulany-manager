@@ -39,7 +39,8 @@ class BaseWithTransaction(Base):
 class Transaction(Base):
     __abstract__ = False
     type = db.Column(db.String(20))
-    date = db.Column(db.Date)
+    line_num = db.Column(db.Integer, index=True)
+    date = db.Column(db.Date, index=True)
     send_date = db.Column(db.Date)
     title = db.Column(db.String(300))
     name = db.Column(db.String(300))
@@ -54,6 +55,7 @@ class Member(Base):
     name = db.Column(db.String(300))
     email = db.Column(db.String(200))
     is_active = db.Column(db.Boolean, default=True)
+    join_date = db.Column(db.Date)
 
 
 class PaidMonth(BaseWithTransaction):
@@ -62,6 +64,7 @@ class PaidMonth(BaseWithTransaction):
     date = db.Column(db.Date)
     is_paid = db.Column(db.Boolean, default=False)
 
+    member = relationship(Member, backref='months')
 
 class Donation(BaseWithTransaction):
     __abstract__ = False

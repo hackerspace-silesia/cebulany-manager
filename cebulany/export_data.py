@@ -12,6 +12,16 @@ if __name__ == "__main__":
 
     with app.app_context():
         for record in data:
-            db.session.add(Transaction(**record))
+            transaction_query = (
+                db.session.query(Transaction)
+                .filter_by(
+                    line_num=record['line_num'],
+                    date=record['date'],
+                )
+            )
+            if transaction_query.first() is None:
+                db.session.add(Transaction(**record))
+            else:
+                transaction_query.update(record)
         db.session.commit()
 
