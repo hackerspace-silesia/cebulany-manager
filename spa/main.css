@@ -1,0 +1,57 @@
+body {
+    background-color: #DCDCDC;
+    color: #2D383A;
+    font-family: Arial;
+    font-size:12pt;
+}
+
+#menu {
+    display: block;
+    font-size: 10pt;
+    border: 1px solid #353839;
+    width: 900px;
+    margin: auto;
+    text-align: center;
+}
+
+#menu > li {
+    display: inline;
+}
+
+#menu > li:not(:last-child):after {
+    content: ' |';
+}
+
+#main {
+    width: 1000px;
+    margin: auto;
+}
+
+table {
+    width: 100%;
+    border: 1px solid #808080;
+    border-collapse: collapse;
+    font-size: 8pt;
+}
+
+thead th {
+    background-color: #353839;
+    border: none;
+    color: #D9D6CF;
+}
+
+td, th {
+    border: 1px solid #808080;
+}
+
+.negative {
+    color: #E12C2C;
+}
+
+.positive {
+    color: #4D8C57;
+}
+
+.price {
+    text-align: right;
+}

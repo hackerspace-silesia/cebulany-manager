@@ -1,0 +1,17 @@
+{
+  "name": "cebulany-manager-js",
+  "version": "0.0.1",
+  "description": "cebulany js",
+  "author": "Firemark",
+  "contributors": [],
+  "scripts": {
+  },
+  "dependencies": {
+      "gulp": "3.9.0",
+      "gulp-jade": "git://github.com/firemark/gulp-jade.git",
+      "gulp-concat": "2.6.0",
+      "typescript": "1.8.9"
+  },
+  "devDependencies": {
+  }
+}

@@ -4,6 +4,7 @@ from sqlalchemy import or_, func as sql_func
 from datetime import datetime
 
 from cebulany import models
+from cebulany.models import db
 
 dt_type = lambda val: datetime.strptime(val, '%Y-%m-%d')
 
@@ -21,13 +22,16 @@ transaction_parser.add_argument('ordering')
 
 
 resource_fields = {
-    'send_date': fields.DateTime(dt_format='iso8601'),
-    'date': fields.DateTime(dt_format='iso8601'),
-    'title': fields.String(),
-    'name': fields.String(),
-    'address': fields.String(),
-    'cost': fields.Price(decimals=2),
-    'iban': fields.String(),
+    'transactions': fields.List(fields.Nested({
+        'send_date': fields.DateTime(dt_format='iso8601'),
+        'date': fields.DateTime(dt_format='iso8601'),
+        'title': fields.String(),
+        'name': fields.String(),
+        'address': fields.String(),
+        'cost': fields.Price(decimals=2),
+        'iban': fields.String(),
+    })),
+    'sum': fields.Price(decimals=2),
 }
 
 
@@ -37,7 +41,16 @@ class TransactionResource(Resource):
     def get(self):
         args = transaction_parser.parse_args()
         model = models.Transaction
-        query =  model.query
+        query = model.query
+        query_sum = db.session.query(sql_func.sum(model.cost))
+        return {
+            'transactions': self.filtering_query(query, args).all(),
+            'sum': self.filtering_query(query_sum, args).scalar(),
+        }
+
+    @staticmethod
+    def filtering_query(query, args):
+        model = models.Transaction
         if args['date_start'] and arg['date_end']:
             query = query.filter(model.date >= args['date_start'])
             query = query.filter(model.date <= args['date_end'])
@@ -61,6 +74,4 @@ class TransactionResource(Resource):
             ))
         if args['ordering']:
             query = query.order_by(*args['ordering'].split(','))
-
-        return query.limit(120).all()
-
+        return query
