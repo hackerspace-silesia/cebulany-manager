@@ -1,5 +1,8 @@
+function byId(id) {
+    return document.getElementById(id);
+}
 function setHTML(id, html) {
-    document.getElementById(id).innerHTML = html;
+    byId(id).innerHTML = html;
 }
 function maxChars(str, charsLen) {
     str = str || '';
@@ -37,46 +40,43 @@ function request(options) {
 ///<reference path="./request.ts"/>
 function showTransactions() {
     setHTML('main', renderTransactions());
-    var form = document.forms['transactions'];
-    form.month.value = getActualMonth();
-    for (var _i = 0, _a = ['month', 'date_start', 'date_end', 'text', 'cost_le', 'cost_ge']; _i < _a.length; _i++) {
-        var el = _a[_i];
-        form[el].oninput = getTransactions;
-    }
-    for (var _b = 0, _c = ['negative', 'positive']; _b < _c.length; _b++) {
-        var el = _c[_b];
-        form[el].onchange = getTransactions;
-    }
-    for (var _d = 0, _e = form.has_month; _d < _e.length; _d++) {
-        var el = _e[_d];
-        el.onchange = changeDateRange;
-    }
-    getTransactions();
+    view = new TransactionView();
 }
-function changeDateRange() {
-    var form = document.forms['transactions'];
-    console.log(this.value);
-    if (this.value == 'y') {
-        form.date_end.disabled = true;
-        form.date_start.disabled = true;
-        form.month.disabled = false;
-        document.getElementById('transaction-month').className = '';
-        document.getElementById('transaction-range').className = 'disabled';
+var TransactionView = (function () {
+    function TransactionView() {
+        this.form = document.forms['transactions'];
+        this.setupSearchForm();
+        this.getTransactions();
     }
-    else {
-        form.date_end.disabled = false;
-        form.date_start.disabled = false;
-        form.month.disabled = true;
-        document.getElementById('transaction-month').className = 'disabled';
-        document.getElementById('transaction-range').className = '';
-    }
-    getTransactions();
-}
-function getTransactions() {
-    setHTML('transactions', renderTableLoading());
-    request({ url: 'transactions', query_form: 'transactions' }).then(function (json) {
-        setHTML('transactions', renderTableTransactions(json));
-    });
-}
+    TransactionView.prototype.setupSearchForm = function () {
+        this.form['month'].value = getActualMonth();
+    };
+    TransactionView.prototype.changeDateRange = function (ev) {
+        var form = this.form;
+        if (ev.value == 'y') {
+            form['date_end'].disabled = true;
+            form['date_start'].disabled = true;
+            form['month'].disabled = false;
+            byId('transaction-month').className = '';
+            byId('transaction-range').className = 'disabled';
+        }
+        else {
+            form['date_end'].disabled = false;
+            form['date_start'].disabled = false;
+            form['month'].disabled = true;
+            byId('transaction-range').className = '';
+            byId('transaction-month').className = 'disabled';
+        }
+        this.getTransactions();
+    };
+    TransactionView.prototype.getTransactions = function () {
+        setHTML('transactions', renderTableLoading());
+        request({ url: 'transactions', query_form: 'transactions' }).then(function (json) {
+            setHTML('transactions', renderTableTransactions(json));
+        });
+    };
+    return TransactionView;
+}());
 ///<reference path="./transactions.ts"/>
+var view = null;
 showTransactions();

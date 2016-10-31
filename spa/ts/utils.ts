@@ -1,5 +1,9 @@
+function byId(id: string): HTMLElement {
+    return document.getElementById(id);
+}
+
 function setHTML(id: string, html: string) {
-    document.getElementById(id).innerHTML = html;
+   byId(id).innerHTML = html;
 }
 
 function maxChars(str: string, charsLen: number): string {

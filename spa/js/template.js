@@ -51,5 +51,48 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<h1>Przelewy</h1><form name=\"transactions\"><fieldset><legend>Data</legend><label>Miesiac</label><input type=\"radio\" name=\"has_month\" value=\"y\" checked=\"checked\"/><label>Zakres</label><input type=\"radio\" name=\"has_month\" value=\"n\"/><div id=\"transaction-month\"><input type=\"month\" name=\"month\"/></div><div id=\"transaction-range\" class=\"disabled\"><label>Od dnia</label><input type=\"date\" name=\"date_start\" disabled=\"disabled\"/><br/><label>Do dnia</label><input type=\"date\" name=\"date_end\" disabled=\"disabled\"/></div></fieldset><fieldset><legend>mniejszy od</legend><input type=\"number\" min=\"0\" step=\"0.01\" name=\"cost_le\"/></fieldset><fieldset><legend>większy od</legend><input type=\"number\" min=\"0\" step=\"0.01\" name=\"cost_ge\"/></fieldset><fieldset><legend>Szukaj</legend><input type=\"search\" name=\"text\"/></fieldset><fieldset><legend>Opcje</legend><input type=\"checkbox\" name=\"negative\" value=\"t\"/><span>Ujemne?</span><input type=\"checkbox\" name=\"positive\" value=\"t\"/><span>Dodatnie?</span></fieldset></form><table id=\"transactions\"></table>");;return buf.join("");
+jade_mixins["query_input"] = jade_interp = function(){
+var block = (this && this.block), attributes = (this && this.attributes) || {};
+buf.push("<input" + (jade.attrs(jade.merge([{"onchange": "view.getTransactions()"},attributes]), false)) + "/>");
+};
+jade_mixins["text_query_input"] = jade_interp = function(){
+var block = (this && this.block), attributes = (this && this.attributes) || {};
+buf.push("<input" + (jade.attrs(jade.merge([{"oninput": "view.getTransactions()"},attributes]), false)) + "/>");
+};
+buf.push("<h1>Przelewy</h1><form name=\"transactions\"><fieldset><legend>Data</legend><label>Miesiac</label><input type=\"radio\" name=\"has_month\" value=\"y\" checked=\"checked\" onchange=\"view.changeDateRange(this)\"/><label>Zakres</label><input type=\"radio\" name=\"has_month\" value=\"n\" onchange=\"view.changeDateRange(this)\"/><div id=\"transaction-month\">");
+jade_mixins["text_query_input"].call({
+attributes: {"type": "month","name": "month"}
+});
+buf.push("<br/></div><div id=\"transaction-range\" class=\"disabled\"><label>Od dnia</label>");
+jade_mixins["text_query_input"].call({
+block: function(){
+buf.push(" ");
+},
+attributes: {"type": "date","name": "date_start","disabled": true}
+});
+buf.push("<br/><label>Do dnia</label>");
+jade_mixins["text_query_input"].call({
+attributes: {"type": "date","name": "date_end","disabled": true}
+});
+buf.push("</div></fieldset><fieldset><legend>Mniejszy od</legend>");
+jade_mixins["text_query_input"].call({
+attributes: {"type": "number","min": "0","step": "0.01","name": "cost_le"}
+});
+buf.push("</fieldset><fieldset><legend>Większy od</legend>");
+jade_mixins["text_query_input"].call({
+attributes: {"type": "number","min": "0","step": "0.01","name": "cost_ge"}
+});
+buf.push("</fieldset><fieldset><legend>Szukaj</legend>");
+jade_mixins["text_query_input"].call({
+attributes: {"type": "search","name": "text"}
+});
+buf.push("</fieldset><fieldset><legend>Opcje</legend>");
+jade_mixins["query_input"].call({
+attributes: {"type": "checkbox","name": "negative","value": "t"}
+});
+buf.push("<label>Ujemne?</label>");
+jade_mixins["query_input"].call({
+attributes: {"type": "checkbox","name": "positive","value": "t"}
+});
+buf.push("<label>Dodatnie?</label></fieldset></form><div class=\"modal disabled\"><form name=\"select_type\"><input type=\"\"/></form></div><table id=\"transactions\"></table>");;return buf.join("");
 }
