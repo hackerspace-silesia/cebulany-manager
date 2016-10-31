@@ -1,4 +1,4 @@
-mixin transaction_row(row)
+mixin transaction_row(num, row)
     tr
         td= row.date
         td(title=row.name)= maxChars(row.name, 60)
@@ -7,7 +7,8 @@ mixin transaction_row(row)
             class=row.cost < 0 ? 'negative' : 'positive'
           )= row.cost + " zł"
         td(title=row.iban)= maxChars(row.iban && row.iban.replace(/ /g, ''), 5)
-        td: a.btn(onclick='addNewTypeTransaction') +
+        td
+            a.btn(onclick='view.addNewTypeTransaction(#{num})') +
 
 
 mixin foot_row(title, value)
@@ -25,8 +26,8 @@ thead: tr
     th IBAN
     th Typy 
 tbody
-    each row in transactions
-        +transaction_row(row)
+    each row, num in transactions
+        +transaction_row(num, row)
 tfoot
     +foot_row('SUMA', sum + ' zł')
     +foot_row('TOTAL', transactions.length)

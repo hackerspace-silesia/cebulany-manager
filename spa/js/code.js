@@ -44,6 +44,7 @@ function showTransactions() {
 }
 var TransactionView = (function () {
     function TransactionView() {
+        this.transactions = null;
         this.form = document.forms['transactions'];
         this.setupSearchForm();
         this.getTransactions();
@@ -70,10 +71,18 @@ var TransactionView = (function () {
         this.getTransactions();
     };
     TransactionView.prototype.getTransactions = function () {
+        var self = this;
         setHTML('transactions', renderTableLoading());
         request({ url: 'transactions', query_form: 'transactions' }).then(function (json) {
+            self.transactions = json.transactions;
             setHTML('transactions', renderTableTransactions(json));
         });
+    };
+    TransactionView.prototype.addNewTypeTransaction = function (id) {
+        var transaction = this.transactions[id];
+        byId('modal_add_type').className = 'modal';
+        setHTML('modal_add_type', renderModalAddNewTypeTransaction({
+            transaction: this.transactions[id] }));
     };
     return TransactionView;
 }());

@@ -1,0 +1,36 @@
+div.modal-content
+    form(name='select_type')
+        legend Typ przelewu:
+        input(type='radio', name='type', value='paid_month', checked)
+        label Składka
+        input(type='radio', name='type', value='bill')
+        label Rachunek
+        input(type='radio', name='type', value='donation')
+        label Dotacja
+
+    form(name='add_paid_month')
+        input(type='hidden', name='transaction_id', value=transaction.id)
+        fieldset
+            label Członek:
+            input(type='search', name='user', list='type_users', onchange='view.SeekUsers()')
+            datalist#type_users
+        fieldset
+            label Miesiąc:
+            input(type='month', name='date', value=transaction.date.slice(0, 7))
+        fieldset
+            label Kwota:
+            input(type='number', name='cost', min='0', value=transaction.cost)
+
+    form(name='add_bill').disabled
+        input(type='hidden', name='transaction_id', value=transaction.id)
+        fieldset
+            label Kwota:
+            input(type='number', name='cost', min='0', value=transaction.cost)
+
+    form(name='add_donation').disabled
+        input(type='hidden', name='transaction_id', value=transaction.id)
+        fieldset
+            label Kwota:
+            input(type='number', name='cost', min='0', value=transaction.cost)
+
+    button(type='button', onchange='view.AddType()') Dodaj

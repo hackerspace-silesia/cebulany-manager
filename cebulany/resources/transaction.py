@@ -24,6 +24,7 @@ transaction_parser.add_argument('ordering')
 
 resource_fields = {
     'transactions': fields.List(fields.Nested({
+        'id': fields.Integer(),
         'send_date': fields.DateTime(dt_format='iso8601'),
         'date': fields.DateTime(dt_format='iso8601'),
         'title': fields.String(),

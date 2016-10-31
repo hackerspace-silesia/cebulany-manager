@@ -62,17 +62,19 @@ class PaidMonth(BaseWithTransaction):
     __abstract__ = False
     member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
     date = db.Column(db.Date)
-    is_paid = db.Column(db.Boolean, default=False)
+    cost = db.Column(db.Numeric(precision=2))
 
     member = relationship(Member, backref='months')
+
 
 class Donation(BaseWithTransaction):
     __abstract__ = False
     name = db.Column(db.String(300))
+    cost = db.Column(db.Numeric(precision=2))
 
 
 class Bill(BaseWithTransaction):
     __abstract__ = False
     name = db.Column(db.String(300))
-    frequency_months = db.Column(db.Integer, default=1)
+    cost = db.Column(db.Numeric(precision=2))
 

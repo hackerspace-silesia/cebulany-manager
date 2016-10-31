@@ -7,8 +7,10 @@ function showTransactions() {
     view = new TransactionView();
 }
 
+
 class TransactionView {
     form: HTMLFormElement;
+    transactions: Map | null=null;
     constructor() {
         this.form = document.forms['transactions'];
         this.setupSearchForm();
@@ -38,11 +40,21 @@ class TransactionView {
     }
 
     getTransactions() {
+        var self = this;
         setHTML('transactions', renderTableLoading());
         request(
             {url: 'transactions', query_form: 'transactions'}
         ).then((json) => {
+            self.transactions = json.transactions;
             setHTML('transactions', renderTableTransactions(json));
         });
     }
+
+    addNewTypeTransaction(id: number) {
+        var transaction = this.transactions[id];
+        byId('modal_add_type').className = 'modal';
+        setHTML('modal_add_type', renderModalAddNewTypeTransaction({
+            transaction: this.transactions[id];
+        ));
+}
 }

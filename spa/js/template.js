@@ -1,3 +1,10 @@
+function renderModalAddNewTypeTransaction(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+;var locals_for_with = (locals || {});(function (transaction) {
+buf.push("<div class=\"modal-content\"><form name=\"select_type\"><legend>Typ przelewu:</legend><input type=\"radio\" name=\"type\" value=\"paid_month\" checked=\"checked\"/><label>Składka</label><input type=\"radio\" name=\"type\" value=\"bill\"/><label>Rachunek</label><input type=\"radio\" name=\"type\" value=\"donation\"/><label>Dotacja</label></form><form name=\"add_paid_month\"><input type=\"hidden\" name=\"transaction_id\"" + (jade.attr("value", transaction.id, true, false)) + "/><fieldset><label>Członek:</label><input type=\"search\" name=\"user\" list=\"type_users\" onchange=\"view.SeekUsers()\"/><datalist id=\"type_users\"></datalist></fieldset><fieldset><label>Miesiąc:</label><input type=\"month\" name=\"date\"" + (jade.attr("value", transaction.date.slice(0, 7), true, false)) + "/></fieldset><fieldset><label>Kwota:</label><input type=\"number\" name=\"cost\" min=\"0\"" + (jade.attr("value", transaction.cost, true, false)) + "/></fieldset></form><form name=\"add_bill\" class=\"disabled\"><input type=\"hidden\" name=\"transaction_id\"" + (jade.attr("value", transaction.id, true, false)) + "/><fieldset><label>Kwota:</label><input type=\"number\" name=\"cost\" min=\"0\"" + (jade.attr("value", transaction.cost, true, false)) + "/></fieldset></form><form name=\"add_donation\" class=\"disabled\"><input type=\"hidden\" name=\"transaction_id\"" + (jade.attr("value", transaction.id, true, false)) + "/><fieldset><label>Kwota:</label><input type=\"number\" name=\"cost\" min=\"0\"" + (jade.attr("value", transaction.cost, true, false)) + "/></fieldset></form><button type=\"button\" onchange=\"view.AddType()\">Dodaj</button></div>");}.call(this,"transaction" in locals_for_with?locals_for_with.transaction:typeof transaction!=="undefined"?transaction:undefined));;return buf.join("");
+}
 function renderTableLoading(locals) {
 var buf = [];
 var jade_mixins = {};
@@ -10,9 +17,9 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 ;var locals_for_with = (locals || {});(function (maxChars, sum, transactions, undefined) {
-jade_mixins["transaction_row"] = jade_interp = function(row){
+jade_mixins["transaction_row"] = jade_interp = function(num, row){
 var block = (this && this.block), attributes = (this && this.attributes) || {};
-buf.push("<tr><td>" + (jade.escape(null == (jade_interp = row.date) ? "" : jade_interp)) + "</td><td" + (jade.attr("title", row.name, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.name, 60)) ? "" : jade_interp)) + "</td><td" + (jade.attr("title", row.title, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.title, 60)) ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',row.cost < 0 ? 'negative' : 'positive'], [null,true])) + ">" + (jade.escape(null == (jade_interp = row.cost + " zł") ? "" : jade_interp)) + "</td><td" + (jade.attr("title", row.iban, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.iban && row.iban.replace(/ /g, ''), 5)) ? "" : jade_interp)) + "</td><td><a onclick=\"addNewTypeTransaction\" class=\"btn\">+</a></td></tr>");
+buf.push("<tr><td>" + (jade.escape(null == (jade_interp = row.date) ? "" : jade_interp)) + "</td><td" + (jade.attr("title", row.name, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.name, 60)) ? "" : jade_interp)) + "</td><td" + (jade.attr("title", row.title, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.title, 60)) ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',row.cost < 0 ? 'negative' : 'positive'], [null,true])) + ">" + (jade.escape(null == (jade_interp = row.cost + " zł") ? "" : jade_interp)) + "</td><td" + (jade.attr("title", row.iban, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.iban && row.iban.replace(/ /g, ''), 5)) ? "" : jade_interp)) + "</td><td><a" + (jade.attr("onclick", 'view.addNewTypeTransaction(' + (num) + ')', true, false)) + " class=\"btn\">+</a></td></tr>");
 };
 jade_mixins["foot_row"] = jade_interp = function(title, value){
 var block = (this && this.block), attributes = (this && this.attributes) || {};
@@ -24,18 +31,18 @@ buf.push("<thead><tr><th>Data</th><th>Nazwa</th><th>Tytuł</th><th>Kwota</th><th
   var $$obj = transactions;
   if ('number' == typeof $$obj.length) {
 
-    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
-      var row = $$obj[$index];
+    for (var num = 0, $$l = $$obj.length; num < $$l; num++) {
+      var row = $$obj[num];
 
-jade_mixins["transaction_row"](row);
+jade_mixins["transaction_row"](num, row);
     }
 
   } else {
     var $$l = 0;
-    for (var $index in $$obj) {
-      $$l++;      var row = $$obj[$index];
+    for (var num in $$obj) {
+      $$l++;      var row = $$obj[num];
 
-jade_mixins["transaction_row"](row);
+jade_mixins["transaction_row"](num, row);
     }
 
   }
@@ -94,5 +101,5 @@ buf.push("<label>Ujemne?</label>");
 jade_mixins["query_input"].call({
 attributes: {"type": "checkbox","name": "positive","value": "t"}
 });
-buf.push("<label>Dodatnie?</label></fieldset></form><div class=\"modal disabled\"><form name=\"select_type\"><input type=\"\"/></form></div><table id=\"transactions\"></table>");;return buf.join("");
+buf.push("<label>Dodatnie?</label></fieldset></form><div id=\"modal_add_type\" class=\"modal disabled\"></div><table id=\"transactions\"></table>");;return buf.join("");
 }
