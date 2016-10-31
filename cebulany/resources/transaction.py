@@ -2,6 +2,7 @@ from flask_restful import Resource, fields, marshal_with
 from flask_restful.reqparse import RequestParser
 from sqlalchemy import or_, func as sql_func
 from datetime import datetime
+from decimal import Decimal
 
 from cebulany import models
 from cebulany.models import db
@@ -16,8 +17,8 @@ transaction_parser.add_argument('month')
 transaction_parser.add_argument('text')
 transaction_parser.add_argument('negative')
 transaction_parser.add_argument('positive')
-transaction_parser.add_argument('cost_le', type=int)
-transaction_parser.add_argument('cost_ge', type=int)
+transaction_parser.add_argument('cost_le', type=Decimal)
+transaction_parser.add_argument('cost_ge', type=Decimal)
 transaction_parser.add_argument('ordering')
 
 
@@ -51,7 +52,7 @@ class TransactionResource(Resource):
     @staticmethod
     def filtering_query(query, args):
         model = models.Transaction
-        if args['date_start'] and arg['date_end']:
+        if args['date_start'] and args['date_end']:
             query = query.filter(model.date >= args['date_start'])
             query = query.filter(model.date <= args['date_end'])
         else:

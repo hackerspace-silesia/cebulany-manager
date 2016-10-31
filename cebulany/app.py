@@ -9,7 +9,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 api = Api(app)
 db.init_app(app)
 
-api.add_resource(TransactionResource, '/transactions')
+api.add_resource(TransactionResource, '/api/transactions')
 
 if __name__ == "__main__":
     with app.app_context():
