@@ -3,7 +3,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<tr><td class=\"loading\"><strong>Loading…</strong></td></tr>");;return buf.join("");
+buf.push("<tr><td class=\"loading\"><img src=\"img/firemark.png\"/><br/><strong>Loading…</strong></td></tr>");;return buf.join("");
 }
 function renderTableTransactions(locals) {
 var buf = [];

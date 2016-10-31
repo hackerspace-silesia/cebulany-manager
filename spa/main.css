@@ -60,11 +60,16 @@ td, th {
     border: 1px solid #808080;
 }
 
+@keyframes spin { 100% {transform:rotate(360deg);} }
+
 td.loading {
     width: 100%;
     height: 200px;
     font-size: 14pt;
     text-align: center;
+}
+td.loading img {
+    animation: spin 4s linear infinite;
 }
 
 .negative {
