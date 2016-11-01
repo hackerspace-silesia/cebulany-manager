@@ -43,6 +43,7 @@ resource_fields = {
         'iban': fields.String(),
         'donations': fields.List(simple_fields),
         'bills': fields.List(simple_fields),
+        'others': fields.List(simple_fields),
         'paidmonths': fields.List(paid_month_fields),
     })),
     'sum': fields.Price(decimals=2),

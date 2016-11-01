@@ -68,3 +68,8 @@ class Bill(BaseWithTransaction):
     name = db.Column(db.String(300))
     cost = db.Column(db.Numeric(precision=2))
 
+
+class Other(BaseWithTransaction):
+    __abstract__ = False
+    name = db.Column(db.String(300))
+    cost = db.Column(db.Numeric(precision=2))

@@ -5,6 +5,7 @@ from cebulany.models import db
 from cebulany.resources.transaction import TransactionResource
 from cebulany.resources.bill import BillResource
 from cebulany.resources.donation import DonationResource
+from cebulany.resources.other import OtherResource 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -14,6 +15,7 @@ db.init_app(app)
 api.add_resource(TransactionResource, '/api/transactions')
 api.add_resource(BillResource, '/api/bill')
 api.add_resource(DonationResource, '/api/donation')
+api.add_resource(OtherResource, '/api/other')
 
 @app.route('/')
 def index():

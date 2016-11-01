@@ -79,6 +79,10 @@ td, th {
     background: #29AB87;
 }
 
+.type_other {
+    background: #606060;
+}
+
 @keyframes spin { 100% {transform:rotate(360deg);} }
 
 td.loading {

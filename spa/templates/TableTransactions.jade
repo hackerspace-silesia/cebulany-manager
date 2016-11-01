@@ -14,6 +14,8 @@ mixin transaction_row(num, row)
                 span.badge.type_bill(title='#{bill.name}\n#{bill.cost} zł') R
             each paid in row.paidmonths
                 span.badge.type_paid_month(title='#{paid.name}\n#{paid.cost} zł') S
+            each other in row.others
+                span.badge.type_other(title='#{other.name}\n#{other.cost} zł') O
             a.right.btn(onclick='view.addNewTypeTransaction(#{num})') +
 
 

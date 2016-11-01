@@ -1,3 +1,13 @@
+mixin default_form(name)
+    form(name=name).disabled.form
+        input(type='hidden', name='transaction_id', value=transaction.id)
+        fieldset
+            legend Kwota
+            input(type='number', name='cost', min='0', value=transaction.cost)
+        fieldset
+            legend Nazwa
+            input(type='text', name='name', min='0', value=transaction.title)
+
 div.modal-content
     table.summary
         tr
@@ -21,6 +31,8 @@ div.modal-content
         label Rachunek
         input(type='radio', name='type', value='donation', onchange='view.changeModalForm()')
         label Darowizna
+        input(type='radio', name='type', value='other', onchange='view.changeModalForm()')
+        label Inne
 
     form(name='add_type_paid_month').form
         input(type='hidden', name='transaction_id', value=transaction.id)
@@ -35,23 +47,10 @@ div.modal-content
             legend Kwota
             input(type='number', name='cost', min='0', value=transaction.cost)
 
-    form(name='add_type_bill').disabled.form
-        input(type='hidden', name='transaction_id', value=transaction.id)
-        fieldset
-            legend Kwota
-            input(type='number', name='cost', min='0', value=transaction.cost)
-        fieldset
-            legend Nazwa
-            input(type='text', name='name', min='0', value=transaction.title)
-
-    form(name='add_type_donation').disabled.form
-        input(type='hidden', name='transaction_id', value=transaction.id)
-        fieldset
-            legend Kwota
-            input(type='number', name='cost', min='0', value=transaction.cost)
-        fieldset
-            legend Nazwa
-            input(type='text', name='name', min='0', value=transaction.title)
+    +default_form('add_type_bill')
+    +default_form('add_type_donation')
+    +default_form('add_type_other')
 
     button(type='button', onclick='view.addType()') Dodaj
     button(type='button', onclick='view.closeModal()') Zamknij
+
