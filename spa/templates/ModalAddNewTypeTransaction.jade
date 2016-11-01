@@ -1,36 +1,57 @@
 div.modal-content
+    table.summary
+        tr
+            th Data
+            td= transaction.date
+        tr
+            th Nazwa
+            td= transaction.name
+        tr
+            th Tytuł
+            td= transaction.title
+        tr
+            th IBAN
+            td= transaction.iban
+
     form(name='select_type')
         legend Typ przelewu:
-        input(type='radio', name='type', value='paid_month', checked)
+        input(type='radio', name='type', value='paid_month', checked, onchange='view.changeModalForm()')
         label Składka
-        input(type='radio', name='type', value='bill')
+        input(type='radio', name='type', value='bill', onchange='view.changeModalForm()')
         label Rachunek
-        input(type='radio', name='type', value='donation')
-        label Dotacja
+        input(type='radio', name='type', value='donation', onchange='view.changeModalForm()')
+        label Darowizna
 
-    form(name='add_paid_month')
+    form(name='add_type_paid_month').form
         input(type='hidden', name='transaction_id', value=transaction.id)
         fieldset
-            label Członek:
-            input(type='search', name='user', list='type_users', onchange='view.SeekUsers()')
+            legend Członek
+            input(type='search', name='user', list='type_users', onchange='view.seekUsers()')
             datalist#type_users
         fieldset
-            label Miesiąc:
+            legend Miesiąc
             input(type='month', name='date', value=transaction.date.slice(0, 7))
         fieldset
-            label Kwota:
+            legend Kwota
             input(type='number', name='cost', min='0', value=transaction.cost)
 
-    form(name='add_bill').disabled
+    form(name='add_type_bill').disabled.form
         input(type='hidden', name='transaction_id', value=transaction.id)
         fieldset
-            label Kwota:
+            legend Kwota
             input(type='number', name='cost', min='0', value=transaction.cost)
+        fieldset
+            legend Nazwa
+            input(type='text', name='name', min='0', value=transaction.title)
 
-    form(name='add_donation').disabled
+    form(name='add_type_donation').disabled.form
         input(type='hidden', name='transaction_id', value=transaction.id)
         fieldset
-            label Kwota:
+            legend Kwota
             input(type='number', name='cost', min='0', value=transaction.cost)
+        fieldset
+            legend Nazwa
+            input(type='text', name='name', min='0', value=transaction.title)
 
-    button(type='button', onchange='view.AddType()') Dodaj
+    button(type='button', onclick='view.addType()') Dodaj
+    button(type='button', onclick='view.closeModal()') Zamknij

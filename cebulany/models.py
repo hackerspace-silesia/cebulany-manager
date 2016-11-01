@@ -17,23 +17,13 @@ class Base(db.Model):
 
 class BaseWithTransaction(Base):
     __abstract__ = True
-
     @declared_attr
-    def transactions(cls):
-        name = cls.__tablename__
-        relationship(
-            Transaction,
-            secondary=cls.create_m2m_table(),
-            backref='%ss' % name, 
-        )
-
-    @classmethod
-    def create_m2m_table(cls):
-        name = cls.__tablename__
-        return Table('transaction_%s' % name, Base.metadata,
-            db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id')),
-            db.Column('%s_id' % name, db.Integer, db.ForeignKey('%s.id' % name)),
-        )
+    def transaction_id(cls):
+        return db.Column(db.Integer, db.ForeignKey('transaction.id'))
+    
+    @declared_attr
+    def transaction(cls):
+        return relationship('Transaction', backref='%ss' % cls.__tablename__)
 
 
 class Transaction(Base):

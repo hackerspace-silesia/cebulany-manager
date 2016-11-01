@@ -21,18 +21,35 @@ function request(options) {
     // ten jezyk nie ma przyszlosci
     var url = new URL(options.url, BASE_URL);
     var method = options.method || 'get';
-    var query_params;
+    var query_params = options.query_params;
     var query_form = options.query_form;
+    var data_form = options.data_form;
+    var data = options.data;
     if (query_form !== undefined) {
         query_params = new FormData(document.forms[query_form]);
     }
-    query_params.forEach(function (value, key) {
-        if (value !== '' && value !== undefined) {
-            url.searchParams.append(key, value);
-        }
-    });
+    if (data_form !== undefined) {
+        var form_data = new FormData(document.forms[data_form]);
+        data = {};
+        form_data.forEach(function (value, key) {
+            data[key] = value;
+        });
+    }
+    if (query_params !== undefined) {
+        query_params.forEach(function (value, key) {
+            if (value !== '' && value !== undefined) {
+                url.searchParams.append(key, value);
+            }
+        });
+    }
+    var headers = new Headers();
+    if (method == 'POST' || method == 'PUT') {
+        headers.set('Content-Type', 'application/json');
+    }
     return fetch(url, {
-        method: method
+        method: method,
+        body: data && JSON.stringify(data),
+        headers: headers
     }).then(function (response) { return response.json(); });
 }
 ///<reference path="./templates.d.ts"/>
@@ -82,7 +99,35 @@ var TransactionView = (function () {
         var transaction = this.transactions[id];
         byId('modal_add_type').className = 'modal';
         setHTML('modal_add_type', renderModalAddNewTypeTransaction({
-            transaction: this.transactions[id] }));
+            transaction: this.transactions[id]
+        }));
+        this.changeModalForm();
+    };
+    TransactionView.prototype.changeModalForm = function () {
+        var action = document.forms['select_type']['type'].value;
+        action = 'add_type_' + action;
+        var forms = document.querySelectorAll('#modal_add_type .form');
+        forms.forEach(function (form) {
+            if (form.attributes.name.value !== action) {
+                form.className = 'disabled form';
+            }
+            else {
+                form.className = 'form';
+            }
+        });
+    };
+    TransactionView.prototype.addType = function () {
+        var self = this;
+        var action = document.forms['select_type']['type'].value;
+        request({
+            url: action,
+            method: 'POST',
+            data_form: 'add_type_' + action
+        }).then(function (json) { self.closeModal(); });
+    };
+    TransactionView.prototype.closeModal = function () {
+        setHTML('modal_add_type', '');
+        byId('modal_add_type').className = 'modal disabled';
     };
     return TransactionView;
 }());

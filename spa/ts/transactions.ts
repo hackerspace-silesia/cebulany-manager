@@ -10,7 +10,7 @@ function showTransactions() {
 
 class TransactionView {
     form: HTMLFormElement;
-    transactions: Map | null=null;
+    transactions: any | null=null;
     constructor() {
         this.form = document.forms['transactions'];
         this.setupSearchForm();
@@ -54,7 +54,37 @@ class TransactionView {
         var transaction = this.transactions[id];
         byId('modal_add_type').className = 'modal';
         setHTML('modal_add_type', renderModalAddNewTypeTransaction({
-            transaction: this.transactions[id];
-        ));
-}
+            transaction: this.transactions[id]
+        }));
+        this.changeModalForm();
+    }
+
+    changeModalForm() {
+        var action = document.forms['select_type']['type'].value;
+        action = 'add_type_' + action;
+        var forms = document.querySelectorAll('#modal_add_type .form');
+        forms.forEach((form) => {
+            if (form.attributes.name.value !== action) {
+                form.className = 'disabled form';
+            } else {
+                form.className = 'form';
+            }
+        });
+    }
+
+    addType() {
+        var self = this;
+        var action = document.forms['select_type']['type'].value;
+        request({
+            url: action,
+            method: 'POST',
+            data_form: 'add_type_' + action
+        }).then((json) => {self.closeModal()});
+    }
+
+    closeModal() {
+        setHTML('modal_add_type', '');
+        byId('modal_add_type').className = 'modal disabled';
+    }
+
 }
