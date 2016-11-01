@@ -16,7 +16,7 @@ setup(
     author='Firemark',
     author_email='marpiechula@gmail.com',
     url='https://github.com/hackerspace-silesia/cebulany-manager',
-    packages=find_packages('cebulany'),
+    packages=find_packages(),
     install_requires=requires,
     tests_require=requires,
 )
