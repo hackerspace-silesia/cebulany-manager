@@ -122,7 +122,7 @@ jade_mixins["foot_row"] = jade_interp = function(title, value){
 var block = (this && this.block), attributes = (this && this.attributes) || {};
 buf.push("<tr><th>" + (jade.escape(null == (jade_interp = title) ? "" : jade_interp)) + "</th><th colspan=\"2\"></th><th class=\"price\"><strong>" + (jade.escape(null == (jade_interp = value) ? "" : jade_interp)) + "</strong></th><th></th></tr>");
 };
-buf.push("<thead><tr><th width=\"8%\">Data</th><th width=\"38%\">Nazwa</th><th width=\"40%\">Tytuł</th><th width=\"5%\">Kwota</th><th width=\"5%\">Typy </th></tr></thead><tbody>");
+buf.push("<thead><tr><th width=\"7%\">Data</th><th width=\"38%\">Nazwa</th><th width=\"40%\">Tytuł</th><th width=\"6%\">Kwota</th><th width=\"5%\">Typy </th></tr></thead><tbody>");
 // iterate transactions
 ;(function(){
   var $$obj = transactions;
