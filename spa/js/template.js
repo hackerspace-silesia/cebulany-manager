@@ -19,13 +19,80 @@ var jade_interp;
 ;var locals_for_with = (locals || {});(function (maxChars, sum, transactions, undefined) {
 jade_mixins["transaction_row"] = jade_interp = function(num, row){
 var block = (this && this.block), attributes = (this && this.attributes) || {};
-buf.push("<tr><td>" + (jade.escape(null == (jade_interp = row.date) ? "" : jade_interp)) + "</td><td" + (jade.attr("title", row.name, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.name, 60)) ? "" : jade_interp)) + "</td><td" + (jade.attr("title", row.title, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.title, 60)) ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',row.cost < 0 ? 'negative' : 'positive'], [null,true])) + ">" + (jade.escape(null == (jade_interp = row.cost + " zł") ? "" : jade_interp)) + "</td><td" + (jade.attr("title", row.iban, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.iban && row.iban.replace(/ /g, ''), 5)) ? "" : jade_interp)) + "</td><td><a" + (jade.attr("onclick", 'view.addNewTypeTransaction(' + (num) + ')', true, false)) + " class=\"btn\">+</a></td></tr>");
+buf.push("<tr><th>" + (jade.escape(null == (jade_interp = row.date) ? "" : jade_interp)) + "</th><td" + (jade.attr("title", row.name, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.name, 60)) ? "" : jade_interp)) + "</td><td" + (jade.attr("title", row.title, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.title, 60)) ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',row.cost < 0 ? 'negative' : 'positive'], [null,true])) + ">" + (jade.escape(null == (jade_interp = row.cost + " zł") ? "" : jade_interp)) + "</td><!--td(title=row.iban)= maxChars(row.iban && row.iban.replace(/ /g, ''), 5)--><td>");
+// iterate row.donations
+;(function(){
+  var $$obj = row.donations;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var donat = $$obj[$index];
+
+buf.push("<span" + (jade.attr("title", '' + (donat.name) + '\n' + (donat.cost) + ' zł', true, false)) + " class=\"badge type_donation\">D</span>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var donat = $$obj[$index];
+
+buf.push("<span" + (jade.attr("title", '' + (donat.name) + '\n' + (donat.cost) + ' zł', true, false)) + " class=\"badge type_donation\">D</span>");
+    }
+
+  }
+}).call(this);
+
+// iterate row.bills
+;(function(){
+  var $$obj = row.bills;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var bill = $$obj[$index];
+
+buf.push("<span" + (jade.attr("title", '' + (bill.name) + '\n' + (bill.cost) + ' zł', true, false)) + " class=\"badge type_bill\">R</span>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var bill = $$obj[$index];
+
+buf.push("<span" + (jade.attr("title", '' + (bill.name) + '\n' + (bill.cost) + ' zł', true, false)) + " class=\"badge type_bill\">R</span>");
+    }
+
+  }
+}).call(this);
+
+// iterate row.paidmonths
+;(function(){
+  var $$obj = row.paidmonths;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var paid = $$obj[$index];
+
+buf.push("<span" + (jade.attr("title", '' + (paid.name) + '\n' + (paid.cost) + ' zł', true, false)) + " class=\"badge type_paid_month\">S</span>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var paid = $$obj[$index];
+
+buf.push("<span" + (jade.attr("title", '' + (paid.name) + '\n' + (paid.cost) + ' zł', true, false)) + " class=\"badge type_paid_month\">S</span>");
+    }
+
+  }
+}).call(this);
+
+buf.push("<a" + (jade.attr("onclick", 'view.addNewTypeTransaction(' + (num) + ')', true, false)) + " class=\"right btn\">+</a></td></tr>");
 };
 jade_mixins["foot_row"] = jade_interp = function(title, value){
 var block = (this && this.block), attributes = (this && this.attributes) || {};
-buf.push("<tr><th>" + (jade.escape(null == (jade_interp = title) ? "" : jade_interp)) + "</th><th colspan=\"2\"></th><th class=\"price\"><strong>" + (jade.escape(null == (jade_interp = value) ? "" : jade_interp)) + "</strong></th><th colspan=\"2\"></th></tr>");
+buf.push("<tr><th>" + (jade.escape(null == (jade_interp = title) ? "" : jade_interp)) + "</th><th colspan=\"2\"></th><th class=\"price\"><strong>" + (jade.escape(null == (jade_interp = value) ? "" : jade_interp)) + "</strong></th><th></th></tr>");
 };
-buf.push("<thead><tr><th>Data</th><th>Nazwa</th><th>Tytuł</th><th>Kwota</th><th>IBAN</th><th>Typy </th></tr></thead><tbody>");
+buf.push("<thead><tr><th width=\"8%\">Data</th><th width=\"38%\">Nazwa</th><th width=\"40%\">Tytuł</th><th width=\"5%\">Kwota</th><th width=\"5%\">Typy </th></tr></thead><tbody>");
 // iterate transactions
 ;(function(){
   var $$obj = transactions;
@@ -101,5 +168,5 @@ buf.push("<label>Ujemne?</label>");
 jade_mixins["query_input"].call({
 attributes: {"type": "checkbox","name": "positive","value": "t"}
 });
-buf.push("<label>Dodatnie?</label></fieldset></form><div id=\"modal_add_type\" class=\"modal disabled\"></div><table id=\"transactions\"></table>");;return buf.join("");
+buf.push("<label>Dodatnie?</label></fieldset></form><div class=\"legend\"><strong>Legenda: &nbsp;</strong><span class=\"badge type_donation\">D</span><span>&nbsp; Darowizna &nbsp;</span><span class=\"badge type_bill\">R</span><span>&nbsp; Rachunek &nbsp;</span><span class=\"badge type_paid_month\">S</span><span>&nbsp; Składka &nbsp;</span></div><div id=\"modal_add_type\" class=\"modal disabled\"></div><table id=\"transactions\"></table>");;return buf.join("");
 }

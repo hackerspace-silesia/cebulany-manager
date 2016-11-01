@@ -79,7 +79,10 @@ class TransactionView {
             url: action,
             method: 'POST',
             data_form: 'add_type_' + action
-        }).then((json) => {self.closeModal()});
+        }).then((json) => {
+            self.closeModal()
+            self.getTransactions();
+        });
     }
 
     closeModal() {

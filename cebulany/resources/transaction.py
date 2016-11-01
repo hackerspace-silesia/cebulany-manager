@@ -9,7 +9,6 @@ from cebulany.models import db
 
 dt_type = lambda val: datetime.strptime(val, '%Y-%m-%d')
 
-
 transaction_parser = RequestParser()
 transaction_parser.add_argument('date_start', type=dt_type)
 transaction_parser.add_argument('date_end', type=dt_type)
@@ -21,6 +20,16 @@ transaction_parser.add_argument('cost_le', type=Decimal)
 transaction_parser.add_argument('cost_ge', type=Decimal)
 transaction_parser.add_argument('ordering')
 
+simple_fields = fields.Nested({
+    'name': fields.String(),
+    'cost': fields.Price(decimals=2),
+})
+
+paid_month_fields = fields.Nested({
+    'member': fields.String(),
+    'date': fields.DateTime(dt_format='iso8601'),
+    'cost': fields.Price(decimals=2),
+})
 
 resource_fields = {
     'transactions': fields.List(fields.Nested({
@@ -32,6 +41,9 @@ resource_fields = {
         'address': fields.String(),
         'cost': fields.Price(decimals=2),
         'iban': fields.String(),
+        'donations': fields.List(simple_fields),
+        'bills': fields.List(simple_fields),
+        'paidmonths': fields.List(paid_month_fields),
     })),
     'sum': fields.Price(decimals=2),
 }

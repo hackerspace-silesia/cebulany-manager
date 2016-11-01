@@ -123,7 +123,10 @@ var TransactionView = (function () {
             url: action,
             method: 'POST',
             data_form: 'add_type_' + action
-        }).then(function (json) { self.closeModal(); });
+        }).then(function (json) {
+            self.closeModal();
+            self.getTransactions();
+        });
     };
     TransactionView.prototype.closeModal = function () {
         setHTML('modal_add_type', '');
