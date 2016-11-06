@@ -12,6 +12,7 @@ member_parser.add_argument('is_active', type=bool)
 
 query_parser = RequestParser()
 query_parser.add_argument('q')
+query_parser.add_argument('limit', type=int)
 
 
 member_fields = {
@@ -26,16 +27,19 @@ class MemberListResource(Resource):
 
     @marshal_with(member_fields)
     def get(self):
-        args = query_parser.parse_args()
+        parse_args = query_parser.parse_args()
         query = Member.query.order_by(Member.name)
-        query_arg = args['q']
+        query_arg = parse_args['q']
+        limit_arg = parse_args['limit']
         if query_arg:
             args = query_arg.split()
             query = query.filter(*[
                 Member.name.ilike('%%%s%%' % arg.replace('%',r'\%'))
                 for arg in args
             ])
-        return query.limit(5).all()
+        if limit_arg is not None:
+            query = query.limit(limit_arg)
+        return query.all()
 
     @marshal_with(member_fields)
     def post(self):

@@ -25,7 +25,7 @@ class ModelResource(Resource):
         return marshal(self.cls.query.all(), self.resource_fields)
 
     def post(self):
-        bill = self.cls(**parser.parse_args())
+        bill = self.cls(**self.parser.parse_args())
         db.session.add(bill)
         db.session.commit()
         return marshal(bill, self.resource_fields), 201

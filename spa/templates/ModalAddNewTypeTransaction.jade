@@ -36,7 +36,7 @@ div.modal-content
 
     form(name='add_type_paid_month').form
         input(type='hidden', name='transaction_id', value=transaction.id)
-        input(type='hidden', name='user_id')
+        input(type='hidden', name='member_id')
         fieldset
             legend Członek
             input(type='search', name='user_search', oninput='view.seekUsers(this)')

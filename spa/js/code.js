@@ -15,18 +15,22 @@ function getActualMonth() {
     var today = new Date();
     return today.getFullYear() + '-' + (today.getMonth() + 1);
 }
-var BASE_URL = new URL('http://localhost:5000/api/');
+var BASE_URL = '/api/';
 function request(options) {
     // nie chcesz frameworka w js? napisz go kurwa sam ._.
     // ten jezyk nie ma przyszlosci
-    var url = new URL(options.url, BASE_URL);
+    var url = BASE_URL + options.url;
     var method = options.method || 'get';
     var query_params = options.query_params;
     var query_form = options.query_form;
     var data_form = options.data_form;
     var data = options.data;
     if (query_form !== undefined) {
-        query_params = new FormData(document.forms[query_form]);
+        query_data = new FormData(document.forms[query_form]);
+        query_params = {};
+        query_data.forEach(function (value, key) {
+            query_params[key] = value;
+        });
     }
     if (data_form !== undefined) {
         var form_data = new FormData(document.forms[data_form]);
@@ -36,10 +40,12 @@ function request(options) {
         });
     }
     if (query_params !== undefined) {
-        query_params.forEach(function (value, key) {
-            if (value !== '' && value !== undefined) {
-                url.searchParams.append(key, value);
-            }
+        Object.keys(query_params).forEach(function (key, index) {
+            var value = query_params[key];
+            if (value === '' || value === undefined)
+                return;
+            var delimiter = index == 0 ? '?' : '&';
+            url += "" + delimiter + escape(key) + "=" + escape(value);
         });
     }
     var headers = new Headers();
@@ -134,8 +140,10 @@ var TransactionView = (function () {
     };
     TransactionView.prototype.seekUsers = function (ev) {
         ev.className = '';
+        document.forms['add_type_paid_month']['member_id'].value = '';
         request({
-            url: 'members?q=' + ev.value
+            url: 'members',
+            query_params: { q: ev.value, limit: 5 }
         }).then(function (json) {
             setHTML('type_users', renderDataListUsers({
                 users: json,
@@ -145,7 +153,7 @@ var TransactionView = (function () {
     };
     TransactionView.prototype.setUserInModal = function (ev) {
         var form = document.forms['add_type_paid_month'];
-        form['user_id'].value = ev.dataset.id;
+        form['member_id'].value = ev.dataset.id;
         form['user_search'].value = ev.textContent;
         form['user_search'].className = 'good-input';
         setHTML('type_users', '');

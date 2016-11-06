@@ -6,8 +6,7 @@ from decimal import Decimal
 
 from cebulany import models
 from cebulany.models import db
-
-dt_type = lambda val: datetime.strptime(val, '%Y-%m-%d')
+from cebulany.resources.types import dt_type
 
 transaction_parser = RequestParser()
 transaction_parser.add_argument('date_start', type=dt_type)
@@ -19,6 +18,7 @@ transaction_parser.add_argument('positive')
 transaction_parser.add_argument('cost_le', type=Decimal)
 transaction_parser.add_argument('cost_ge', type=Decimal)
 transaction_parser.add_argument('ordering')
+
 
 simple_fields = fields.Nested({
     'name': fields.String(),

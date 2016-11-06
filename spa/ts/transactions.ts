@@ -92,8 +92,10 @@ class TransactionView {
 
     seekUsers(ev) {
         ev.className = '';
+        document.forms['add_type_paid_month']['member_id'].value = '';
         request({
-            url: 'members?q=' + ev.value
+            url: 'members',
+            query_params: {q: ev.value, limit: 5}
         }).then((json) => {
             setHTML('type_users', renderDataListUsers({
                 users: json,
@@ -103,8 +105,8 @@ class TransactionView {
     }
 
     setUserInModal(ev) {
-        var form = document.forms['add_type_paid_month']
-        form['user_id'].value = ev.dataset.id;
+        var form = document.forms['add_type_paid_month'];
+        form['member_id'].value = ev.dataset.id;
         form['user_search'].value = ev.textContent;
         form['user_search'].className = 'good-input';
         setHTML('type_users', '');
