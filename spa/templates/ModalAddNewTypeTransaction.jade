@@ -36,10 +36,11 @@ div.modal-content
 
     form(name='add_type_paid_month').form
         input(type='hidden', name='transaction_id', value=transaction.id)
+        input(type='hidden', name='user_id')
         fieldset
             legend Członek
-            input(type='search', name='user', list='type_users', onchange='view.seekUsers()')
-            datalist#type_users
+            input(type='search', name='user_search', oninput='view.seekUsers(this)')
+            ul.data-list#type_users
         fieldset
             legend Miesiąc
             input(type='month', name='date', value=transaction.date.slice(0, 7))

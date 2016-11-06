@@ -116,6 +116,40 @@ td.loading img {
     text-align: right;
 }
 
+.clear {
+    clear: both;
+    width: 100%;
+}
+
+input.good-input {
+    background-color: #93DFB8;
+}
+
+ul.data-list {
+    display: block;
+    z-index: 2;
+    position: fixed;
+    width: 400px;
+}
+
+ul.data-list li {
+    display: block;
+    background-color: #ccc;
+    border: 1px solid #ddd;
+	border-radius: 5px;
+    font-size: 9pt;
+    padding: 1px;
+}
+
+ul.data-list li:hover {
+    background-color: #dfdfdf;
+}
+
+.data-list .not-active {
+    color: red;
+    float: right;
+}
+
 .modal {
     position: fixed;
     z-index: 1;

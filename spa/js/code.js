@@ -132,6 +132,24 @@ var TransactionView = (function () {
         setHTML('modal_add_type', '');
         byId('modal_add_type').className = 'modal disabled';
     };
+    TransactionView.prototype.seekUsers = function (ev) {
+        ev.className = '';
+        request({
+            url: 'members?q=' + ev.value
+        }).then(function (json) {
+            setHTML('type_users', renderDataListUsers({
+                users: json,
+                func: 'view.setUserInModal(this)'
+            }));
+        });
+    };
+    TransactionView.prototype.setUserInModal = function (ev) {
+        var form = document.forms['add_type_paid_month'];
+        form['user_id'].value = ev.dataset.id;
+        form['user_search'].value = ev.textContent;
+        form['user_search'].className = 'good-input';
+        setHTML('type_users', '');
+    };
     return TransactionView;
 }());
 ///<reference path="./transactions.ts"/>

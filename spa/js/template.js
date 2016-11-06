@@ -1,3 +1,41 @@
+function renderDataListUsers(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+;var locals_for_with = (locals || {});(function (func, undefined, users) {
+// iterate users
+;(function(){
+  var $$obj = users;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var user = $$obj[$index];
+
+buf.push("<li" + (jade.attr("data-id", user.id, true, false)) + (jade.attr("onclick", func, true, false)) + ">" + (jade.escape(null == (jade_interp = user.name) ? "" : jade_interp)));
+if ( !user.is_active)
+{
+buf.push("<span class=\"not-active\">(NIE AKTYWNY)</span>");
+}
+buf.push("</li>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var user = $$obj[$index];
+
+buf.push("<li" + (jade.attr("data-id", user.id, true, false)) + (jade.attr("onclick", func, true, false)) + ">" + (jade.escape(null == (jade_interp = user.name) ? "" : jade_interp)));
+if ( !user.is_active)
+{
+buf.push("<span class=\"not-active\">(NIE AKTYWNY)</span>");
+}
+buf.push("</li>");
+    }
+
+  }
+}).call(this);
+}.call(this,"func" in locals_for_with?locals_for_with.func:typeof func!=="undefined"?func:undefined,"undefined" in locals_for_with?locals_for_with.undefined:typeof undefined!=="undefined"?undefined:undefined,"users" in locals_for_with?locals_for_with.users:typeof users!=="undefined"?users:undefined));;return buf.join("");
+}
 function renderModalAddNewTypeTransaction(locals) {
 var buf = [];
 var jade_mixins = {};
@@ -7,7 +45,7 @@ jade_mixins["default_form"] = jade_interp = function(name){
 var block = (this && this.block), attributes = (this && this.attributes) || {};
 buf.push("<form" + (jade.attr("name", name, true, false)) + " class=\"disabled form\"><input type=\"hidden\" name=\"transaction_id\"" + (jade.attr("value", transaction.id, true, false)) + "/><fieldset><legend>Kwota</legend><input type=\"number\" name=\"cost\" min=\"0\"" + (jade.attr("value", transaction.cost, true, false)) + "/></fieldset><fieldset><legend>Nazwa</legend><input type=\"text\" name=\"name\" min=\"0\"" + (jade.attr("value", transaction.title, true, false)) + "/></fieldset></form>");
 };
-buf.push("<div class=\"modal-content\"><table class=\"summary\"><tr><th>Data</th><td>" + (jade.escape(null == (jade_interp = transaction.date) ? "" : jade_interp)) + "</td></tr><tr><th>Nazwa</th><td>" + (jade.escape(null == (jade_interp = transaction.name) ? "" : jade_interp)) + "</td></tr><tr><th>Tytuł</th><td>" + (jade.escape(null == (jade_interp = transaction.title) ? "" : jade_interp)) + "</td></tr><tr><th>IBAN</th><td>" + (jade.escape(null == (jade_interp = transaction.iban) ? "" : jade_interp)) + "</td></tr></table><form name=\"select_type\"><legend>Typ przelewu:</legend><input type=\"radio\" name=\"type\" value=\"paid_month\" checked=\"checked\" onchange=\"view.changeModalForm()\"/><label>Składka</label><input type=\"radio\" name=\"type\" value=\"bill\" onchange=\"view.changeModalForm()\"/><label>Rachunek</label><input type=\"radio\" name=\"type\" value=\"donation\" onchange=\"view.changeModalForm()\"/><label>Darowizna</label><input type=\"radio\" name=\"type\" value=\"other\" onchange=\"view.changeModalForm()\"/><label>Inne</label></form><form name=\"add_type_paid_month\" class=\"form\"><input type=\"hidden\" name=\"transaction_id\"" + (jade.attr("value", transaction.id, true, false)) + "/><fieldset><legend>Członek</legend><input type=\"search\" name=\"user\" list=\"type_users\" onchange=\"view.seekUsers()\"/><datalist id=\"type_users\"></datalist></fieldset><fieldset><legend>Miesiąc</legend><input type=\"month\" name=\"date\"" + (jade.attr("value", transaction.date.slice(0, 7), true, false)) + "/></fieldset><fieldset><legend>Kwota</legend><input type=\"number\" name=\"cost\" min=\"0\"" + (jade.attr("value", transaction.cost, true, false)) + "/></fieldset></form>");
+buf.push("<div class=\"modal-content\"><table class=\"summary\"><tr><th>Data</th><td>" + (jade.escape(null == (jade_interp = transaction.date) ? "" : jade_interp)) + "</td></tr><tr><th>Nazwa</th><td>" + (jade.escape(null == (jade_interp = transaction.name) ? "" : jade_interp)) + "</td></tr><tr><th>Tytuł</th><td>" + (jade.escape(null == (jade_interp = transaction.title) ? "" : jade_interp)) + "</td></tr><tr><th>IBAN</th><td>" + (jade.escape(null == (jade_interp = transaction.iban) ? "" : jade_interp)) + "</td></tr></table><form name=\"select_type\"><legend>Typ przelewu:</legend><input type=\"radio\" name=\"type\" value=\"paid_month\" checked=\"checked\" onchange=\"view.changeModalForm()\"/><label>Składka</label><input type=\"radio\" name=\"type\" value=\"bill\" onchange=\"view.changeModalForm()\"/><label>Rachunek</label><input type=\"radio\" name=\"type\" value=\"donation\" onchange=\"view.changeModalForm()\"/><label>Darowizna</label><input type=\"radio\" name=\"type\" value=\"other\" onchange=\"view.changeModalForm()\"/><label>Inne</label></form><form name=\"add_type_paid_month\" class=\"form\"><input type=\"hidden\" name=\"transaction_id\"" + (jade.attr("value", transaction.id, true, false)) + "/><input type=\"hidden\" name=\"user_id\"/><fieldset class=\"clear\"><legend>Członek</legend><input type=\"search\" name=\"user_search\" oninput=\"view.seekUsers(this)\"/><ul id=\"type_users\" class=\"data-list\"></ul></fieldset><fieldset><legend>Miesiąc</legend><input type=\"month\" name=\"date\"" + (jade.attr("value", transaction.date.slice(0, 7), true, false)) + "/></fieldset><fieldset><legend>Kwota</legend><input type=\"number\" name=\"cost\" min=\"0\"" + (jade.attr("value", transaction.cost, true, false)) + "/></fieldset></form>");
 jade_mixins["default_form"]('add_type_bill');
 jade_mixins["default_form"]('add_type_donation');
 jade_mixins["default_form"]('add_type_other');
