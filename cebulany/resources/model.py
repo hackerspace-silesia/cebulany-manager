@@ -11,9 +11,9 @@ resource_fields = {
 }
 
 parser = RequestParser()
-parser.add_argument('name')
-parser.add_argument('cost', type=str)
-parser.add_argument('transaction_id', type=int)
+parser.add_argument('name', required=True)
+parser.add_argument('cost', required=True, type=str)
+parser.add_argument('transaction_id', required=True, type=int)
 
 
 class ModelResource(Resource):

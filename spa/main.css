@@ -53,7 +53,6 @@ table {
 
 thead th {
     background-color: #353839;
-    border: none;
     color: #D9D6CF;
 }
 
@@ -121,6 +120,15 @@ td.loading img {
     width: 100%;
 }
 
+.not-active {
+    color: red;
+}
+
+.warn {
+    background-color: #FF5349;
+    font-weight: bold;
+}
+
 input.good-input {
     background-color: #93DFB8;
 }
@@ -128,7 +136,7 @@ input.good-input {
 ul.data-list {
     display: block;
     z-index: 2;
-    position: fixed;
+    position: relative;
     width: 400px;
 }
 
@@ -146,7 +154,6 @@ ul.data-list li:hover {
 }
 
 .data-list .not-active {
-    color: red;
     float: right;
 }
 
@@ -168,4 +175,8 @@ ul.data-list li:hover {
     border: 1px solid #888;
 	border-radius: 10px;
     width: 500px; 
+}
+
+#table-members td {
+    text-align: center;
 }

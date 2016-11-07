@@ -36,6 +36,13 @@ buf.push("</li>");
 }).call(this);
 }.call(this,"func" in locals_for_with?locals_for_with.func:typeof func!=="undefined"?func:undefined,"undefined" in locals_for_with?locals_for_with.undefined:typeof undefined!=="undefined"?undefined:undefined,"users" in locals_for_with?locals_for_with.users:typeof users!=="undefined"?users:undefined));;return buf.join("");
 }
+function renderMembers(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+buf.push("<h1>Członkowie</h1><h2>Płatności</h2><table id=\"table-members\"></table>");;return buf.join("");
+}
 function renderModalAddNewTypeTransaction(locals) {
 var buf = [];
 var jade_mixins = {};
@@ -45,7 +52,7 @@ jade_mixins["default_form"] = jade_interp = function(name){
 var block = (this && this.block), attributes = (this && this.attributes) || {};
 buf.push("<form" + (jade.attr("name", name, true, false)) + " class=\"disabled form\"><input type=\"hidden\" name=\"transaction_id\"" + (jade.attr("value", transaction.id, true, false)) + "/><fieldset><legend>Kwota</legend><input type=\"number\" name=\"cost\" min=\"0\"" + (jade.attr("value", transaction.cost, true, false)) + "/></fieldset><fieldset><legend>Nazwa</legend><input type=\"text\" name=\"name\" min=\"0\"" + (jade.attr("value", transaction.title, true, false)) + "/></fieldset></form>");
 };
-buf.push("<div class=\"modal-content\"><table class=\"summary\"><tr><th>Data</th><td>" + (jade.escape(null == (jade_interp = transaction.date) ? "" : jade_interp)) + "</td></tr><tr><th>Nazwa</th><td>" + (jade.escape(null == (jade_interp = transaction.name) ? "" : jade_interp)) + "</td></tr><tr><th>Tytuł</th><td>" + (jade.escape(null == (jade_interp = transaction.title) ? "" : jade_interp)) + "</td></tr><tr><th>IBAN</th><td>" + (jade.escape(null == (jade_interp = transaction.iban) ? "" : jade_interp)) + "</td></tr></table><form name=\"select_type\"><legend>Typ przelewu:</legend><input type=\"radio\" name=\"type\" value=\"paid_month\" checked=\"checked\" onchange=\"view.changeModalForm()\"/><label>Składka</label><input type=\"radio\" name=\"type\" value=\"bill\" onchange=\"view.changeModalForm()\"/><label>Rachunek</label><input type=\"radio\" name=\"type\" value=\"donation\" onchange=\"view.changeModalForm()\"/><label>Darowizna</label><input type=\"radio\" name=\"type\" value=\"other\" onchange=\"view.changeModalForm()\"/><label>Inne</label></form><form name=\"add_type_paid_month\" class=\"form\"><input type=\"hidden\" name=\"transaction_id\"" + (jade.attr("value", transaction.id, true, false)) + "/><input type=\"hidden\" name=\"member_id\"/><fieldset><legend>Członek</legend><input type=\"search\" name=\"user_search\" oninput=\"view.seekUsers(this)\"/><ul id=\"type_users\" class=\"data-list\"></ul></fieldset><fieldset><legend>Miesiąc</legend><input type=\"month\" name=\"date\"" + (jade.attr("value", transaction.date.slice(0, 7), true, false)) + "/></fieldset><fieldset><legend>Kwota</legend><input type=\"number\" name=\"cost\" min=\"0\"" + (jade.attr("value", transaction.cost, true, false)) + "/></fieldset></form>");
+buf.push("<div class=\"modal-content\"><table class=\"summary\"><tr><th>Data</th><td>" + (jade.escape(null == (jade_interp = transaction.date) ? "" : jade_interp)) + "</td></tr><tr><th>Nazwa</th><td>" + (jade.escape(null == (jade_interp = transaction.name) ? "" : jade_interp)) + "</td></tr><tr><th>Tytuł</th><td>" + (jade.escape(null == (jade_interp = transaction.title) ? "" : jade_interp)) + "</td></tr><tr><th>IBAN</th><td>" + (jade.escape(null == (jade_interp = transaction.iban) ? "" : jade_interp)) + "</td></tr></table><form name=\"select_type\"><legend>Typ przelewu:</legend><input type=\"radio\" name=\"type\" value=\"paid_month\" checked=\"checked\" onchange=\"view.changeModalForm()\"/><label>Składka</label><input type=\"radio\" name=\"type\" value=\"bill\" onchange=\"view.changeModalForm()\"/><label>Rachunek</label><input type=\"radio\" name=\"type\" value=\"donation\" onchange=\"view.changeModalForm()\"/><label>Darowizna</label><input type=\"radio\" name=\"type\" value=\"other\" onchange=\"view.changeModalForm()\"/><label>Inne</label></form><form name=\"add_type_paid_month\" class=\"form\"><input type=\"hidden\" name=\"transaction_id\"" + (jade.attr("value", transaction.id, true, false)) + "/><input type=\"hidden\" name=\"member_id\"" + (jade.attr("value", transaction.proposed_member_id || '', true, false)) + "/><fieldset><legend>Członek</legend><input type=\"search\" name=\"user_search\"" + (jade.attr("value", transaction.proposed_member ? transaction.proposed_member.name : '', true, false)) + " oninput=\"view.seekUsers(this)\"" + (jade.cls([transaction.proposed_member_id ? 'good-input' : ''], [true])) + "/><ul id=\"type_users\" class=\"data-list\"></ul></fieldset><fieldset><legend>Miesiąc</legend><input type=\"month\" name=\"date\"" + (jade.attr("value", transaction.date.slice(0, 7), true, false)) + "/></fieldset><fieldset><legend>Kwota</legend><input type=\"number\" name=\"cost\" min=\"0\"" + (jade.attr("value", transaction.cost, true, false)) + "/></fieldset></form>");
 jade_mixins["default_form"]('add_type_bill');
 jade_mixins["default_form"]('add_type_donation');
 jade_mixins["default_form"]('add_type_other');
@@ -57,6 +64,269 @@ var jade_mixins = {};
 var jade_interp;
 
 buf.push("<tr><td class=\"loading\"><img src=\"img/firemark.png\"/><br/><strong>Loading…</strong></td></tr>");;return buf.join("");
+}
+function renderTableMembers(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+;var locals_for_with = (locals || {});(function (Number, dt_now, members, months, paid_months, undefined, years) {
+jade_mixins["paid_cell"] = jade_interp = function(member, year, month){
+var block = (this && this.block), attributes = (this && this.attributes) || {};
+var dt = year + '-' + month
+var key = member.id + ':' + dt
+var value = paid_months[key]
+if ( value === undefined)
+{
+var not_payed = member.join_date < dt && dt <= dt_now
+buf.push("<td" + (jade.cls([not_payed? 'warn' : ''], [true])) + ">" + (jade.escape(null == (jade_interp = '-') ? "" : jade_interp)) + "</td>");
+}
+else
+{
+buf.push("<td>" + (jade.escape(null == (jade_interp = Number(value).toFixed()) ? "" : jade_interp)) + "</td>");
+}
+};
+buf.push("<thead><tr><th rowspan=\"2\">Nazwa</th>");
+// iterate years
+;(function(){
+  var $$obj = years;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var year = $$obj[$index];
+
+buf.push("<th colspan=\"12\">" + (jade.escape(null == (jade_interp = year) ? "" : jade_interp)) + "</th>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var year = $$obj[$index];
+
+buf.push("<th colspan=\"12\">" + (jade.escape(null == (jade_interp = year) ? "" : jade_interp)) + "</th>");
+    }
+
+  }
+}).call(this);
+
+buf.push("</tr><tr>");
+// iterate years
+;(function(){
+  var $$obj = years;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var year = $$obj[$index];
+
+// iterate months
+;(function(){
+  var $$obj = months;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var month = $$obj[$index];
+
+buf.push("<th>" + (jade.escape(null == (jade_interp = month) ? "" : jade_interp)) + "</th>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var month = $$obj[$index];
+
+buf.push("<th>" + (jade.escape(null == (jade_interp = month) ? "" : jade_interp)) + "</th>");
+    }
+
+  }
+}).call(this);
+
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var year = $$obj[$index];
+
+// iterate months
+;(function(){
+  var $$obj = months;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var month = $$obj[$index];
+
+buf.push("<th>" + (jade.escape(null == (jade_interp = month) ? "" : jade_interp)) + "</th>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var month = $$obj[$index];
+
+buf.push("<th>" + (jade.escape(null == (jade_interp = month) ? "" : jade_interp)) + "</th>");
+    }
+
+  }
+}).call(this);
+
+    }
+
+  }
+}).call(this);
+
+buf.push("</tr></thead><tbody>");
+// iterate members
+;(function(){
+  var $$obj = members;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var member = $$obj[$index];
+
+buf.push("<tr><th" + (jade.cls([!member.is_active ? 'not-active' : ''], [true])) + ">" + (jade.escape(null == (jade_interp = member.name) ? "" : jade_interp)) + "</th>");
+// iterate years
+;(function(){
+  var $$obj = years;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var year = $$obj[$index];
+
+// iterate months
+;(function(){
+  var $$obj = months;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var month = $$obj[$index];
+
+jade_mixins["paid_cell"](member, year, month);
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var month = $$obj[$index];
+
+jade_mixins["paid_cell"](member, year, month);
+    }
+
+  }
+}).call(this);
+
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var year = $$obj[$index];
+
+// iterate months
+;(function(){
+  var $$obj = months;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var month = $$obj[$index];
+
+jade_mixins["paid_cell"](member, year, month);
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var month = $$obj[$index];
+
+jade_mixins["paid_cell"](member, year, month);
+    }
+
+  }
+}).call(this);
+
+    }
+
+  }
+}).call(this);
+
+buf.push("</tr>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var member = $$obj[$index];
+
+buf.push("<tr><th" + (jade.cls([!member.is_active ? 'not-active' : ''], [true])) + ">" + (jade.escape(null == (jade_interp = member.name) ? "" : jade_interp)) + "</th>");
+// iterate years
+;(function(){
+  var $$obj = years;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var year = $$obj[$index];
+
+// iterate months
+;(function(){
+  var $$obj = months;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var month = $$obj[$index];
+
+jade_mixins["paid_cell"](member, year, month);
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var month = $$obj[$index];
+
+jade_mixins["paid_cell"](member, year, month);
+    }
+
+  }
+}).call(this);
+
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var year = $$obj[$index];
+
+// iterate months
+;(function(){
+  var $$obj = months;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var month = $$obj[$index];
+
+jade_mixins["paid_cell"](member, year, month);
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var month = $$obj[$index];
+
+jade_mixins["paid_cell"](member, year, month);
+    }
+
+  }
+}).call(this);
+
+    }
+
+  }
+}).call(this);
+
+buf.push("</tr>");
+    }
+
+  }
+}).call(this);
+
+buf.push("</tbody>");}.call(this,"Number" in locals_for_with?locals_for_with.Number:typeof Number!=="undefined"?Number:undefined,"dt_now" in locals_for_with?locals_for_with.dt_now:typeof dt_now!=="undefined"?dt_now:undefined,"members" in locals_for_with?locals_for_with.members:typeof members!=="undefined"?members:undefined,"months" in locals_for_with?locals_for_with.months:typeof months!=="undefined"?months:undefined,"paid_months" in locals_for_with?locals_for_with.paid_months:typeof paid_months!=="undefined"?paid_months:undefined,"undefined" in locals_for_with?locals_for_with.undefined:typeof undefined!=="undefined"?undefined:undefined,"years" in locals_for_with?locals_for_with.years:typeof years!=="undefined"?years:undefined));;return buf.join("");
 }
 function renderTableTransactions(locals) {
 var buf = [];

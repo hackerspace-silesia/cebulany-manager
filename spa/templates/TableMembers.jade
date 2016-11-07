@@ -1,0 +1,27 @@
+mixin paid_cell(member, year, month)
+    - var dt = year + '-' + month
+    - var key = member.id + ':' + dt
+    - var value = paid_months[key]
+    if value === undefined
+        - var not_payed = member.join_date < dt && dt <= dt_now
+        td(class=not_payed? 'warn' : '')= '-'
+    else
+        td= Number(value).toFixed()
+
+thead
+    tr
+        th(rowspan=2) Nazwa
+        each year in years
+            th(colspan=12)= year 
+    tr
+        each year in years
+            each month in months
+                th= month
+tbody
+    each member in members
+        tr
+            th(class=!member.is_active ? 'not-active' : '')= member.name
+            each year in years
+                each month in months
+                    +paid_cell(member, year, month)
+

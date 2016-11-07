@@ -4,8 +4,7 @@ from sqlalchemy import or_, func as sql_func
 from datetime import datetime
 from decimal import Decimal
 
-from cebulany import models
-from cebulany.models import db
+from cebulany.models import db, Transaction
 from cebulany.resources.types import dt_type
 
 transaction_parser = RequestParser()
@@ -21,14 +20,19 @@ transaction_parser.add_argument('ordering')
 
 
 simple_fields = fields.Nested({
-    'name': fields.String(),
+    'name': fields.String,
     'cost': fields.Price(decimals=2),
 })
 
 paid_month_fields = fields.Nested({
-    'member': fields.String(),
+    'member': fields.String,
     'date': fields.DateTime(dt_format='iso8601'),
     'cost': fields.Price(decimals=2),
+})
+
+member_fields = fields.Nested({
+    'name': fields.String,
+    'id': fields.Integer
 })
 
 resource_fields = {
@@ -45,6 +49,8 @@ resource_fields = {
         'bills': fields.List(simple_fields),
         'others': fields.List(simple_fields),
         'paidmonths': fields.List(paid_month_fields),
+        'proposed_member_id': fields.String,
+        'proposed_member': member_fields,
     })),
     'sum': fields.Price(decimals=2),
 }
@@ -55,7 +61,7 @@ class TransactionResource(Resource):
     @marshal_with(resource_fields)
     def get(self):
         args = transaction_parser.parse_args()
-        model = models.Transaction
+        model = Transaction
         query = model.query
         query_sum = db.session.query(sql_func.sum(model.cost))
         return {
@@ -65,7 +71,7 @@ class TransactionResource(Resource):
 
     @staticmethod
     def filtering_query(query, args):
-        model = models.Transaction
+        model = Transaction
         if args['date_start'] and args['date_end']:
             query = query.filter(model.date >= args['date_start'])
             query = query.filter(model.date <= args['date_end'])

@@ -6,8 +6,8 @@ from datetime import datetime
 from cebulany.models import db, Member
 
 member_parser = RequestParser()
-member_parser.add_argument('name')
-member_parser.add_argument('join_date')
+member_parser.add_argument('name', required=True)
+member_parser.add_argument('join_date', required=True)
 member_parser.add_argument('is_active', type=bool)
 
 query_parser = RequestParser()

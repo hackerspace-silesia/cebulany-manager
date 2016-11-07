@@ -36,10 +36,18 @@ div.modal-content
 
     form(name='add_type_paid_month').form
         input(type='hidden', name='transaction_id', value=transaction.id)
-        input(type='hidden', name='member_id')
+        input(
+            type='hidden',
+            name='member_id',
+            value=transaction.proposed_member_id || '')
         fieldset
             legend Członek
-            input(type='search', name='user_search', oninput='view.seekUsers(this)')
+            input(
+                type='search',
+                name='user_search',
+                value=transaction.proposed_member ? transaction.proposed_member.name : '',
+                class=transaction.proposed_member_id ? 'good-input' : '',
+                oninput='view.seekUsers(this)')
             ul.data-list#type_users
         fieldset
             legend Miesiąc
