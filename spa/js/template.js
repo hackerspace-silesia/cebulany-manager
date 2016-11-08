@@ -80,6 +80,13 @@ var jade_interp;
 
 buf.push("<h1>Dotacje</h1><table id=\"table\"></table>");;return buf.join("");
 }
+function renderLogin(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+buf.push("<div class=\"login\"><h1>Logowanie</h1><form name=\"login\" class=\"login\"><fieldset><label>Użytkownik:</label><input type=\"text\" name=\"user\"/></fieldset><fieldset><label>Hasło:</label><input type=\"text\" name=\"password\"/></fieldset><fieldset><input type=\"submit\" value=\"Zaloguj\"/></fieldset></form></div>");;return buf.join("");
+}
 function renderMembers(locals) {
 var buf = [];
 var jade_mixins = {};

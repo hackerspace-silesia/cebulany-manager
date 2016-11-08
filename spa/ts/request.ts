@@ -35,6 +35,10 @@ function request(options: any): any {
     if (method == 'POST' || method == 'PUT') {
         headers.set('Content-Type', 'application/json');
     }
+
+    var hash = window.btoa(auth.user + ':' + auth.password)
+    headers.set('Authorization', 'Basic ' +  hash)
+
     return fetch(
         url, {
             method: method,

@@ -57,6 +57,8 @@ function request(options) {
     if (method == 'POST' || method == 'PUT') {
         headers.set('Content-Type', 'application/json');
     }
+    var hash = window.btoa(auth.user + ':' + auth.password);
+    headers.set('Authorization', 'Basic ' + hash);
     return fetch(url, {
         method: method,
         body: data && JSON.stringify(data),
@@ -74,6 +76,61 @@ function request(options) {
         }
     });
 }
+///<reference path="./templates.d.ts"/>
+///<reference path="./utils.ts"/>
+///<reference path="./request.ts"/>
+var DefaultTableView = (function () {
+    function DefaultTableView() {
+    }
+    DefaultTableView.prototype.showRecords = function () {
+        setHTML('table', renderTableLoading());
+        request({ url: this.endpoint }).then(function (json) {
+            setHTML('table', renderDefaultTable({
+                data: json
+            }));
+        });
+    };
+    DefaultTableView.prototype.deleteRecord = function (ev, id) {
+        var yes = confirm("Czy napewno chcesz skasowa\u0107?");
+        var self = this;
+        if (!yes) {
+            return;
+        }
+        request({
+            url: this.endpoint + "/" + id,
+            method: 'DELETE'
+        }).then(function (json) {
+            self.showRecords();
+        });
+    };
+    return DefaultTableView;
+}());
+///<reference path="./default_table.ts"/>
+function showBills() {
+    setHTML('main', renderBills());
+    view = new BillView();
+}
+var BillView = (function (_super) {
+    __extends(BillView, _super);
+    function BillView() {
+        this.endpoint = 'bill';
+        this.showRecords();
+    }
+    return BillView;
+}(DefaultTableView));
+///<reference path="./default_table.ts"/>
+function showDonations() {
+    setHTML('main', renderDonations());
+    view = new DonationView();
+}
+var DonationView = (function (_super) {
+    __extends(DonationView, _super);
+    function DonationView() {
+        this.endpoint = 'donation';
+        this.showRecords();
+    }
+    return DonationView;
+}(DefaultTableView));
 ///<reference path="./templates.d.ts"/>
 ///<reference path="./utils.ts"/>
 ///<reference path="./request.ts"/>
@@ -289,61 +346,6 @@ var MemberView = (function () {
     };
     return MemberView;
 }());
-///<reference path="./templates.d.ts"/>
-///<reference path="./utils.ts"/>
-///<reference path="./request.ts"/>
-var DefaultTableView = (function () {
-    function DefaultTableView() {
-    }
-    DefaultTableView.prototype.showRecords = function () {
-        setHTML('table', renderTableLoading());
-        request({ url: this.endpoint }).then(function (json) {
-            setHTML('table', renderDefaultTable({
-                data: json
-            }));
-        });
-    };
-    DefaultTableView.prototype.deleteRecord = function (ev, id) {
-        var yes = confirm("Czy napewno chcesz skasowa\u0107?");
-        var self = this;
-        if (!yes) {
-            return;
-        }
-        request({
-            url: this.endpoint + "/" + id,
-            method: 'DELETE'
-        }).then(function (json) {
-            self.showRecords();
-        });
-    };
-    return DefaultTableView;
-}());
-///<reference path="./default_table.ts"/>
-function showBills() {
-    setHTML('main', renderBills());
-    view = new BillView();
-}
-var BillView = (function (_super) {
-    __extends(BillView, _super);
-    function BillView() {
-        this.endpoint = 'bill';
-        this.showRecords();
-    }
-    return BillView;
-}(DefaultTableView));
-///<reference path="./default_table.ts"/>
-function showDonations() {
-    setHTML('main', renderDonations());
-    view = new DonationView();
-}
-var DonationView = (function (_super) {
-    __extends(DonationView, _super);
-    function DonationView() {
-        this.endpoint = 'donation';
-        this.showRecords();
-    }
-    return DonationView;
-}(DefaultTableView));
 ///<reference path="./default_table.ts"/>
 function showOthers() {
     setHTML('main', renderOthers());
@@ -362,5 +364,30 @@ var OthersView = (function (_super) {
 ///<reference path="./bills.ts"/>
 ///<reference path="./donations.ts"/>
 ///<reference path="./others.ts"/>
+function showLogin() {
+    setHTML('main', renderLogin());
+    view = new LoginView();
+    menu = document.getElementById('menu');
+    menu.style.display = 'none';
+}
+var LoginView = (function () {
+    function LoginView() {
+        this.form = document.forms['login'];
+        this.form.onsubmit = doLogin;
+    }
+    return LoginView;
+}());
+function doLogin() {
+    form = document.forms['login'];
+    auth.password = form.elements['password'].value;
+    auth.user = form.elements['user'].value;
+    console.log(auth);
+    menu = document.getElementById('menu');
+    menu.style.display = 'block';
+    showTransactions();
+    return false;
+}
+///<reference path="./login.ts"/>
 var view = null;
-showTransactions();
+var auth = {};
+showLogin();

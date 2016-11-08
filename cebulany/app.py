@@ -1,7 +1,10 @@
 from flask import Flask, send_from_directory
 from flask_restful import Api
-from cebulany.models import db
 
+from flask_security import http_auth_required
+
+from cebulany.auth import init_auth
+from cebulany.models import db
 from cebulany.resources.transaction import TransactionResource
 from cebulany.resources.member import MemberResource, MemberListResource
 from cebulany.resources.paid_month import PaidMonthListResource, PaidMonthResource, PaidMonthTableResource
@@ -31,18 +34,23 @@ api.add_resource(OtherResource, '/api/other/<int:id>')
 
 app.register_blueprint(report_page)
 
+security = init_auth(app)
+
 
 @app.route('/')
+@http_auth_required
 def index():
     return send_from_directory('../spa', 'index.html')
 
 
 @app.route('/main.css')
+@http_auth_required
 def css():
     return send_from_directory('../spa', 'main.css')
 
 
 @app.route('/<path>/<file>')
+@http_auth_required
 def pseudo_static(path, file):
     return send_from_directory('../spa', '{}/{}'.format(path, file))
 

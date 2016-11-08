@@ -7,6 +7,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 requires = [
     'Flask-RESTful==0.3.5',
     'Flask-SQLAlchemy==2.1',
+    'Flask-Security==1.7.5',
 ]
 
 setup(

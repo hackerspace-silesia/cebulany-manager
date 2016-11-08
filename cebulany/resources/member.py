@@ -1,3 +1,4 @@
+from flask_security import http_auth_required
 from flask_restful import Resource, fields, marshal_with
 from flask_restful.reqparse import RequestParser
 from cebulany.resources.model import ModelResource, ModelListResource
@@ -25,6 +26,7 @@ member_fields = {
 
 
 class MemberListResource(ModelListResource):
+    method_decorators = [http_auth_required]
     cls = Member
     resource_fields = member_fields
     parser = member_parser
@@ -46,6 +48,7 @@ class MemberListResource(ModelListResource):
 
 
 class MemberResource(ModelResource):
+    method_decorators = [http_auth_required]
     cls = Member
     parser = member_parser
     resource_fields = member_fields

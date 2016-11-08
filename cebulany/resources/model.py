@@ -1,5 +1,6 @@
 from flask_restful import Resource, fields, marshal, abort
 from flask_restful.reqparse import RequestParser
+from flask_security import http_auth_required
 
 from cebulany.models import db, Transaction
 
@@ -22,6 +23,7 @@ parser.add_argument('transaction_id', required=True, type=int)
 
 
 class ModelListResource(Resource):
+    method_decorators = [http_auth_required]
     cls = None
     parser = parser
     resource_fields = resource_fields
@@ -41,6 +43,7 @@ class ModelListResource(Resource):
 
 
 class TransactionTypeListResource(ModelListResource):
+    method_decorators = [http_auth_required]
     type_name = ''
 
     def get_list_query(self):
@@ -70,6 +73,7 @@ class TransactionTypeListResource(ModelListResource):
 
 
 class ModelResource(Resource):
+    method_decorators = [http_auth_required]
     cls = None
     parser = parser
     resource_fields = resource_fields
