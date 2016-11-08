@@ -3,6 +3,7 @@ from flask_restful.reqparse import RequestParser
 from sqlalchemy import or_, func as sql_func
 from datetime import datetime
 from decimal import Decimal
+from flask_security import http_auth_required
 
 from cebulany.models import db, Transaction
 from cebulany.resources.types import dt_type
@@ -57,6 +58,7 @@ resource_fields = {
 
 
 class TransactionResource(Resource):
+    method_decorators = [http_auth_required]
 
     @marshal_with(resource_fields)
     def get(self):

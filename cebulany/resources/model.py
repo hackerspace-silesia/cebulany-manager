@@ -1,3 +1,4 @@
+from flask_security import http_auth_required
 from flask_restful import Resource, fields, marshal
 from flask_restful.reqparse import RequestParser
 
@@ -17,6 +18,8 @@ parser.add_argument('transaction_id', required=True, type=int)
 
 
 class ModelResource(Resource):
+    method_decorators = [http_auth_required]
+
     cls = None
     parser = parser
     resource_fields = resource_fields

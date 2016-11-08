@@ -1,3 +1,4 @@
+from flask_security import http_auth_required
 from flask_restful import Resource, fields, marshal_with
 from flask_restful.reqparse import RequestParser
 from sqlalchemy import or_, func as sql_func
@@ -24,6 +25,7 @@ member_fields = {
 
 
 class MemberListResource(Resource):
+    method_decorators = [http_auth_required]
 
     @marshal_with(member_fields)
     def get(self):
@@ -51,6 +53,7 @@ class MemberListResource(Resource):
 
 
 class MemberResource(Resource):
+    method_decorators = [http_auth_required]
 
     @marshal_with(member_fields)
     def get(self, id):
