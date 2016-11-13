@@ -50,6 +50,7 @@ resource_fields = {
         'others': fields.List(simple_fields),
         'paidmonths': fields.List(paid_month_fields),
         'proposed_member_id': fields.String,
+        'proposed_type_name': fields.String,
         'proposed_member': member_fields,
     })),
     'sum': fields.Price(decimals=2),

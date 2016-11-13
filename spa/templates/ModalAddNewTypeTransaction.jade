@@ -6,7 +6,7 @@ mixin default_form(name)
             input(type='number', name='cost', min='0', value=transaction.cost)
         fieldset
             legend Nazwa
-            input(type='text', name='name', min='0', value=transaction.title)
+            input(type='text', name='name', value=transaction.proposed_type_name || transaction.title)
 
 div.modal-content
     table.summary

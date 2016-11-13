@@ -1,7 +1,7 @@
 from flask_restful import Resource, fields, marshal
 from flask_restful.reqparse import RequestParser
 
-from cebulany.models import db
+from cebulany.models import db, Transaction
 
 resource_fields = {
     'id': fields.Integer(),
@@ -25,8 +25,16 @@ class ModelResource(Resource):
         return marshal(self.cls.query.all(), self.resource_fields)
 
     def post(self):
-        bill = self.cls(**self.parser.parse_args())
-        db.session.add(bill)
+        data = self.parser.parse_args()
+        obj = self.cls(**data)
+        name = data.pop('name')
+        if name:
+            db.session.query(Transaction).filter_by(
+                id=data['transaction_id'],
+            ).update({
+                'proposed_type_name': name,
+            })
+        db.session.add(obj)
         db.session.commit()
-        return marshal(bill, self.resource_fields), 201
+        return marshal(obj, self.resource_fields), 201
 
