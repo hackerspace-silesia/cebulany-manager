@@ -7,9 +7,10 @@
   "scripts": {
   },
   "dependencies": {
-      "gulp": "3.9.0",
+      "gulp": "3.9.1",
       "gulp-jade": "git://github.com/firemark/gulp-jade.git",
       "gulp-concat": "2.6.0",
+      "gulp-sass": "2.3.2",
       "typescript": "1.8.9"
   },
   "devDependencies": {

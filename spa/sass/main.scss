@@ -1,0 +1,88 @@
+@import 'colors';
+@import 'table';
+@import 'helpers';
+@import 'modals';
+
+@mixin nice_button() {
+    border: 1px solid $border-color;
+    box-shadow: 1px 1px 1px $shadow-color;
+    border-radius: 5px;
+    background: linear-gradient(#e1e1e1, #c0c0c0);
+    cursor: pointer;
+    padding: 0 2px;
+    &:hover {
+        background: linear-gradient(#f1f1f1, #e1e1e1);
+    }
+    &:active {
+        color: #c0c0c0;
+        background: linear-gradient(#ffffff, #f1f1f1);
+    }
+}
+
+body {
+    background-color: $bg-color;
+    color: $text-color;
+    font-family: Arial;
+    font-size:12pt;
+}
+
+#menu {
+    display: block;
+    font-size: 10pt;
+    margin: auto;
+    text-align: center;
+    & > li {
+        display: inline;
+        padding: 5px;
+        @include nice_button();
+    }
+}
+
+a.btn {
+    @include nice_button();
+}
+#main {
+    width: 1000px;
+    margin: auto;
+}
+
+
+fieldset {
+    height: 50px;
+    display: inline;
+    border: none;
+}
+
+input.good-input {
+    background-color: $bg-ok-color;
+}
+
+input {
+    border: 1px solid $border-color;
+    background-color: $bg-input-color;
+    color: $text-color;
+}
+
+ul.data-list {
+    display: block;
+    z-index: 2;
+    position: relative;
+    width: 400px;
+}
+
+ul.data-list li {
+    display: block;
+    background-color: #ccc;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 9pt;
+    padding: 1px;
+}
+
+ul.data-list li:hover {
+    background-color: #dfdfdf;
+}
+
+.data-list .not-active {
+    float: right;
+}
