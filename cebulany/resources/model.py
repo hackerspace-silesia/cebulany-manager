@@ -36,6 +36,7 @@ class ModelListResource(Resource):
 
 
 class TransactionTypeListResource(ModelListResource):
+    type_name = ''
 
     def get_list_query():
         return cls.query.join(cls.transaction).order_by(Transaction.date.desc)
@@ -48,7 +49,10 @@ class TransactionTypeListResource(ModelListResource):
         ).scalar()
         db.session.query(Transaction).filter_by(
             name=transaction_name,
-        ).update(dict(proposed_type_name=name)) 
+        ).update(dict(
+            proposed_type_name=name,
+            proposed_type=self.type_name,
+        )) 
         db.session.commit()
 
         return data, status

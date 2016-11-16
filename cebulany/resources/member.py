@@ -29,7 +29,7 @@ class MemberListResource(ModelListResource):
     resource_fields = member_fields
     parser = member_parser
 
-    def get_list_query():
+    def get_list_query(self):
         parse_args = query_parser.parse_args()
         query = Member.query.order_by(Member.name)
         query_arg = parse_args['q']

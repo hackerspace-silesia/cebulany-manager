@@ -4,4 +4,5 @@ from cebulany.models import Other
 
 class OtherListResource(TransactionTypeListResource):
     cls = Other
+    type_name = 'other'
 

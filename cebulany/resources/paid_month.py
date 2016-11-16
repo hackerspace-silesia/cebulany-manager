@@ -16,6 +16,7 @@ parser.add_argument('date', type=month_type)
 
 paid_month_fields = {
     'date': fields.DateTime(dt_format='iso8601'),
+    'transaction_id': fields.Integer,
     'cost': fields.Price,
 }
 
@@ -66,9 +67,12 @@ class PaidMonthListResource(ModelListResource):
         # update proposed_member_id in every transaction who has this same name
         transaction_name = db.session.query(Transaction.name).filter_by(
             id=data['transaction_id'],
-        ).first()
+        ).scalar()
         query_trans = db.session.query(Transaction).filter_by(name=transaction_name)
-        query_trans.update(dict(proposed_member_id=args['member_id']))
+        query_trans.update(dict(
+            proposed_member_id=args['member_id'],
+            proposed_type='paid_month',
+        ))
         db.session.commit()
         return data, status
 

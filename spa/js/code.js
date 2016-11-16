@@ -107,10 +107,10 @@ var TransactionView = (function () {
         setHTML('modal_add_type', renderModalAddNewTypeTransaction({
             transaction: this.transactions[id]
         }));
-        this.changeModalForm();
+        this.changeModalForm(transaction.proposed_type);
     };
-    TransactionView.prototype.changeModalForm = function () {
-        var action = document.forms['select_type']['type'].value;
+    TransactionView.prototype.changeModalForm = function (default_action) {
+        action = default_action || document.forms['select_type']['type'].value;
         action = 'add_type_' + action;
         var forms = document.querySelectorAll('#modal_add_type .form');
         forms.forEach(function (form) {
@@ -121,6 +121,9 @@ var TransactionView = (function () {
                 form.className = 'form';
             }
         });
+        if (default_action) {
+            document.forms['select_type']['type'].value = default_action;
+        }
     };
     TransactionView.prototype.addType = function () {
         var self = this;

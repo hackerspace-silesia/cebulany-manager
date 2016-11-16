@@ -40,6 +40,7 @@ class Transaction(Base):
     iban = db.Column(db.String(300))
     proposed_member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
     proposed_type_name = db.Column(db.String(300))
+    proposed_type = db.Column(db.String(300))
 
     proposed_member = relationship('Member')
 

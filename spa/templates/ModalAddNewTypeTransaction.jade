@@ -25,7 +25,7 @@ div.modal-content
 
     form(name='select_type')
         legend Typ przelewu:
-        input(type='radio', name='type', value='paid_month', checked, onchange='view.changeModalForm()')
+        input(type='radio', name='type', value='paid_month', onchange='view.changeModalForm()')
         label Składka
         input(type='radio', name='type', value='bill', onchange='view.changeModalForm()')
         label Rachunek
