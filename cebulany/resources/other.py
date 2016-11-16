@@ -6,3 +6,6 @@ class OtherListResource(TransactionTypeListResource):
     cls = Other
     type_name = 'other'
 
+
+class OtherResource(ModelResource):
+    cls = Other

@@ -5,3 +5,7 @@ from cebulany.models import Bill
 class BillListResource(TransactionTypeListResource):
     cls = Bill
     type_name = 'bill'
+
+
+class BillResource(ModelResource):
+    cls = Bill

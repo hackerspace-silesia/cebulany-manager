@@ -8,6 +8,9 @@ resource_fields = {
     'transaction_id': fields.Integer(),
     'name': fields.String(),
     'cost': fields.Price(decimals=2),
+    'transaction': fields.Nested({
+        'date': fields.DateTime(dt_format='iso8601'),
+    })
 }
 
 parser = RequestParser()
@@ -38,8 +41,13 @@ class ModelListResource(Resource):
 class TransactionTypeListResource(ModelListResource):
     type_name = ''
 
-    def get_list_query():
-        return cls.query.join(cls.transaction).order_by(Transaction.date.desc)
+    def get_list_query(self):
+        cls = self.cls
+        return cls.query.join(
+            cls.transaction
+        ).order_by(
+            Transaction.date.desc()
+        ).all()
 
     def post(self):
         data, status = super(TransactionTypeListResource, self).post()
@@ -64,21 +72,21 @@ class ModelResource(Resource):
     parser = parser
     resource_fields = resource_fields
 
-    def get(self, pk):
-        obj = self.cls.query.get(pk)
+    def get(self, id):
+        obj = self.cls.query.get(id)
         if obj is None:
             abort(404)
         return marshal(obj, self.resource_fields)
 
-    def put(self, pk):
-        query = self.cls.query.filter_by(id=pk)
+    def put(self, id):
+        query = self.cls.query.filter_by(id=id)
         is_exists = query.exists()
         if not is_exists:
             abort(404)
         return marshal(obj, self.resource_fields)
 
-    def delete(self, pk):
-        query = self.cls.query.filter_by(id=pk)
+    def delete(self, id):
+        query = self.cls.query.filter_by(id=id)
         is_exists = query.exists()
         if not is_exists:
             abort(404)

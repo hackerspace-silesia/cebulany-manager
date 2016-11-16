@@ -5,7 +5,7 @@ from datetime import datetime
 from itertools import groupby
 
 from cebulany.models import db, Member, PaidMonth, Transaction
-from cebulany.resources.model import ModelListResource
+from cebulany.resources.model import ModelListResource, ModelResource
 from cebulany.resources.types import month_type
 
 parser = RequestParser()
@@ -75,4 +75,10 @@ class PaidMonthListResource(ModelListResource):
         ))
         db.session.commit()
         return data, status
+
+
+class PaidMonthResource(ModelResource):
+    cls = PaidMonth
+    resource_fields = paid_month_fields
+    parser = parser
 

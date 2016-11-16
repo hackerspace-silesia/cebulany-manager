@@ -6,3 +6,6 @@ class DonationListResource(TransactionTypeListResource):
     cls = Donation
     type_name = 'donation'
 
+
+class DonationResource(ModelResource):
+    cls = Donation
