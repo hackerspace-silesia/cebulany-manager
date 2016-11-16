@@ -1,7 +1,7 @@
-from cebulany.resources.model import ModelResource
+from cebulany.resources.model import ModelResource, TransactionTypeListResource
 from cebulany.models import Other
 
 
-class OtherResource(ModelResource):
+class OtherListResource(TransactionTypeListResource):
     cls = Other
 

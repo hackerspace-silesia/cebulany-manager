@@ -5,7 +5,7 @@ from datetime import datetime
 from itertools import groupby
 
 from cebulany.models import db, Member, PaidMonth, Transaction
-from cebulany.resources.model import ModelResource
+from cebulany.resources.model import ModelListResource
 from cebulany.resources.types import month_type
 
 parser = RequestParser()
@@ -28,7 +28,7 @@ paid_month_sum_fields = {
 }
 
 
-class PaidMonthResource(ModelResource):
+class PaidMonthListResource(ModelListResource):
     cls = PaidMonth
     parser = parser
     resource_fields = paid_month_fields
@@ -61,11 +61,14 @@ class PaidMonthResource(ModelResource):
         ]
 
     def post(self):
+        data, status = super(PaidMonthListResource, self).post()
         args = self.parser.parse_args()
         # update proposed_member_id in every transaction who has this same name
-        transaction = Transaction.query.get(args['transaction_id'])
-        query_trans = db.session.query(Transaction).filter_by(name=transaction.name)
+        transaction_name = db.session.query(Transaction.name).filter_by(
+            id=data['transaction_id'],
+        ).first()
+        query_trans = db.session.query(Transaction).filter_by(name=transaction_name)
         query_trans.update(dict(proposed_member_id=args['member_id']))
         db.session.commit()
-        return super(PaidMonthResource, self).post()
+        return data, status
 

@@ -1,6 +1,6 @@
-from cebulany.resources.model import ModelResource
+from cebulany.resources.model import ModelResource, TransactionTypeListResource
 from cebulany.models import Donation
 
 
-class DonationResource(ModelResource):
+class DonationListResource(TransactionTypeListResource):
     cls = Donation

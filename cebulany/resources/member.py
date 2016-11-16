@@ -1,5 +1,6 @@
 from flask_restful import Resource, fields, marshal_with
 from flask_restful.reqparse import RequestParser
+from cebulany.resources.model import ModelResource, ModelListResource
 from sqlalchemy import or_, func as sql_func
 from datetime import datetime
 
@@ -23,10 +24,12 @@ member_fields = {
 }
 
 
-class MemberListResource(Resource):
+class MemberListResource(ModelListResource):
+    cls = Member
+    resource_fields = member_fields
+    parser = member_parser
 
-    @marshal_with(member_fields)
-    def get(self):
+    def get_list_query():
         parse_args = query_parser.parse_args()
         query = Member.query.order_by(Member.name)
         query_arg = parse_args['q']
@@ -41,22 +44,9 @@ class MemberListResource(Resource):
             query = query.limit(limit_arg)
         return query.all()
 
-    @marshal_with(member_fields)
-    def post(self):
-        args = member_parse.parse_args()
-        member = Member(**parse.args())
-        db.session.add(member)
-        db.session.commit()
-        return member, 201
 
-
-class MemberResource(Resource):
-
-    @marshal_with(member_fields)
-    def get(self, id):
-        return Member.query.get(id)
-
-    def delete(self, id):
-        db.session.delete(Member.query.get(id))
-        return 204
+class MemberResource(ModelResource):
+    cls = Member
+    parser = member_parser
+    resource_fields = member_fields
 

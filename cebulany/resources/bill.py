@@ -1,6 +1,6 @@
-from cebulany.resources.model import ModelResource
+from cebulany.resources.model import ModelResource, TransactionTypeListResource
 from cebulany.models import Bill
 
 
-class BillResource(ModelResource):
+class BillListResource(TransactionTypeListResource):
     cls = Bill
