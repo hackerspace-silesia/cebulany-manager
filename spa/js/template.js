@@ -1,3 +1,10 @@
+function renderBills(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+buf.push("<h1>Rachunki</h1><table id=\"table\"></table>");;return buf.join("");
+}
 function renderDataListUsers(locals) {
 var buf = [];
 var jade_mixins = {};
@@ -36,6 +43,43 @@ buf.push("</li>");
 }).call(this);
 }.call(this,"func" in locals_for_with?locals_for_with.func:typeof func!=="undefined"?func:undefined,"undefined" in locals_for_with?locals_for_with.undefined:typeof undefined!=="undefined"?undefined:undefined,"users" in locals_for_with?locals_for_with.users:typeof users!=="undefined"?users:undefined));;return buf.join("");
 }
+function renderDefaultTable(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+;var locals_for_with = (locals || {});(function (data, undefined) {
+buf.push("<thead><th>Data</th><th>Nazwa</th><th>Kwota</th><th>*</th></thead><tbody>");
+// iterate data
+;(function(){
+  var $$obj = data;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var obj = $$obj[$index];
+
+buf.push("<tr><td>" + (jade.escape(null == (jade_interp = obj.transaction.date) ? "" : jade_interp)) + "</td><td>" + (jade.escape(null == (jade_interp = obj.name) ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',obj.cost < 0 ? 'negative' : 'positive'], [null,true])) + ">" + (jade.escape(null == (jade_interp = obj.cost + " zł") ? "" : jade_interp)) + "</td><td><a" + (jade.attr("onclick", 'view.DeleteRecord(' + (obj.id) + ')', true, false)) + " class=\"btn\">Usuń</a></td></tr>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var obj = $$obj[$index];
+
+buf.push("<tr><td>" + (jade.escape(null == (jade_interp = obj.transaction.date) ? "" : jade_interp)) + "</td><td>" + (jade.escape(null == (jade_interp = obj.name) ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',obj.cost < 0 ? 'negative' : 'positive'], [null,true])) + ">" + (jade.escape(null == (jade_interp = obj.cost + " zł") ? "" : jade_interp)) + "</td><td><a" + (jade.attr("onclick", 'view.DeleteRecord(' + (obj.id) + ')', true, false)) + " class=\"btn\">Usuń</a></td></tr>");
+    }
+
+  }
+}).call(this);
+
+buf.push("</tbody>");}.call(this,"data" in locals_for_with?locals_for_with.data:typeof data!=="undefined"?data:undefined,"undefined" in locals_for_with?locals_for_with.undefined:typeof undefined!=="undefined"?undefined:undefined));;return buf.join("");
+}
+function renderDonations(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+buf.push("<h1>Dotacje</h1><table id=\"table\"></table>");;return buf.join("");
+}
 function renderMembers(locals) {
 var buf = [];
 var jade_mixins = {};
@@ -57,6 +101,13 @@ jade_mixins["default_form"]('add_type_bill');
 jade_mixins["default_form"]('add_type_donation');
 jade_mixins["default_form"]('add_type_other');
 buf.push("<button type=\"button\" onclick=\"view.addType()\">Dodaj</button><button type=\"button\" onclick=\"view.closeModal()\">Zamknij</button></div>");}.call(this,"transaction" in locals_for_with?locals_for_with.transaction:typeof transaction!=="undefined"?transaction:undefined));;return buf.join("");
+}
+function renderOthers(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+buf.push("<h1>Inne płatności</h1><table id=\"table\"></table>");;return buf.join("");
 }
 function renderTableLoading(locals) {
 var buf = [];

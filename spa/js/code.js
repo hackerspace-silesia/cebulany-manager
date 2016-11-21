@@ -1,3 +1,8 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 function byId(id) {
     return document.getElementById(id);
 }
@@ -205,7 +210,65 @@ var MemberView = (function () {
     };
     return MemberView;
 }());
+///<reference path="./templates.d.ts"/>
+///<reference path="./utils.ts"/>
+///<reference path="./request.ts"/>
+var DefaultTableView = (function () {
+    function DefaultTableView() {
+    }
+    DefaultTableView.prototype.showRecords = function () {
+        setHTML('table', renderTableLoading());
+        request({ url: this.endpoint }).then(function (json) {
+            setHTML('table', renderDefaultTable({
+                data: json
+            }));
+        });
+    };
+    return DefaultTableView;
+}());
+///<reference path="./default_table.ts"/>
+function showBills() {
+    setHTML('main', renderBills());
+    view = new BillView();
+}
+var BillView = (function (_super) {
+    __extends(BillView, _super);
+    function BillView() {
+        this.endpoint = 'bill';
+        this.showRecords();
+    }
+    return BillView;
+}(DefaultTableView));
+///<reference path="./default_table.ts"/>
+function showDonations() {
+    setHTML('main', renderDonations());
+    view = new DonationView();
+}
+var DonationView = (function (_super) {
+    __extends(DonationView, _super);
+    function DonationView() {
+        this.endpoint = 'donation';
+        this.showRecords();
+    }
+    return DonationView;
+}(DefaultTableView));
+///<reference path="./default_table.ts"/>
+function showOthers() {
+    setHTML('main', renderOthers());
+    view = new OthersView();
+}
+var OthersView = (function (_super) {
+    __extends(OthersView, _super);
+    function OthersView() {
+        this.endpoint = 'other';
+        this.showRecords();
+    }
+    return OthersView;
+}(DefaultTableView));
 ///<reference path="./transactions.ts"/>
 ///<reference path="./members.ts"/>
+///<reference path="./bills.ts"/>
+///<reference path="./donations.ts"/>
+///<reference path="./others.ts"/>
 var view = null;
 showTransactions();
