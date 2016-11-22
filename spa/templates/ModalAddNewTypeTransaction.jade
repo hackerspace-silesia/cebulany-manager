@@ -45,6 +45,7 @@ div.modal-content
             input(
                 type='search',
                 name='user_search',
+                autocomplete='off',
                 value=transaction.proposed_member ? transaction.proposed_member.name : '',
                 class=transaction.proposed_member_id ? 'good-input' : '',
                 oninput='view.seekUsers(this)')
