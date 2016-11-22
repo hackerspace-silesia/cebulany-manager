@@ -22,27 +22,28 @@ transaction_parser.add_argument('ordering')
 simple_fields = fields.Nested({
     'name': fields.String,
     'cost': fields.Price(decimals=2),
+    'id': fields.Integer,
 })
 
-paid_month_fields = fields.Nested({
-    'member': fields.String,
-    'date': fields.DateTime(dt_format='iso8601'),
-    'cost': fields.Price(decimals=2),
-})
 
 member_fields = fields.Nested({
     'name': fields.String,
-    'id': fields.Integer
+    'id': fields.Integer,
+})
+
+paid_month_fields = fields.Nested({
+    'member': member_fields,
+    'date': fields.DateTime(dt_format='iso8601'),
+    'cost': fields.Price(decimals=2),
+    'id': fields.Integer,
 })
 
 resource_fields = {
     'transactions': fields.List(fields.Nested({
         'id': fields.Integer(),
-        'send_date': fields.DateTime(dt_format='iso8601'),
         'date': fields.DateTime(dt_format='iso8601'),
         'title': fields.String(),
         'name': fields.String(),
-        'address': fields.String(),
         'cost': fields.Price(decimals=2),
         'iban': fields.String(),
         'donations': fields.List(simple_fields),

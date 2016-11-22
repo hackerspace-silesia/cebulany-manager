@@ -79,16 +79,21 @@ class ModelResource(Resource):
         return marshal(obj, self.resource_fields)
 
     def put(self, id):
-        query = self.cls.query.filter_by(id=id)
-        is_exists = query.exists()
-        if not is_exists:
+        obj = self.cls.query.get(id)
+        if obj is None:
             abort(404)
+
+        data = self.parser.parse_args()
+        obj.__dict__.update(**data)
+        db.session.add(obj)
+        db.session.commit()
         return marshal(obj, self.resource_fields)
 
     def delete(self, id):
         query = self.cls.query.filter_by(id=id)
-        is_exists = query.exists()
+        is_exists = db.session.query(query.exists()).scalar()
         if not is_exists:
             abort(404)
         query.delete()
-        return 204
+        db.session.commit()
+        return '', 204

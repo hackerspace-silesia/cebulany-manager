@@ -61,7 +61,19 @@ function request(options) {
         method: method,
         body: data && JSON.stringify(data),
         headers: headers
-    }).then(function (response) { return response.json(); });
+    }).then(function (response) {
+        console.log(response.status);
+        switch (response.status) {
+            case 200:
+            case 201:
+                return response.json();
+                break;
+            case 204:
+                return null;
+                break;
+            default: throw 'Unknown error';
+        }
+    });
 }
 ///<reference path="./templates.d.ts"/>
 ///<reference path="./utils.ts"/>
@@ -165,6 +177,20 @@ var TransactionView = (function () {
         form['user_search'].value = ev.textContent;
         form['user_search'].className = 'good-input';
         setHTML('type_users', '');
+    };
+    TransactionView.prototype.removeType = function (ev, str_type, id) {
+        var title = ev.title.replace('/\n/g', ' ');
+        var yes = confirm("Czy chcesz skasowa\u0107 typ \"" + str_type + "\" o tytule \"" + ev.title + "\"?");
+        var self = this;
+        if (!yes) {
+            return;
+        }
+        request({
+            url: str_type + "/" + id,
+            method: 'DELETE'
+        }).then(function (json) {
+            self.getTransactions();
+        });
     };
     return TransactionView;
 }());

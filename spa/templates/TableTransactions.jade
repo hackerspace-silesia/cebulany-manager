@@ -9,13 +9,25 @@ mixin transaction_row(num, row)
         //td(title=row.iban)= maxChars(row.iban && row.iban.replace(/ /g, ''), 5)
         td
             each donat in row.donations
-                span.badge.type_donation(title='#{donat.name}\n#{donat.cost} zł') D
+                span.badge.type_donation(
+                    title='#{donat.name}\n#{donat.cost} zł',
+                    onclick='view.removeType(this, "donation", #{donat.id})',
+                ) D
             each bill in row.bills
-                span.badge.type_bill(title='#{bill.name}\n#{bill.cost} zł') R
+                span.badge.type_bill(
+                    title='#{bill.name}\n#{bill.cost} zł',
+                    onclick='view.removeType(this, "bill", #{bill.id})',
+                ) R
             each paid in row.paidmonths
-                span.badge.type_paid_month(title='#{paid.name}\n#{paid.cost} zł') S
+                span.badge.type_paid_month(
+                    title='#{paid.member.name}\n#{paid.cost} zł',
+                    onclick='view.removeType(this, "paid_month", #{paid.id})',
+                ) S
             each other in row.others
-                span.badge.type_other(title='#{other.name}\n#{other.cost} zł') O
+                span.badge.type_other(
+                    title='#{other.name}\n#{other.cost} zł'
+                    onclick='view.removeType(this, "other", #{other.id})',
+                ) O
             a.right.btn(onclick='view.addNewTypeTransaction(#{num})') +
 
 

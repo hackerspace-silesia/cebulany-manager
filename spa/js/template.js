@@ -395,7 +395,7 @@ buf.push("<tr><th>" + (jade.escape(null == (jade_interp = row.date) ? "" : jade_
     for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
       var donat = $$obj[$index];
 
-buf.push("<span" + (jade.attr("title", '' + (donat.name) + '\n' + (donat.cost) + ' zł', true, false)) + " class=\"badge type_donation\">D</span>");
+buf.push("<span" + (jade.attr("title", '' + (donat.name) + '\n' + (donat.cost) + ' zł', true, false)) + (jade.attr("onclick", 'view.removeType(this, "donation", ' + (donat.id) + ')', true, false)) + " class=\"badge type_donation\">D</span>");
     }
 
   } else {
@@ -403,7 +403,7 @@ buf.push("<span" + (jade.attr("title", '' + (donat.name) + '\n' + (donat.cost) +
     for (var $index in $$obj) {
       $$l++;      var donat = $$obj[$index];
 
-buf.push("<span" + (jade.attr("title", '' + (donat.name) + '\n' + (donat.cost) + ' zł', true, false)) + " class=\"badge type_donation\">D</span>");
+buf.push("<span" + (jade.attr("title", '' + (donat.name) + '\n' + (donat.cost) + ' zł', true, false)) + (jade.attr("onclick", 'view.removeType(this, "donation", ' + (donat.id) + ')', true, false)) + " class=\"badge type_donation\">D</span>");
     }
 
   }
@@ -417,7 +417,7 @@ buf.push("<span" + (jade.attr("title", '' + (donat.name) + '\n' + (donat.cost) +
     for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
       var bill = $$obj[$index];
 
-buf.push("<span" + (jade.attr("title", '' + (bill.name) + '\n' + (bill.cost) + ' zł', true, false)) + " class=\"badge type_bill\">R</span>");
+buf.push("<span" + (jade.attr("title", '' + (bill.name) + '\n' + (bill.cost) + ' zł', true, false)) + (jade.attr("onclick", 'view.removeType(this, "bill", ' + (bill.id) + ')', true, false)) + " class=\"badge type_bill\">R</span>");
     }
 
   } else {
@@ -425,7 +425,7 @@ buf.push("<span" + (jade.attr("title", '' + (bill.name) + '\n' + (bill.cost) + '
     for (var $index in $$obj) {
       $$l++;      var bill = $$obj[$index];
 
-buf.push("<span" + (jade.attr("title", '' + (bill.name) + '\n' + (bill.cost) + ' zł', true, false)) + " class=\"badge type_bill\">R</span>");
+buf.push("<span" + (jade.attr("title", '' + (bill.name) + '\n' + (bill.cost) + ' zł', true, false)) + (jade.attr("onclick", 'view.removeType(this, "bill", ' + (bill.id) + ')', true, false)) + " class=\"badge type_bill\">R</span>");
     }
 
   }
@@ -439,7 +439,7 @@ buf.push("<span" + (jade.attr("title", '' + (bill.name) + '\n' + (bill.cost) + '
     for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
       var paid = $$obj[$index];
 
-buf.push("<span" + (jade.attr("title", '' + (paid.name) + '\n' + (paid.cost) + ' zł', true, false)) + " class=\"badge type_paid_month\">S</span>");
+buf.push("<span" + (jade.attr("title", '' + (paid.member.name) + '\n' + (paid.cost) + ' zł', true, false)) + (jade.attr("onclick", 'view.removeType(this, "paid_month", ' + (paid.id) + ')', true, false)) + " class=\"badge type_paid_month\">S</span>");
     }
 
   } else {
@@ -447,7 +447,7 @@ buf.push("<span" + (jade.attr("title", '' + (paid.name) + '\n' + (paid.cost) + '
     for (var $index in $$obj) {
       $$l++;      var paid = $$obj[$index];
 
-buf.push("<span" + (jade.attr("title", '' + (paid.name) + '\n' + (paid.cost) + ' zł', true, false)) + " class=\"badge type_paid_month\">S</span>");
+buf.push("<span" + (jade.attr("title", '' + (paid.member.name) + '\n' + (paid.cost) + ' zł', true, false)) + (jade.attr("onclick", 'view.removeType(this, "paid_month", ' + (paid.id) + ')', true, false)) + " class=\"badge type_paid_month\">S</span>");
     }
 
   }
@@ -461,7 +461,7 @@ buf.push("<span" + (jade.attr("title", '' + (paid.name) + '\n' + (paid.cost) + '
     for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
       var other = $$obj[$index];
 
-buf.push("<span" + (jade.attr("title", '' + (other.name) + '\n' + (other.cost) + ' zł', true, false)) + " class=\"badge type_other\">O</span>");
+buf.push("<span" + (jade.attr("title", '' + (other.name) + '\n' + (other.cost) + ' zł', true, false)) + (jade.attr("onclick", 'view.removeType(this, "other", ' + (other.id) + ')', true, false)) + " class=\"badge type_other\">O</span>");
     }
 
   } else {
@@ -469,7 +469,7 @@ buf.push("<span" + (jade.attr("title", '' + (other.name) + '\n' + (other.cost) +
     for (var $index in $$obj) {
       $$l++;      var other = $$obj[$index];
 
-buf.push("<span" + (jade.attr("title", '' + (other.name) + '\n' + (other.cost) + ' zł', true, false)) + " class=\"badge type_other\">O</span>");
+buf.push("<span" + (jade.attr("title", '' + (other.name) + '\n' + (other.cost) + ' zł', true, false)) + (jade.attr("onclick", 'view.removeType(this, "other", ' + (other.id) + ')', true, false)) + " class=\"badge type_other\">O</span>");
     }
 
   }

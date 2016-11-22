@@ -41,5 +41,12 @@ function request(options: any): any {
             body: data && JSON.stringify(data),
             headers: headers
         }
-    ).then((response) => {return response.json();});
+    ).then((response) => {
+        console.log(response.status);
+        switch(response.status) {
+            case 200: case 201: return response.json(); break;
+            case 204: return null; break;
+            default: throw 'Unknown error';
+        }
+    });
 }

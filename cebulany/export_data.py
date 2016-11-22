@@ -15,8 +15,7 @@ if __name__ == "__main__":
             transaction_query = (
                 db.session.query(Transaction)
                 .filter_by(
-                    line_num=record['line_num'],
-                    date=record['date'],
+                    ref_id=record['ref_id'],
                 )
             )
             if transaction_query.first() is None:

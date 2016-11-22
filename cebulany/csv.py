@@ -8,21 +8,18 @@ from re import compile as re_compile
 
 import itertools
 
-re_iban = re_compile(ur'\d\d(\s*\d{4}){6}')
-
 
 TRANSACTION_TYPES = {
     u'PRZELEW UZNANIOWY': re_compile(
         ur'(?P<type>PRZELEW UZNANIOWY) '
-        ur'(\(NADANO (?P<send_date>\d+-\d+-\d+)\) )?'
-        ur'(?P<title>.+?)  +'
-        ur'(?P<name>.+?)(  +|$)'
-        ur'(?P<addr>.*)?'
+        ur'(\(NADANO (?P<send_date>[\d ]+-[\d ]+-[\d ]+)\) )?'
+        ur'(?P<title>.+?)(  +|$)'
+        ur'(?P<name>.+)?'
     ),
     u'PRZELEW OBCIĄŻENIOWY': re_compile(
         ur'(?P<type>PRZELEW OBCIĄŻENIOWY) '
-        ur'(\(NADANO (?P<send_date>\d+-\d+-\d+)\) )?'
-        ur'(?P<title>.+?)  +'
+        ur'(\(NADANO (?P<send_date>[\d ]+-[\d ]+-[\d ]+)\) )?'
+        ur'(?P<title>.+?)(  +|$)'
         ur'(?P<name>.*)?'
     ),
     u'WPŁATA GOTÓWKOWA': re_compile(
@@ -32,14 +29,7 @@ TRANSACTION_TYPES = {
     )
 }
 
-TRANSACTION_TYPES_SQL = {
-    u'PRZELEW UZNANIOWY': 'payment',
-    u'PRZELEW OBCIĄŻENIOWY': 'payout',
-    u'WPŁATA GOTÓWKOWA': 'handy',
-}
-
-DATE_FORMAT = '%Y-%m-%d'
-REV_DATE_FORMAT = '%d-%m-%Y'
+DATE_FORMAT = '%d-%m-%Y'
 
 
 def parse_lines(lines):
@@ -50,16 +40,23 @@ def parse_lines(lines):
 
 
 def parse_line(line, line_num=None):
-    # problably main line has commas
-    # unpacked as ((date, main), cost, total)
-    date_main, cost, total = line.rsplit(',', 2)
-    date, main = date_main.split(',', 1)
+    date, cost, name, main, iban, ref_id, op_code = line.split(u';', 6)
     main = main.strip()
-    data = parse_main(main)
+    if not name:
+        data = parse_main(main)
+    else:
+        name = name.strip()
+        data = dict(
+            main_line=u'{} {}'.format(name, main),
+            title=main,
+            name=name,
+        )
     data.update(
         date=datetime.strptime(date.strip(), DATE_FORMAT).date(),
         cost=Decimal(cost),
         line_num=line_num,
+        iban=iban,
+        ref_id=ref_id,
     )
     return data
 
@@ -72,36 +69,22 @@ def get_data(main):
         if match is not None:
             return match.groupdict()
     else:
-        raise ValueError(main)
-
-def get_iban(main):
-    match = re_iban.search(main)
-    if match is None:
-        return main, ''
-    return main[:match.start(0)], match.group(0)
+        raise ValueError(repr(main))
 
 
 def parse_main(main):
-    without_iban, iban = get_iban(main)
-    data = get_data(without_iban)
-    send_date = data.get('send_date')
-    send_date = send_date and datetime.strptime(send_date, REV_DATE_FORMAT)
-    data_type = TRANSACTION_TYPES_SQL.get(data['type'], 'unknown')
+    data = get_data(main)
 
     return dict(
-        type=data_type,
-        send_date=send_date and send_date.date(),
         title=data['title'],
         name=data.get('name', ''),
-        address=data.get('addr'),
-        iban=iban or None,
         main_line=main,
     )
 
 
 def open_and_parse(arg):
-    with codecs_open(arg, encoding='windows-1250') as f:
-        return parse_lines(f.readlines()[1:-1])
+    with codecs_open(arg, encoding='utf-8') as f:
+        return parse_lines(f.readlines())
     
 
 if __name__ == "__main__":

@@ -115,4 +115,21 @@ class TransactionView {
         setHTML('type_users', '');
     }
 
+    removeType(ev, str_type, id) {
+        var title = ev.title.replace('/\n/g', ' ');
+        var yes = confirm(`Czy chcesz skasować typ "${str_type}" o tytule "${ev.title}"?`)
+        var self = this;
+        if (!yes) {
+            return;
+        }
+
+        request({
+            url: `${str_type}/${id}`,
+            method: 'DELETE',
+        }).then((json) => {
+            self.getTransactions();
+        });
+
+    }
+
 }
