@@ -114,7 +114,16 @@ var TransactionView = (function () {
         var self = this;
         setHTML('transactions', renderTableLoading());
         request({ url: 'transactions', query_form: 'transactions' }).then(function (json) {
+            var total_left = 0;
             self.transactions = json.transactions;
+            self.transactions.forEach(function (tran) {
+                tran.left = new Number(tran.cost);
+                var sub_total = function (obj) { tran.left -= new Number(obj.cost); };
+                var types = [tran.donations, tran.paidmonths, tran.bills, tran.others];
+                types.forEach(function (tran_type) { tran_type.forEach(sub_total); });
+                total_left += tran.left;
+            });
+            json.total_left = total_left;
             setHTML('transactions', renderTableTransactions(json));
         });
     };

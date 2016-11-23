@@ -6,6 +6,9 @@ mixin transaction_row(num, row)
         td.price(
             class=row.cost < 0 ? 'negative' : 'positive'
           )= row.cost + " zł"
+        td.price(
+            class=row.left < 0 ? 'negative' : ''
+        )= row.left + " zł"
         //td(title=row.iban)= maxChars(row.iban && row.iban.replace(/ /g, ''), 5)
         td
             each donat in row.donations
@@ -31,22 +34,24 @@ mixin transaction_row(num, row)
             a.right.btn(onclick='view.addNewTypeTransaction(#{num})') +
 
 
-mixin foot_row(title, value)
+mixin foot_row(title, value, value2='')
     tr
         th= title
         th(colspan=2)
         th.price: strong= value
+        th.price: strong= value2
         th
 
 thead: tr
-    th(width='7%') Data
+    th(width='6%') Data
     th(width='38%') Nazwa
-    th(width='40%') Tytuł
+    th(width='38%') Tytuł
     th(width='6%') Kwota
-    th(width='5%') Typy 
+    th(width='6%'): small Pozostało do roz.
+    th(width='6%') Typy 
 tbody
     each row, num in transactions
         +transaction_row(num, row)
 tfoot
-    +foot_row('SUMA', sum + ' zł')
+    +foot_row('SUMA', sum + ' zł', total_left + ' zł')
     +foot_row('TOTAL', transactions.length)

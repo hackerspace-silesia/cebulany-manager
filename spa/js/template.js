@@ -383,10 +383,10 @@ function renderTableTransactions(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-;var locals_for_with = (locals || {});(function (maxChars, sum, transactions, undefined) {
+;var locals_for_with = (locals || {});(function (maxChars, sum, total_left, transactions, undefined) {
 jade_mixins["transaction_row"] = jade_interp = function(num, row){
 var block = (this && this.block), attributes = (this && this.attributes) || {};
-buf.push("<tr><th>" + (jade.escape(null == (jade_interp = row.date) ? "" : jade_interp)) + "</th><td" + (jade.attr("title", row.name, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.name, 60)) ? "" : jade_interp)) + "</td><td" + (jade.attr("title", row.title, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.title, 60)) ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',row.cost < 0 ? 'negative' : 'positive'], [null,true])) + ">" + (jade.escape(null == (jade_interp = row.cost + " zł") ? "" : jade_interp)) + "</td><!--td(title=row.iban)= maxChars(row.iban && row.iban.replace(/ /g, ''), 5)--><td>");
+buf.push("<tr><th>" + (jade.escape(null == (jade_interp = row.date) ? "" : jade_interp)) + "</th><td" + (jade.attr("title", row.name, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.name, 60)) ? "" : jade_interp)) + "</td><td" + (jade.attr("title", row.title, true, false)) + ">" + (jade.escape(null == (jade_interp = maxChars(row.title, 60)) ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',row.cost < 0 ? 'negative' : 'positive'], [null,true])) + ">" + (jade.escape(null == (jade_interp = row.cost + " zł") ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',row.left < 0 ? 'negative' : ''], [null,true])) + ">" + (jade.escape(null == (jade_interp = row.left + " zł") ? "" : jade_interp)) + "</td><!--td(title=row.iban)= maxChars(row.iban && row.iban.replace(/ /g, ''), 5)--><td>");
 // iterate row.donations
 ;(function(){
   var $$obj = row.donations;
@@ -477,11 +477,11 @@ buf.push("<span" + (jade.attr("title", '' + (other.name) + '\n' + (other.cost) +
 
 buf.push("<a" + (jade.attr("onclick", 'view.addNewTypeTransaction(' + (num) + ')', true, false)) + " class=\"right btn\">+</a></td></tr>");
 };
-jade_mixins["foot_row"] = jade_interp = function(title, value){
+jade_mixins["foot_row"] = jade_interp = function(title, value, value2=''){
 var block = (this && this.block), attributes = (this && this.attributes) || {};
-buf.push("<tr><th>" + (jade.escape(null == (jade_interp = title) ? "" : jade_interp)) + "</th><th colspan=\"2\"></th><th class=\"price\"><strong>" + (jade.escape(null == (jade_interp = value) ? "" : jade_interp)) + "</strong></th><th></th></tr>");
+buf.push("<tr><th>" + (jade.escape(null == (jade_interp = title) ? "" : jade_interp)) + "</th><th colspan=\"2\"></th><th class=\"price\"><strong>" + (jade.escape(null == (jade_interp = value) ? "" : jade_interp)) + "</strong></th><th class=\"price\"><strong>" + (jade.escape(null == (jade_interp = value2) ? "" : jade_interp)) + "</strong></th><th></th></tr>");
 };
-buf.push("<thead><tr><th width=\"7%\">Data</th><th width=\"38%\">Nazwa</th><th width=\"40%\">Tytuł</th><th width=\"6%\">Kwota</th><th width=\"5%\">Typy </th></tr></thead><tbody>");
+buf.push("<thead><tr><th width=\"6%\">Data</th><th width=\"38%\">Nazwa</th><th width=\"38%\">Tytuł</th><th width=\"6%\">Kwota</th><th width=\"6%\"><small>Pozostało do roz.</small></th><th width=\"6%\">Typy </th></tr></thead><tbody>");
 // iterate transactions
 ;(function(){
   var $$obj = transactions;
@@ -505,9 +505,9 @@ jade_mixins["transaction_row"](num, row);
 }).call(this);
 
 buf.push("</tbody><tfoot>");
-jade_mixins["foot_row"]('SUMA', sum + ' zł');
+jade_mixins["foot_row"]('SUMA', sum + ' zł', total_left + ' zł');
 jade_mixins["foot_row"]('TOTAL', transactions.length);
-buf.push("</tfoot>");}.call(this,"maxChars" in locals_for_with?locals_for_with.maxChars:typeof maxChars!=="undefined"?maxChars:undefined,"sum" in locals_for_with?locals_for_with.sum:typeof sum!=="undefined"?sum:undefined,"transactions" in locals_for_with?locals_for_with.transactions:typeof transactions!=="undefined"?transactions:undefined,"undefined" in locals_for_with?locals_for_with.undefined:typeof undefined!=="undefined"?undefined:undefined));;return buf.join("");
+buf.push("</tfoot>");}.call(this,"maxChars" in locals_for_with?locals_for_with.maxChars:typeof maxChars!=="undefined"?maxChars:undefined,"sum" in locals_for_with?locals_for_with.sum:typeof sum!=="undefined"?sum:undefined,"total_left" in locals_for_with?locals_for_with.total_left:typeof total_left!=="undefined"?total_left:undefined,"transactions" in locals_for_with?locals_for_with.transactions:typeof transactions!=="undefined"?transactions:undefined,"undefined" in locals_for_with?locals_for_with.undefined:typeof undefined!=="undefined"?undefined:undefined));;return buf.join("");
 }
 function renderTransactions(locals) {
 var buf = [];
