@@ -439,7 +439,7 @@ buf.push("<span" + (jade.attr("title", '' + (bill.name) + '\n' + (bill.cost) + '
     for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
       var paid = $$obj[$index];
 
-buf.push("<span" + (jade.attr("title", '' + (paid.member.name) + '\n' + (paid.cost) + ' zł', true, false)) + (jade.attr("onclick", 'view.removeType(this, "paid_month", ' + (paid.id) + ')', true, false)) + " class=\"badge type_paid_month\">S</span>");
+buf.push("<span" + (jade.attr("title", '' + (paid.member.name) + '\n' + (paid.date) + '\n' + (paid.cost) + ' zł', true, false)) + (jade.attr("onclick", 'view.removeType(this, "paid_month", ' + (paid.id) + ')', true, false)) + " class=\"badge type_paid_month\">S</span>");
     }
 
   } else {
@@ -447,7 +447,7 @@ buf.push("<span" + (jade.attr("title", '' + (paid.member.name) + '\n' + (paid.co
     for (var $index in $$obj) {
       $$l++;      var paid = $$obj[$index];
 
-buf.push("<span" + (jade.attr("title", '' + (paid.member.name) + '\n' + (paid.cost) + ' zł', true, false)) + (jade.attr("onclick", 'view.removeType(this, "paid_month", ' + (paid.id) + ')', true, false)) + " class=\"badge type_paid_month\">S</span>");
+buf.push("<span" + (jade.attr("title", '' + (paid.member.name) + '\n' + (paid.date) + '\n' + (paid.cost) + ' zł', true, false)) + (jade.attr("onclick", 'view.removeType(this, "paid_month", ' + (paid.id) + ')', true, false)) + " class=\"badge type_paid_month\">S</span>");
     }
 
   }

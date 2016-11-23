@@ -20,7 +20,7 @@ mixin transaction_row(num, row)
                 ) R
             each paid in row.paidmonths
                 span.badge.type_paid_month(
-                    title='#{paid.member.name}\n#{paid.cost} zł',
+                    title='#{paid.member.name}\n#{paid.date}\n#{paid.cost} zł',
                     onclick='view.removeType(this, "paid_month", #{paid.id})',
                 ) S
             each other in row.others
