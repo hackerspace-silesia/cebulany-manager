@@ -57,7 +57,7 @@ buf.push("<thead><th>Data</th><th>Nazwa</th><th>Kwota</th><th>*</th></thead><tbo
     for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
       var obj = $$obj[$index];
 
-buf.push("<tr><td>" + (jade.escape(null == (jade_interp = obj.transaction.date) ? "" : jade_interp)) + "</td><td>" + (jade.escape(null == (jade_interp = obj.name) ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',obj.cost < 0 ? 'negative' : 'positive'], [null,true])) + ">" + (jade.escape(null == (jade_interp = obj.cost + " zł") ? "" : jade_interp)) + "</td><td><a" + (jade.attr("onclick", 'view.DeleteRecord(' + (obj.id) + ')', true, false)) + " class=\"btn\">Usuń</a></td></tr>");
+buf.push("<tr><td>" + (jade.escape(null == (jade_interp = obj.transaction.date) ? "" : jade_interp)) + "</td><td>" + (jade.escape(null == (jade_interp = obj.name) ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',obj.cost < 0 ? 'negative' : 'positive'], [null,true])) + ">" + (jade.escape(null == (jade_interp = obj.cost + " zł") ? "" : jade_interp)) + "</td><td><a" + (jade.attr("onclick", 'view.deleteRecord(this, ' + (obj.id) + ')', true, false)) + " class=\"btn\">Usuń</a></td></tr>");
     }
 
   } else {
@@ -65,7 +65,7 @@ buf.push("<tr><td>" + (jade.escape(null == (jade_interp = obj.transaction.date) 
     for (var $index in $$obj) {
       $$l++;      var obj = $$obj[$index];
 
-buf.push("<tr><td>" + (jade.escape(null == (jade_interp = obj.transaction.date) ? "" : jade_interp)) + "</td><td>" + (jade.escape(null == (jade_interp = obj.name) ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',obj.cost < 0 ? 'negative' : 'positive'], [null,true])) + ">" + (jade.escape(null == (jade_interp = obj.cost + " zł") ? "" : jade_interp)) + "</td><td><a" + (jade.attr("onclick", 'view.DeleteRecord(' + (obj.id) + ')', true, false)) + " class=\"btn\">Usuń</a></td></tr>");
+buf.push("<tr><td>" + (jade.escape(null == (jade_interp = obj.transaction.date) ? "" : jade_interp)) + "</td><td>" + (jade.escape(null == (jade_interp = obj.name) ? "" : jade_interp)) + "</td><td" + (jade.cls(['price',obj.cost < 0 ? 'negative' : 'positive'], [null,true])) + ">" + (jade.escape(null == (jade_interp = obj.cost + " zł") ? "" : jade_interp)) + "</td><td><a" + (jade.attr("onclick", 'view.deleteRecord(this, ' + (obj.id) + ')', true, false)) + " class=\"btn\">Usuń</a></td></tr>");
     }
 
   }

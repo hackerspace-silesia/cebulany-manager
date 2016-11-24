@@ -11,4 +11,4 @@ tbody
             td.price(
                 class=obj.cost < 0 ? 'negative' : 'positive'
             )= obj.cost + " zł"
-            td: a.btn(onclick='view.DeleteRecord(#{obj.id})') Usuń
+            td: a.btn(onclick='view.deleteRecord(this, #{obj.id})') Usuń

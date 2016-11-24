@@ -14,4 +14,19 @@ class DefaultTableView {
         })
     } 
 
+    deleteRecord(ev, id) {
+        var yes = confirm(`Czy napewno chcesz skasować?`);
+        var self = this;
+        if (!yes) {
+            return;
+        }
+
+        request({
+            url: this.endpoint,
+            method: 'DELETE',
+        }).then((json) => {
+            self.showRecords();
+        });
+
+    }
 }

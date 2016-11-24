@@ -259,6 +259,19 @@ var DefaultTableView = (function () {
             }));
         });
     };
+    DefaultTableView.prototype.deleteRecord = function (ev, id) {
+        var yes = confirm("Czy napewno chcesz skasowa\u0107?");
+        var self = this;
+        if (!yes) {
+            return;
+        }
+        request({
+            url: this.endpoint,
+            method: 'DELETE'
+        }).then(function (json) {
+            self.showRecords();
+        });
+    };
     return DefaultTableView;
 }());
 ///<reference path="./default_table.ts"/>
