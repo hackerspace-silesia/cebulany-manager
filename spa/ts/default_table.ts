@@ -22,7 +22,7 @@ class DefaultTableView {
         }
 
         request({
-            url: this.endpoint,
+            url: `${this.endpoint}/${id}`,
             method: 'DELETE',
         }).then((json) => {
             self.showRecords();

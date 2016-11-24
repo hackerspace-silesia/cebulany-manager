@@ -266,7 +266,7 @@ var DefaultTableView = (function () {
             return;
         }
         request({
-            url: this.endpoint,
+            url: this.endpoint + "/" + id,
             method: 'DELETE'
         }).then(function (json) {
             self.showRecords();

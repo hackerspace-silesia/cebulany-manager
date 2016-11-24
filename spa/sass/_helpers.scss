@@ -4,6 +4,7 @@
     border-radius: 5px;
     color: white;
     padding: 0 2px;
+    td & { float: left; }
 
     &.type_donation { background: #339ACC; }
     &.type_bill { background: #D92121; }
