@@ -92,7 +92,7 @@ class TransactionView {
             method: 'POST',
             data_form: 'add_type_' + action
         }).then((json) => {
-            self.closeModal()
+            self.closeModal();
             self.getTransactions();
         });
     }
@@ -125,7 +125,7 @@ class TransactionView {
     }
 
     removeType(ev, str_type, id) {
-        var title = ev.title.replace('/\n/g', ' ');
+        var title = ev.title.replace('/\\n/g', ' ');
         var yes = confirm(`Czy chcesz skasować typ "${str_type}" o tytule "${ev.title}"?`)
         var self = this;
         if (!yes) {

@@ -6,7 +6,7 @@ mixin paid_cell(member, year, month)
         - var not_payed = member.join_date < dt && dt <= dt_now
         td(class=not_payed? 'warn' : '')= '-'
     else
-        td= Number(value).toFixed()
+        td(onclick='view.showPaidMonths(#{member.id}, "#{dt}")')= Number(value).toFixed()
 
 thead
     tr

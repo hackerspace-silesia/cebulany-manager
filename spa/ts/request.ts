@@ -42,7 +42,6 @@ function request(options: any): any {
             headers: headers
         }
     ).then((response) => {
-        console.log(response.status);
         switch(response.status) {
             case 200: case 201: return response.json(); break;
             case 204: return null; break;

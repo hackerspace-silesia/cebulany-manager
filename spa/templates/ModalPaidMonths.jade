@@ -1,0 +1,24 @@
+div.modal-content
+    h4 Płatności
+    h5
+        = member_name
+        = " "
+        = dt
+    table.summary
+        thead: tr
+            th Data transakcji
+            th Nazwa
+            th Tytuł
+            th Kwota
+            th *
+        tbody
+            - for obj in paid_months
+                tr
+                    th= obj.transaction.date
+                    td= obj.transaction.name
+                    td= obj.transaction.title
+                    td= new Number(obj.cost).toFixed(2)
+                    td: a.btn(onclick='view.removePaidMonth(this, #{obj.id})') Usuń
+
+    button(type='button', onclick='view.closeModal()') Zamknij
+

@@ -10,6 +10,8 @@ resource_fields = {
     'cost': fields.Price(decimals=2),
     'transaction': fields.Nested({
         'date': fields.DateTime(dt_format='iso8601'),
+        'name': fields.String,
+        'title': fields.String,
     })
 }
 

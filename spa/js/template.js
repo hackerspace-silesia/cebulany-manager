@@ -85,7 +85,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<h1>Członkowie</h1><h2>Płatności</h2><table id=\"table-members\"></table>");;return buf.join("");
+buf.push("<h1>Członkowie</h1><h2>Płatności</h2><table id=\"table-members\"></table><div id=\"modal_paidmonth\" class=\"modal disabled\"></div>");;return buf.join("");
 }
 function renderModalAddNewTypeTransaction(locals) {
 var buf = [];
@@ -101,6 +101,36 @@ jade_mixins["default_form"]('add_type_bill');
 jade_mixins["default_form"]('add_type_donation');
 jade_mixins["default_form"]('add_type_other');
 buf.push("<button type=\"button\" onclick=\"view.addType()\">Dodaj</button><button type=\"button\" onclick=\"view.closeModal()\">Zamknij</button></div>");}.call(this,"transaction" in locals_for_with?locals_for_with.transaction:typeof transaction!=="undefined"?transaction:undefined));;return buf.join("");
+}
+function renderModalPaidMonths(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+;var locals_for_with = (locals || {});(function (Number, dt, member_name, paid_months, undefined) {
+buf.push("<div class=\"modal-content\"><h4>Płatności</h4><h5>" + (jade.escape(null == (jade_interp = member_name) ? "" : jade_interp)) + (jade.escape(null == (jade_interp = " ") ? "" : jade_interp)) + (jade.escape(null == (jade_interp = dt) ? "" : jade_interp)) + "</h5><table class=\"summary\"><thead><tr><th>Data transakcji</th><th>Nazwa</th><th>Tytuł</th><th>Kwota</th><th>*</th></tr></thead><tbody>");
+// iterate paid_months
+;(function(){
+  var $$obj = paid_months;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var obj = $$obj[$index];
+
+buf.push("<tr><th>" + (jade.escape(null == (jade_interp = obj.transaction.date) ? "" : jade_interp)) + "</th><td>" + (jade.escape(null == (jade_interp = obj.transaction.name) ? "" : jade_interp)) + "</td><td>" + (jade.escape(null == (jade_interp = obj.transaction.title) ? "" : jade_interp)) + "</td><td>" + (jade.escape(null == (jade_interp = new Number(obj.cost).toFixed(2)) ? "" : jade_interp)) + "</td><td><a" + (jade.attr("onclick", 'view.removePaidMonth(this, ' + (obj.id) + ')', true, false)) + " class=\"btn\">Usuń</a></td></tr>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var obj = $$obj[$index];
+
+buf.push("<tr><th>" + (jade.escape(null == (jade_interp = obj.transaction.date) ? "" : jade_interp)) + "</th><td>" + (jade.escape(null == (jade_interp = obj.transaction.name) ? "" : jade_interp)) + "</td><td>" + (jade.escape(null == (jade_interp = obj.transaction.title) ? "" : jade_interp)) + "</td><td>" + (jade.escape(null == (jade_interp = new Number(obj.cost).toFixed(2)) ? "" : jade_interp)) + "</td><td><a" + (jade.attr("onclick", 'view.removePaidMonth(this, ' + (obj.id) + ')', true, false)) + " class=\"btn\">Usuń</a></td></tr>");
+    }
+
+  }
+}).call(this);
+
+buf.push("</tbody></table><button type=\"button\" onclick=\"view.closeModal()\">Zamknij</button></div>");}.call(this,"Number" in locals_for_with?locals_for_with.Number:typeof Number!=="undefined"?Number:undefined,"dt" in locals_for_with?locals_for_with.dt:typeof dt!=="undefined"?dt:undefined,"member_name" in locals_for_with?locals_for_with.member_name:typeof member_name!=="undefined"?member_name:undefined,"paid_months" in locals_for_with?locals_for_with.paid_months:typeof paid_months!=="undefined"?paid_months:undefined,"undefined" in locals_for_with?locals_for_with.undefined:typeof undefined!=="undefined"?undefined:undefined));;return buf.join("");
 }
 function renderOthers(locals) {
 var buf = [];
@@ -133,7 +163,7 @@ buf.push("<td" + (jade.cls([not_payed? 'warn' : ''], [true])) + ">" + (jade.esca
 }
 else
 {
-buf.push("<td>" + (jade.escape(null == (jade_interp = Number(value).toFixed()) ? "" : jade_interp)) + "</td>");
+buf.push("<td" + (jade.attr("onclick", 'view.showPaidMonths(' + (member.id) + ', "' + (dt) + '")', true, false)) + ">" + (jade.escape(null == (jade_interp = Number(value).toFixed()) ? "" : jade_interp)) + "</td>");
 }
 };
 buf.push("<thead><tr><th rowspan=\"2\">Nazwa</th>");

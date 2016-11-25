@@ -15,13 +15,14 @@ class MemberView {
 
     getTablePaidMonths() {
         var members = {};
+        this.members = members;
         var paidmonths = {};
         setHTML('table-members', renderTableLoading());
         request({url: 'members'}).then((json) => {
             json.forEach((obj) => {
                 members[obj.id] = obj;
             });
-            return request({url: 'paid_month'});
+            return request({url: 'paid_month/table'});
         }).then((json) => {
             json.forEach((member) => {
                 member.months.forEach((month) => {
@@ -43,4 +44,52 @@ class MemberView {
         })
     }
 
+    showPaidMonths(id: number, dt: string) {
+        var modal_paidmonth = byId('modal_paidmonth');
+        modal_paidmonth.dataset.member_id = id;
+        modal_paidmonth.dataset.dt = dt;
+        modal_paidmonth.className = 'modal';
+        this.getPaidMonths();
+    }
+
+    getPaidMonths() {
+        var modal_paidmonth = byId('modal_paidmonth');
+        var member_id = modal_paidmonth.dataset.member_id;
+        var dt = modal_paidmonth.dataset.dt;
+        var member_name = this.members[member_id].name;
+        request({
+            url: 'paid_month',
+            query_params: {
+                member_id: member_id,
+                month: dt
+            }
+        }).then((json) => {
+            setHTML('modal_paidmonth', renderModalPaidMonths({
+                paid_months: json,
+                member_name: member_name,
+                dt: dt
+            }));
+        })
+    }
+
+    removePaidMonth(ev, id: number) {
+        var yes = confirm(`Czy chcesz skasować tą płatność?`)
+        var self = this;
+        if (!yes) {
+            return;
+        }
+
+        request({
+            url: `paid_month/${id}`,
+            method: 'DELETE',
+        }).then((json) => {
+            self.getPaidMonths();
+            self.getTablePaidMonths();
+        });
+    }
+
+    closeModal() {
+        setHTML('modal_paidmonth', '');
+        byId('modal_paidmonth').className = 'modal disabled';
+    }
 }

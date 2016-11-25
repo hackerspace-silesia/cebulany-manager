@@ -62,7 +62,6 @@ function request(options) {
         body: data && JSON.stringify(data),
         headers: headers
     }).then(function (response) {
-        console.log(response.status);
         switch (response.status) {
             case 200:
             case 201:
@@ -188,7 +187,7 @@ var TransactionView = (function () {
         setHTML('type_users', '');
     };
     TransactionView.prototype.removeType = function (ev, str_type, id) {
-        var title = ev.title.replace('/\n/g', ' ');
+        var title = ev.title.replace('/\\n/g', ' ');
         var yes = confirm("Czy chcesz skasowa\u0107 typ \"" + str_type + "\" o tytule \"" + ev.title + "\"?");
         var self = this;
         if (!yes) {
@@ -216,13 +215,14 @@ var MemberView = (function () {
     }
     MemberView.prototype.getTablePaidMonths = function () {
         var members = {};
+        this.members = members;
         var paidmonths = {};
         setHTML('table-members', renderTableLoading());
         request({ url: 'members' }).then(function (json) {
             json.forEach(function (obj) {
                 members[obj.id] = obj;
             });
-            return request({ url: 'paid_month' });
+            return request({ url: 'paid_month/table' });
         }).then(function (json) {
             json.forEach(function (member) {
                 member.months.forEach(function (month) {
@@ -242,6 +242,50 @@ var MemberView = (function () {
                 months: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'] // i know bro, arr.map() but is midnight
             }));
         });
+    };
+    MemberView.prototype.showPaidMonths = function (id, dt) {
+        var modal_paidmonth = byId('modal_paidmonth');
+        modal_paidmonth.dataset.member_id = id;
+        modal_paidmonth.dataset.dt = dt;
+        modal_paidmonth.className = 'modal';
+        this.getPaidMonths();
+    };
+    MemberView.prototype.getPaidMonths = function () {
+        var modal_paidmonth = byId('modal_paidmonth');
+        var member_id = modal_paidmonth.dataset.member_id;
+        var dt = modal_paidmonth.dataset.dt;
+        var member_name = this.members[member_id].name;
+        request({
+            url: 'paid_month',
+            query_params: {
+                member_id: member_id,
+                month: dt
+            }
+        }).then(function (json) {
+            setHTML('modal_paidmonth', renderModalPaidMonths({
+                paid_months: json,
+                member_name: member_name,
+                dt: dt
+            }));
+        });
+    };
+    MemberView.prototype.removePaidMonth = function (ev, id) {
+        var yes = confirm("Czy chcesz skasowa\u0107 t\u0105 p\u0142atno\u015B\u0107?");
+        var self = this;
+        if (!yes) {
+            return;
+        }
+        request({
+            url: "paid_month/" + id,
+            method: 'DELETE'
+        }).then(function (json) {
+            self.getPaidMonths();
+            self.getTablePaidMonths();
+        });
+    };
+    MemberView.prototype.closeModal = function () {
+        setHTML('modal_paidmonth', '');
+        byId('modal_paidmonth').className = 'modal disabled';
     };
     return MemberView;
 }());

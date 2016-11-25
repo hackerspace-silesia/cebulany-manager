@@ -14,9 +14,22 @@ parser.add_argument('transaction_id', required=True, type=int)
 parser.add_argument('cost', required=True)
 parser.add_argument('date', type=month_type)
 
+query_parser = RequestParser()
+query_parser.add_argument('member_id',type=int)
+query_parser.add_argument('month', type=month_type)
+
+transaction_fields = {
+    'date': fields.DateTime(dt_format='iso8601'),
+    'name': fields.String,
+    'title': fields.String,
+}
+
 paid_month_fields = {
+    'id': fields.Integer,
     'date': fields.DateTime(dt_format='iso8601'),
     'transaction_id': fields.Integer,
+    'member_id': fields.Integer,
+    'transaction': fields.Nested(transaction_fields),
     'cost': fields.Price,
 }
 
@@ -29,7 +42,7 @@ paid_month_sum_fields = {
 }
 
 
-class PaidMonthListResource(ModelListResource):
+class PaidMonthTableResource(ModelListResource):
     cls = PaidMonth
     parser = parser
     resource_fields = paid_month_fields
@@ -60,6 +73,34 @@ class PaidMonthListResource(ModelListResource):
             }
             for member_id, data in groupby(query.all(), lambda o: o[0])
         ]
+
+
+class PaidMonthListResource(ModelListResource):
+    cls = PaidMonth
+    parser = parser
+    resource_fields = paid_month_fields
+
+    def get_list_query(self):
+        cls = self.cls
+        query = cls.query.join(
+            cls.transaction
+        ).order_by(
+            Transaction.date.desc()
+        )
+        query_args = query_parser.parse_args()
+        member_id = query_args['member_id']
+        month = query_args['month']
+
+        if member_id:
+            query = query.filter(
+                cls.member_id == member_id
+            )
+        if month:
+            query = query.filter(
+                sql_func.strftime('%Y-%m', cls.date) == month.strftime('%Y-%m')
+            )
+        print query
+        return query.all()
 
     def post(self):
         data, status = super(PaidMonthListResource, self).post()

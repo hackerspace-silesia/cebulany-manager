@@ -4,7 +4,7 @@ from cebulany.models import db
 
 from cebulany.resources.transaction import TransactionResource
 from cebulany.resources.member import MemberResource, MemberListResource
-from cebulany.resources.paid_month import PaidMonthListResource, PaidMonthResource
+from cebulany.resources.paid_month import PaidMonthListResource, PaidMonthResource, PaidMonthTableResource
 from cebulany.resources.bill import BillListResource, BillResource
 from cebulany.resources.donation import DonationListResource, DonationResource
 from cebulany.resources.other import OtherListResource, OtherResource
@@ -19,6 +19,7 @@ api.add_resource(MemberListResource, '/api/members')
 api.add_resource(MemberResource, '/api/members/<int:id>')
 
 api.add_resource(PaidMonthListResource, '/api/paid_month')
+api.add_resource(PaidMonthTableResource, '/api/paid_month/table')
 api.add_resource(PaidMonthResource, '/api/paid_month/<int:id>')
 api.add_resource(BillListResource, '/api/bill')
 api.add_resource(BillResource, '/api/bill/<int:id>')
