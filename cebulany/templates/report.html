@@ -1,0 +1,40 @@
+<style>
+body {
+    font-family: 'Arial';
+    font-size: 16pt;
+}
+table {
+    margin-top: 20px;
+    width: 600px;
+}
+caption {
+    font-size: 24pt;
+}
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+thead {
+    background-color: black;
+    color: white;
+}
+</style>
+{% for report in months %}
+<table>
+    <caption> {{report.year}}-{{"%02d" | format(report.month) }}
+    <thead>
+        <tr>
+            <th>NAZWA</th>
+            <th>WARTOŚĆ</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in report.rows %}
+        <tr>
+            <td>{{ row.name | upper }}</td>
+            <td>{{ row.value }} {{ row.suffix }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endfor %}

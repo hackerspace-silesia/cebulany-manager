@@ -8,6 +8,7 @@ from cebulany.resources.paid_month import PaidMonthListResource, PaidMonthResour
 from cebulany.resources.bill import BillListResource, BillResource
 from cebulany.resources.donation import DonationListResource, DonationResource
 from cebulany.resources.other import OtherListResource, OtherResource
+from cebulany.resources.report import report_page
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -27,6 +28,8 @@ api.add_resource(DonationListResource, '/api/donation')
 api.add_resource(DonationResource, '/api/donation/<int:id>')
 api.add_resource(OtherListResource, '/api/other')
 api.add_resource(OtherResource, '/api/other/<int:id>')
+
+app.register_blueprint(report_page)
 
 
 @app.route('/')
