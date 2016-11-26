@@ -53,7 +53,7 @@ class ReportMonth(object):
     def compute_bills(self):
         query = db.session.query(
             Bill.name,
-            Bill.cost,
+            sql_func.sum(Bill.cost),
         ).join(
             Bill.transaction
         ).filter(
@@ -85,7 +85,7 @@ class ReportMonth(object):
     def compute_others(self):
         query = db.session.query(
             Other.name,
-            Other.cost,
+            sql_func.sum(Other.cost),
         ).join(
             Other.transaction
         ).filter(
@@ -140,6 +140,5 @@ def basic():
         ReportMonth(year, month, total)
         for year, month, total in query_dates.all()
     ]
-
 
     return render_template('report.html', months=months)
