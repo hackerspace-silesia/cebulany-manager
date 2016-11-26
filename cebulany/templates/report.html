@@ -4,13 +4,17 @@ body {
     font-size: 16pt;
     color: #7b7b7b;
 }
+#main {
+    width: 900px;
+    margin: auto;
+}
 table {
     margin-top: 20px;
     box-shadow: 1px 1px 1px #bcbcbc;
 }
 caption {
     font-size: 24pt;
-    font-align: left;
+    text-align: left;
 }
 table, th, td {
     border: 1px solid #bcbcbc;
@@ -31,9 +35,13 @@ thead {
     color: #B2140C;
 }
 </style>
+<div id='main'>
 {% for report in months %}
 <table>
-    <caption> {{report.year}}-{{"%02d" | format(report.month) }}
+    <caption>
+        {{report.year}}
+        {% if report.month %} - {{"%02d" | format(report.month) }}{% endif %}
+    </caption>
     <thead>
         <tr>
             <th>NAZWA</th>
@@ -50,3 +58,4 @@ thead {
     </tbody>
 </table>
 {% endfor %}
+</div>
