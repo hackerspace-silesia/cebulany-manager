@@ -99,7 +99,6 @@ class PaidMonthListResource(ModelListResource):
             query = query.filter(
                 sql_func.strftime('%Y-%m', cls.date) == month.strftime('%Y-%m')
             )
-        print query
         return query.all()
 
     def post(self):
