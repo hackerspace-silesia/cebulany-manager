@@ -2,21 +2,33 @@
 body {
     font-family: 'Arial';
     font-size: 16pt;
+    color: #7b7b7b;
 }
 table {
     margin-top: 20px;
-    width: 600px;
+    box-shadow: 1px 1px 1px #bcbcbc;
 }
 caption {
     font-size: 24pt;
+    font-align: left;
 }
 table, th, td {
-    border: 1px solid black;
+    border: 1px solid #bcbcbc;
     border-collapse: collapse;
 }
+td.name {
+    width: 500px;
+}
+td.value {
+    width: 100px;
+    text-align: right;
+}
 thead {
-    background-color: black;
+    background-color: #62B5FF;
     color: white;
+}
+.negative {
+    color: #B2140C;
 }
 </style>
 {% for report in months %}
@@ -31,8 +43,8 @@ thead {
     <tbody>
         {% for row in report.rows %}
         <tr>
-            <td>{{ row.name | upper }}</td>
-            <td>{{ row.value }} {{ row.suffix }}</td>
+            <td class='name'>{{ row.name | upper }}</td>
+            <td class='value {{ row.get_classes() }}'>{{ row.get_value() }}</td>
         </tr>
         {% endfor %}
     </tbody>

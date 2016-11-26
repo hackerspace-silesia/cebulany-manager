@@ -24,17 +24,15 @@ class ReportMonth(object):
         self.month = month
         self.rows = []
 
-        paids_value = self.compute_paids()
-        bills_value = self.compute_bills()
-        donations_value = self.compute_donations()
-        others_value = self.compute_others()
+        values = sum([
+            self.compute_paids(),
+            self.compute_bills(),
+            self.compute_donations(),
+            self.compute_others(),
+        ])
 
-        self.rows.append(Row(
-            u'NIE ROZLICZONE',
-            total - (paids_value + bills_value + donations_value + others_value),
-            u'zł'
-        ))
-        self.rows.append(Row(u'RAZEM', total, u'zł'))
+        self.rows.append(Money(u'NIE ROZLICZONE', total - values))
+        self.rows.append(Money(u'RAZEM', total))
 
     def compute_paids(self):
         query = db.session.query(
@@ -45,12 +43,11 @@ class ReportMonth(object):
         ).filter(year_field == self.year, month_field == self.month)
 
         paids_value, member_count = query.first()
-        # todo: maybe i18n lol im too lazy
-        self.rows.append(Row(u'SKŁADKI', round(paids_value, 2), u'zł'))
-        self.rows.append(Row(u'WPŁACIŁO', member_count , u'osób'))
+        self.rows.append(Money(u'SKŁADKI', paids_value))
+        self.rows.append(Row(u'WPŁACIŁO', member_count))
         if member_count > 0:
-            avg_paid = round(paids_value / member_count, 2)
-            self.rows.append(Row(u'ŚREDNIA SKŁADEK', avg_paid , u'zł'))
+            avg_value = paids_value / member_count
+            self.rows.append(Money(u'ŚREDNIA SKŁADEK', avg_value))
         return paids_value
 
     def compute_bills(self):
@@ -66,11 +63,10 @@ class ReportMonth(object):
 
         total = Decimal('0.00')
         for name, cost in query.all():
-            cost = round(cost, 2)
             total += Decimal(cost)
-            self.rows.append(Row(name, cost, u'zł'))
+            self.rows.append(Money(name, cost))
 
-        self.rows.append(Row(u'SUMA RACHUNKÓW', round(total, 2), u'zł'))
+        self.rows.append(Money(u'SUMA RACHUNKÓW', total))
 
         return total
 
@@ -83,7 +79,7 @@ class ReportMonth(object):
 
         donations_value = query.scalar() or 0
         if donations_value > 0:
-            self.rows.append(Row(u'DAROWIZNY', round(donations_value, 2), u'zł'))
+            self.rows.append(Money(u'DAROWIZNY', donations_value))
         return donations_value
 
     def compute_others(self):
@@ -97,20 +93,36 @@ class ReportMonth(object):
             month_field == self.month,
         ).group_by(sql_func.upper(Other.name))
 
-        total = Decimal('0.00')
+        total = Decimal(0)
         for name, cost in query.all():
-            cost = round(cost, 2)
-            total += Decimal(cost)
-            self.rows.append(Row(name, cost, u'zł'))
+            total += Decimal(cost) 
+            self.rows.append(Money(name, cost))
 
         return total
 
+
 class Row(object):
 
-    def __init__(self, name, value, suffix=''):
+    def __init__(self, name, value):
         self.name = name
         self.value = value
-        self.suffix = suffix
+
+    def get_value(self):
+        return str(self.value)
+
+    def get_classes(self):
+        return ''
+
+
+class Money(Row):
+
+    def get_value(self):
+        return u'{:0.2f} zł'.format(self.value)
+    
+    def get_classes(self):
+        if self.value < 0:
+            return 'negative'
+        return ''
 
 
 @report_page.route('/report')
