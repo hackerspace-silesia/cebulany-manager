@@ -2,6 +2,7 @@
 from flask import Blueprint, render_template
 from sqlalchemy import func as sql_func
 from sqlalchemy import distinct
+from decimal import Decimal
 
 from cebulany.models import (
     db,
@@ -18,12 +19,20 @@ year_field = sql_func.extract('year', Transaction.date)
 
 class ReportMonth(object):
 
-    def __init__(self, year, month, total, avg):
+    def __init__(self, year, month, total):
         self.year = year
         self.month = month
         self.rows = []
 
         paids_value = self.compute_paids()
+        bills_value = self.compute_bills()
+
+        self.rows.append(Row(
+            u'NIE ROZLICZONE',
+            total - (paids_value + bills_value),
+            u'zł'
+        ))
+        self.rows.append(Row(u'RAZEM', total, u'zł'))
 
     def compute_paids(self):
         query = db.session.query(
@@ -42,6 +51,27 @@ class ReportMonth(object):
             self.rows.append(Row(u'ŚREDNIA SKŁADEK', avg_paid , u'zł'))
         return paids_value
 
+    def compute_bills(self):
+        query = db.session.query(
+            Bill.name,
+            Bill.cost,
+        ).join(
+            Bill.transaction
+        ).filter(
+            year_field == self.year,
+            month_field == self.month,
+        ).group_by(sql_func.upper(Bill.name))
+
+        total = Decimal('0.00')
+        for name, cost in query.all():
+            cost = round(cost, 2)
+            total += Decimal(cost)
+            self.rows.append(Row(name, cost, u'zł'))
+
+        self.rows.append(Row(u'SUMA RACHUNKÓW', round(total, 2), u'zł'))
+
+        return total
+
 class Row(object):
 
     def __init__(self, name, value, suffix=''):
@@ -56,15 +86,14 @@ def basic():
         year_field,
         month_field,
         sql_func.sum(Transaction.cost),
-        sql_func.avg(Transaction.cost),
     ).group_by(
         year_field, month_field,
     ).order_by(
         year_field, month_field,
     )
     months = [
-        ReportMonth(year, month, total, avg)
-        for year, month, total, avg in query_dates.all()
+        ReportMonth(year, month, total)
+        for year, month, total in query_dates.all()
     ]
 
 
