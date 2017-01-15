@@ -26,7 +26,12 @@ TRANSACTION_TYPES = {
         ur'(?P<type>WPŁATA GOTÓWKOWA)'
         ur'(?P<name>.+?)  +'
         ur'(?P<title>.+)'
-    )
+    ),
+    u'': re_compile(
+        ur'(?P<type>)'
+        ur'(?P<name>)'
+        ur'(?P<title>)'
+    ),
 }
 
 DATE_FORMAT = '%d-%m-%Y'
@@ -35,7 +40,7 @@ DATE_FORMAT = '%d-%m-%Y'
 def parse_lines(lines):
     return [
         parse_line(line.rstrip('\n'), line_num)
-        for line_num, line in enumerate(lines)
+        for line_num, line in enumerate(lines, start=1)
     ]
 
 
@@ -43,7 +48,7 @@ def parse_line(line, line_num=None):
     date, cost, name, main, iban, ref_id, op_code = line.split(u';', 6)
     main = main.strip()
     if not name:
-        data = parse_main(main)
+        data = parse_main(main, line_num)
     else:
         name = name.strip()
         data = dict(
@@ -61,7 +66,7 @@ def parse_line(line, line_num=None):
     return data
 
 
-def get_data(main):
+def get_data(main, line_num=None):
     for transaction_type, regex in TRANSACTION_TYPES.items():
         if not main.startswith(transaction_type):
             continue
@@ -69,11 +74,11 @@ def get_data(main):
         if match is not None:
             return match.groupdict()
     else:
-        raise ValueError(repr(main))
+        raise ValueError(repr(main), line_num)
 
 
-def parse_main(main):
-    data = get_data(main)
+def parse_main(main, line_num=None):
+    data = get_data(main, line_num)
 
     return dict(
         title=data['title'],

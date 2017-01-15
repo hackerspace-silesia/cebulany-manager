@@ -54,11 +54,11 @@ class TransactionTypeListResource(ModelListResource):
     def post(self):
         data, status = super(TransactionTypeListResource, self).post()
         name = data.pop('name')
-        transaction_name = db.session.query(Transaction.name).filter_by(
+        iban = db.session.query(Transaction.name).filter_by(
             id=data['transaction_id']
         ).scalar()
         db.session.query(Transaction).filter_by(
-            name=transaction_name,
+           iban=iban, 
         ).update(dict(
             proposed_type_name=name,
             proposed_type=self.type_name,

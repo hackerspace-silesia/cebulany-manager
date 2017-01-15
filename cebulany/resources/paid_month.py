@@ -105,10 +105,10 @@ class PaidMonthListResource(ModelListResource):
         data, status = super(PaidMonthListResource, self).post()
         args = self.parser.parse_args()
         # update proposed_member_id in every transaction who has this same name
-        transaction_name = db.session.query(Transaction.name).filter_by(
+        iban = db.session.query(Transaction.iban).filter_by(
             id=data['transaction_id'],
         ).scalar()
-        query_trans = db.session.query(Transaction).filter_by(name=transaction_name)
+        query_trans = db.session.query(Transaction).filter_by(iban=iban)
         query_trans.update(dict(
             proposed_member_id=args['member_id'],
             proposed_type='paid_month',
