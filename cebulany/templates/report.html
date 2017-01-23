@@ -37,6 +37,7 @@ thead {
 </style>
 <div id='main'>
 {% for report in months %}
+<div class='month'>
 <table>
     <caption>
         {{report.year}}
@@ -57,5 +58,9 @@ thead {
         {% endfor %}
     </tbody>
 </table>
+<img src="data:image/png;base64,{{ report.graphs['positive'] }}"\>
+<img src="data:image/png;base64,{{ report.graphs['negative'] }}"\>
+<hr/>
+</div>
 {% endfor %}
 </div>

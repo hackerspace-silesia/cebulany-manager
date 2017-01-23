@@ -3,6 +3,9 @@ from flask import Blueprint, render_template
 from sqlalchemy import func as sql_func
 from sqlalchemy import distinct
 from decimal import Decimal
+from matplotlib import pyplot as plt
+from io import BytesIO
+from base64 import b64encode
 
 from cebulany.models import (
     db,
@@ -18,22 +21,37 @@ month_field = sql_func.extract('month', Transaction.date)
 year_field = sql_func.extract('year', Transaction.date)
 
 
+def save_plot(fig):
+    bio = BytesIO()
+    fig.savefig(bio, format='png')
+    return b64encode(bio.getvalue())
+
+
 class ReportMonth(object):
 
     def __init__(self, year, month, total):
         self.year = year
         self.month = month
         self.rows = []
+        self.graphs = {}
+
+        paids_value = self.compute_paids()
+        donations_value = self.compute_donations()
+        bills_value, bills = self.compute_bills()
+        others_value, others = self.compute_others()
+
+        self.add_positive_graph(paids_value, donations_value, others) 
+        self.add_negative_graph(bills, others) 
 
         values = sum([
-            self.compute_paids(),
-            self.compute_bills(),
-            self.compute_donations(),
-            self.compute_others(),
+            paids_value,
+            donations_value,
+            bills_value,
+            others_value,
         ])
 
         diff = total - values
-        if diff > 0:
+        if abs(diff) > Decimal('0.01'):
             self.rows.append(Money(u'NIE ROZLICZONE', diff))
         self.rows.append(Money(u'RAZEM', total))
 
@@ -60,14 +78,14 @@ class ReportMonth(object):
         ).group_by(sql_func.upper(Bill.name))
         query = self.filterize_query(query)
 
-        total = Decimal('0.00')
-        for name, cost in query.all():
-            total += Decimal(cost)
-            self.rows.append(Money(name, cost))
+        bills = [Money(name, cost) for name, cost in query.all()]
+        total = sum((Decimal(obj.value) for obj in bills), Decimal('0.00'))
+
+        self.rows += bills
 
         self.rows.append(Money(u'SUMA RACHUNKÓW', total))
 
-        return total
+        return total, bills
 
     def compute_donations(self):
         query = db.session.query(
@@ -90,12 +108,12 @@ class ReportMonth(object):
         ).group_by(sql_func.upper(Other.name))
         query = self.filterize_query(query)
 
-        total = Decimal(0)
-        for name, cost in query.all():
-            total += Decimal(cost) 
-            self.rows.append(Money(name, cost))
+        others = [Money(name, cost) for name, cost in query.all()]
+        total = sum((Decimal(obj.value) for obj in others), Decimal('0.00'))
 
-        return total
+        self.rows += others
+
+        return total, others
 
     def filterize_query(self, query):
         if self.month is None:
@@ -107,6 +125,31 @@ class ReportMonth(object):
                 year_field == self.year,
                 month_field == self.month,
             )
+
+    def add_positive_graph(self, paids_values, donations_values, others):
+        labels = [obj.name for obj in others if int(obj.value) > 0]
+        values = [obj.value for obj in others if int(obj.value) > 0]
+        if donations_values > 0:
+            labels.insert(0, u'DOTACJE')
+            values.insert(0, donations_values)
+        if paids_values > 0:
+            labels.insert(0, u'SKŁADKI')
+            values.insert(0, paids_values)
+        fig, ax = plt.subplots(figsize=(3, 3))
+        ax.pie(values, labels=labels, autopct=u'%0.2f%%')
+        ax.tick_params(labelsize=4)
+        fig.suptitle('ZYSK')
+        self.graphs['positive'] = save_plot(fig)
+
+    def add_negative_graph(self, bills, others):
+        labels = [obj.name for obj in bills] + [
+                obj.name for obj in others if int(obj.value) < 0]
+        values = [-obj.value for obj in bills] + [
+                -obj.value for obj in others if int(obj.value) < 0]
+        fig, ax = plt.subplots(figsize=(3, 3))
+        ax.pie(values, labels=labels, autopct=u'%0.2f%%')
+        fig.suptitle(u'PLATNOŚĆ')
+        self.graphs['negative'] = save_plot(fig)
 
 
 class Row(object):
