@@ -17,6 +17,7 @@ report_page = Blueprint('report_page', 'report', template_folder='../templates')
 month_field = sql_func.extract('month', Transaction.date)
 year_field = sql_func.extract('year', Transaction.date)
 
+
 class ReportMonth(object):
 
     def __init__(self, year, month, total):
@@ -31,7 +32,9 @@ class ReportMonth(object):
             self.compute_others(),
         ])
 
-        self.rows.append(Money(u'NIE ROZLICZONE', total - values))
+        diff = total - values
+        if diff > 0:
+            self.rows.append(Money(u'NIE ROZLICZONE', diff))
         self.rows.append(Money(u'RAZEM', total))
 
     def compute_paids(self):
@@ -132,6 +135,7 @@ class Money(Row):
 
 @report_page.route('/report')
 def basic():
+    from datetime import date
     query_dates = db.session.query(
         year_field,
         month_field,
@@ -140,11 +144,12 @@ def basic():
         year_field, month_field,
     ).order_by(
         year_field, month_field,
-    )
+    ).filter(Transaction.date >= date(2015, 4, 1))
     months = [
         ReportMonth(year, month, total)
         for year, month, total in query_dates.all()
     ]
+    """
     query_dates = db.session.query(
         year_field,
         sql_func.sum(Transaction.cost),
@@ -152,10 +157,10 @@ def basic():
         year_field
     ).order_by(
         year_field
-    )
+    ).filter(Transaction.date >= date(2015, 4, 1))
     months += [
         ReportMonth(year, None, total)
         for year, total in query_dates.all()
-    ]
+    ]"""
 
     return render_template('report.html', months=months)

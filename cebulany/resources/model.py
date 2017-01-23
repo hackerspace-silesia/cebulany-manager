@@ -54,7 +54,7 @@ class TransactionTypeListResource(ModelListResource):
     def post(self):
         data, status = super(TransactionTypeListResource, self).post()
         name = data.pop('name')
-        iban = db.session.query(Transaction.name).filter_by(
+        iban = db.session.query(Transaction.iban).filter_by(
             id=data['transaction_id']
         ).scalar()
         db.session.query(Transaction).filter_by(
