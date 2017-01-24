@@ -4,8 +4,11 @@ from sqlalchemy import func as sql_func
 from sqlalchemy import distinct
 from decimal import Decimal
 from matplotlib import pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
 from io import BytesIO
 from base64 import b64encode
+from datetime import date
+from math import ceil, floor
 
 from cebulany.models import (
     db,
@@ -19,6 +22,14 @@ from cebulany.models import (
 report_page = Blueprint('report_page', 'report', template_folder='../templates')
 month_field = sql_func.extract('month', Transaction.date)
 year_field = sql_func.extract('year', Transaction.date)
+
+def accumulate_sum(iterable):  # py2.7 why
+    values = []
+    s = 0.0
+    for i in iterable:
+        s += float(i)
+        values.append(s)
+    return values
 
 
 def save_plot(fig):
@@ -105,7 +116,9 @@ class ReportMonth(object):
             sql_func.sum(Other.cost),
         ).join(
             Other.transaction
-        ).group_by(sql_func.upper(Other.name))
+        ).group_by(
+            sql_func.upper(Other.name)
+        )
         query = self.filterize_query(query)
 
         others = [Money(name, cost) for name, cost in query.all()]
@@ -135,20 +148,24 @@ class ReportMonth(object):
         if paids_values > 0:
             labels.insert(0, u'SKŁADKI')
             values.insert(0, paids_values)
-        fig, ax = plt.subplots(figsize=(3, 3))
-        ax.pie(values, labels=labels, autopct=u'%i%%')
-        ax.set_title('ZYSK')
-        self.graphs['positive'] = save_plot(fig)
+        self.graphs['positive'] = self.make_pie(u'PRZYCHÓD', values, labels)
 
     def add_negative_graph(self, bills, others):
         labels = [obj.name for obj in bills] + [
                 obj.name for obj in others if int(obj.value) < 0]
         values = [-obj.value for obj in bills] + [
                 -obj.value for obj in others if int(obj.value) < 0]
-        fig, ax = plt.subplots(figsize=(3, 3))
-        ax.pie(values, labels=labels, autopct=u'%i%%')
-        ax.set_title(u'PLATNOŚĆ')
-        self.graphs['negative'] = save_plot(fig)
+        self.graphs['negative'] = self.make_pie(u'WYDATKI', values, labels)
+
+    @staticmethod
+    def make_pie(title, values, labels):
+        fig = plt.figure(figsize=(4, 4))
+        plt.title(title)
+        patches, _, _ = plt.pie(values, autopct=u'%.0f%%')
+        plt.tight_layout()
+        plt.legend(patches, labels, loc='best', fontsize='x-small')
+        return save_plot(fig)
+
 
 
 class Row(object):
@@ -174,10 +191,45 @@ class Money(Row):
             return 'negative'
         return ''
 
+def get_costs_graph():
+    query_total = db.session.query(
+        sql_func.sum(Transaction.cost),
+        year_field,
+        month_field,
+    ).group_by(
+        year_field, month_field
+    ).order_by(
+        year_field, month_field
+    )
+    data = query_total.all()
+    labels = ['{}-{:02}'.format(o[1], o[2]) for o in data]
+    label_indexs = range(len(labels))
+    values = [float(o[0]) for o in data]
+    acc_values = accumulate_sum(values)
+    min_value = int(floor(min(values) / 1000) * 1000)
+    max_value = int(ceil(max(acc_values) / 1000) * 1000)
+
+    fig, ax = plt.subplots(figsize=(8, 3))
+    plt.grid(which='major', color='silver', linestyle='--')
+
+    plt.plot(values, label=u'Przychód / Strata')
+    plt.fill_between(label_indexs, 0, acc_values, color='deepskyblue', label='Stan konta')
+    plt.xlim([0, len(labels) - 1])
+    plt.ylim([min_value - 250, max_value + 250])
+
+    plt.xticks(label_indexs, labels, rotation=45)
+    ax.yaxis.set_major_formatter(FormatStrFormatter(u'%.0f zł'))
+    plt.yticks(range(min_value, max_value, 500))
+    plt.tick_params(axis='x', labelsize='x-small')
+    plt.tick_params(axis='y', labelsize='x-small')
+    plt.axhline(color='r')
+    plt.tight_layout()
+    plt.legend(loc='upper left')
+    return save_plot(fig)
+
 
 @report_page.route('/report')
 def basic():
-    from datetime import date
     query_dates = db.session.query(
         year_field,
         month_field,
@@ -185,7 +237,7 @@ def basic():
     ).group_by(
         year_field, month_field,
     ).order_by(
-        year_field, month_field,
+        year_field.desc(), month_field.desc(),
     ).filter(Transaction.date >= date(2015, 4, 1))
     months = [
         ReportMonth(year, month, total)
@@ -205,26 +257,5 @@ def basic():
         for year, total in query_dates.all()
     ]"""
 
-    query_total = db.session.query(
-        sql_func.sum(Transaction.cost),
-        year_field,
-        month_field,
-    ).group_by(
-        year_field, month_field
-    ).order_by(
-        year_field, month_field
-    ).filter(Transaction.date >= date(2015, 4, 1))
-    data = query_total.all()
-    labels = ['{}-{}'.format(o[1], o[2]) for o in data]
-    values = [o[0] for o in data]
 
-    fig, ax = plt.subplots(figsize=(10, 3))
-    ax.plot(values)
-    ax.set_xticks(range(len(labels)))
-    ax.set_xticklabels(labels)
-    ax.tick_params(axis='x', labelsize='x-small')
-    for t in ax.get_xticklabels():
-        t.set_rotation(30)
-    fig_total = save_plot(fig)
-
-    return render_template('report.html', months=months, fig_total=fig_total)
+    return render_template('report.html', months=months, fig_total=get_costs_graph())
