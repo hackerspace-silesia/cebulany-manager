@@ -136,9 +136,8 @@ class ReportMonth(object):
             labels.insert(0, u'SKŁADKI')
             values.insert(0, paids_values)
         fig, ax = plt.subplots(figsize=(3, 3))
-        ax.pie(values, labels=labels, autopct=u'%0.2f%%')
-        ax.tick_params(labelsize=4)
-        fig.suptitle('ZYSK')
+        ax.pie(values, labels=labels, autopct=u'%i%%')
+        ax.set_title('ZYSK')
         self.graphs['positive'] = save_plot(fig)
 
     def add_negative_graph(self, bills, others):
@@ -147,8 +146,8 @@ class ReportMonth(object):
         values = [-obj.value for obj in bills] + [
                 -obj.value for obj in others if int(obj.value) < 0]
         fig, ax = plt.subplots(figsize=(3, 3))
-        ax.pie(values, labels=labels, autopct=u'%0.2f%%')
-        fig.suptitle(u'PLATNOŚĆ')
+        ax.pie(values, labels=labels, autopct=u'%i%%')
+        ax.set_title(u'PLATNOŚĆ')
         self.graphs['negative'] = save_plot(fig)
 
 
@@ -206,4 +205,26 @@ def basic():
         for year, total in query_dates.all()
     ]"""
 
-    return render_template('report.html', months=months)
+    query_total = db.session.query(
+        sql_func.sum(Transaction.cost),
+        year_field,
+        month_field,
+    ).group_by(
+        year_field, month_field
+    ).order_by(
+        year_field, month_field
+    ).filter(Transaction.date >= date(2015, 4, 1))
+    data = query_total.all()
+    labels = ['{}-{}'.format(o[1], o[2]) for o in data]
+    values = [o[0] for o in data]
+
+    fig, ax = plt.subplots(figsize=(10, 3))
+    ax.plot(values)
+    ax.set_xticks(range(len(labels)))
+    ax.set_xticklabels(labels)
+    ax.tick_params(axis='x', labelsize='x-small')
+    for t in ax.get_xticklabels():
+        t.set_rotation(30)
+    fig_total = save_plot(fig)
+
+    return render_template('report.html', months=months, fig_total=fig_total)
