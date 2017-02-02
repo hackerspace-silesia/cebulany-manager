@@ -18,7 +18,11 @@ function maxChars(str, charsLen) {
 }
 function getActualMonth() {
     var today = new Date();
-    return today.getFullYear() + '-' + (today.getMonth() + 1);
+    var month = today.getMonth() + 1;
+    if (month < 10) {
+        month = '0' + month;
+    }
+    return today.getFullYear() + '-' + month;
 }
 var BASE_URL = '/api/';
 function request(options) {
@@ -326,8 +330,10 @@ function showBills() {
 var BillView = (function (_super) {
     __extends(BillView, _super);
     function BillView() {
-        this.endpoint = 'bill';
-        this.showRecords();
+        var _this;
+        _this.endpoint = 'bill';
+        _this.showRecords();
+        return _this;
     }
     return BillView;
 }(DefaultTableView));
@@ -339,8 +345,10 @@ function showDonations() {
 var DonationView = (function (_super) {
     __extends(DonationView, _super);
     function DonationView() {
-        this.endpoint = 'donation';
-        this.showRecords();
+        var _this;
+        _this.endpoint = 'donation';
+        _this.showRecords();
+        return _this;
     }
     return DonationView;
 }(DefaultTableView));
@@ -352,8 +360,10 @@ function showOthers() {
 var OthersView = (function (_super) {
     __extends(OthersView, _super);
     function OthersView() {
-        this.endpoint = 'other';
-        this.showRecords();
+        var _this;
+        _this.endpoint = 'other';
+        _this.showRecords();
+        return _this;
     }
     return OthersView;
 }(DefaultTableView));

@@ -16,5 +16,9 @@ function maxChars(str: string, charsLen: number): string {
 
 function getActualMonth(): string {
     var today = new Date();
-    return today.getFullYear() + '-' + (today.getMonth() + 1);
+    var month = today.getMonth() + 1;
+    if (month < 10) {
+        month = '0' + month;
+    }
+    return today.getFullYear() + '-' + month;
 }
