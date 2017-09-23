@@ -5,7 +5,7 @@
     template(slot="title", scope="row")
       span(:title="row.value") {{ row.value | truncate(50) }}
     template(slot="cost", scope="row") {{ row.value }} zł
-    template(slot="left", scope="row") {{ compute_left(row.item) }} zł
+    template(slot="left", scope="row") {{ computeLeftCost(row.item) }} zł
     template(slot="types", scope="row")
       span(v-for="donation in row.item.donations")
         span.badge.badge-success(:title="donation | type_basic_title") D
@@ -18,6 +18,7 @@
 
 </template>
 <script>
+  import Transaction from '@/models/transaction.js';
   export default {
     props: ['transactions'],
     data () {
@@ -33,16 +34,7 @@
       }
     },
     methods: {
-      compute_left (obj) {
-        /* eslint-disable no-unused-vars */
-        var left = obj.cost || 0;
-        let subCost = (obj) => { left -= obj.cost };
-        obj.donations.forEach(subCost);
-        obj.bills.forEach(subCost);
-        obj.paidmonths.forEach(subCost);
-        obj.others.forEach(subCost);
-        return left.toFixed(2);
-      }
+      computeLeftCost: Transaction.computeLeftCost
     },
     filters: {
       type_basic_title (obj) {
@@ -57,5 +49,5 @@
 
 <style>
   .transactions td { font-size: 8pt; }
-  .transactions td.no-wrap {white-space: nowrap;}
+  .transactions td.no-wrap { white-space: nowrap; }
 </style>

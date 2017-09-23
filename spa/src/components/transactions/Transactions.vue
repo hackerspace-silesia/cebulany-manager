@@ -13,7 +13,8 @@
 import TransactionLegend from './TransactionLegend'
 import TransactionTable from './TransactionTable'
 import TransactionForm from './TransactionForm'
-import TransactionModel from '@/models/transactions'
+import TransactionService from '@/services/transactions'
+import linkVm from '@/helpers/linkVm'
 
 export default {
   data () {
@@ -33,17 +34,9 @@ export default {
   },
   methods: {
     fetchTransactions () {
-      this.is_loading = true;
-      this.is_error = false;
-      TransactionModel
-        .get()
+      linkVm(this, TransactionService.get())
         .then((response) => {
           this.transactions = response.data.transactions;
-          this.is_loading = false;
-        })
-        .catch((response) => {
-          this.is_loading = false;
-          this.is_error = true;
         })
     }
   }
