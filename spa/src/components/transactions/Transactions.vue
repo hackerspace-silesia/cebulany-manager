@@ -4,7 +4,14 @@
       h1 Przelewy
       TransactionForm
       TransactionLegend
-      TransactionTable(:transactions="transactions")
+      template(v-if='is_loading')
+        b-progress(:value="1", :max="1", animated)
+      template(v-else-if='is_error')
+        b-progress(:value="1", :max="1", variant="danger" striped)
+        br
+        h3(class='text-center') Ugh Error ;_;
+      template(v-else)
+        TransactionTable(:transactions="transactions")
       TransactionLegend
 
 </template>

@@ -7,7 +7,8 @@ export default function (vm, promise) {
       return response;
     })
     .catch((error) => {
+      vm.is_loading = false;
       vm.is_error = true;
-      return error;
+      throw error;
     });
 }
