@@ -15,3 +15,9 @@ export default {
   }
 }
 </script>
+
+<style>
+  .table-sm td { font-size: 8pt; }
+  .table-sm th { font-size: 8pt; }
+  .monospace { font-family: 'monospace'; }
+</style>

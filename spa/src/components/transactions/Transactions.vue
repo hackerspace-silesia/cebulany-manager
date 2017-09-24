@@ -4,14 +4,8 @@
       h1 Przelewy
       TransactionForm
       TransactionLegend
-      template(v-if='is_loading')
-        b-progress(:value="1", :max="1", animated)
-      template(v-else-if='is_error')
-        b-progress(:value="1", :max="1", variant="danger" striped)
-        br
-        h3(class='text-center') Ugh Error ;_;
-      template(v-else)
-        TransactionTable(:transactions="transactions")
+      PromisedComponent(:state="promiseState")
+        TransactionTable(:transactions="transactions", :sum="sum", :sumLeft="sumLeft")
       TransactionLegend
 
 </template>
@@ -27,8 +21,9 @@ export default {
   data () {
     return {
       transactions: [],
-      is_loading: false,
-      is_error: false
+      sum: 0,
+      sumLeft: 0,
+      promiseState: null
     }
   },
   components: {
@@ -44,6 +39,8 @@ export default {
       linkVm(this, TransactionService.get())
         .then((response) => {
           this.transactions = response.data.transactions;
+          this.sum = response.data.sum;
+          this.sumLeft = response.data.sumLeft;
         })
     }
   }

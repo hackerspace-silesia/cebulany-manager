@@ -17,6 +17,7 @@ let methods = {
       })
     });
 
+    obj.left = left;
     return left.toFixed(2);
   }
 };

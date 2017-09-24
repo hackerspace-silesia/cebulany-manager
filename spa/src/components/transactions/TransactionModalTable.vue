@@ -13,19 +13,13 @@
       td {{ item.date }}
     tr
       th Kwota
-      th
-        span.text-danger(v-if="item.cost < 0") {{ item.cost }} zł
-        span(v-else) {{ item.cost }} zł
+      th: money-value(:value="item.cost")
       th Pozostało do rozliczenia
-      td {{ computeLeftCost(item) }} zł
+      td: money-value(:value="item.left")
 
 </template>
 <script>
-  import Transaction from '@/models/transaction';
   export default {
-    props: ['item'],
-    methods: {
-      computeLeftCost: Transaction.computeLeftCost
-    }
+    props: ['item']
   }
 </script>

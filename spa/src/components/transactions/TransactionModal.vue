@@ -8,16 +8,7 @@
         th Nazwa
         th Kwota
         th *
-      tr
-        td: b-dropdown(size="sm", text="Wybierz...")
-          b-dropdown-item Składka
-          b-dropdown-item Rachunek
-          b-dropdown-item Dotacja
-          b-dropdown-item Inne
-        td: b-form-input(size="sm")
-        td: b-form-input(size="sm", type="number")
-        td: b-btn(size="sm" variant="primary") dodaj
-
+      TransactionModalForm(:item="item")
       tr(v-for="bill in item.bills")
         td: span.badge.badge-danger Rachunek
         td {{bill.name}}
@@ -26,8 +17,8 @@
       tr(v-for="paidmonth in item.paidmonths")
         td: span.badge.badge-primary Składka
         td
-          strong {{paidmonth.date}}
-          span &nbsp; (Członek {{paidmonth.member.name}})
+          strong {{paidmonth.date.slice(0, 7)}}
+          span &nbsp; {{paidmonth.member.name}}
         td.text-right {{paidmonth.cost}} zł
         td: b-btn(size="sm" variant="danger") usuń
       tr(v-for="other in item.others")
@@ -44,13 +35,10 @@
 
 </template>
 <script>
-  import Transaction from '@/models/transaction';
   import TransactionModalTable from './TransactionModalTable';
+  import TransactionModalForm from './TransactionModalForm';
   export default {
     props: ['item'],
-    components: {TransactionModalTable},
-    methods: {
-      computeLeftCost: Transaction.computeLeftCost
-    }
+    components: {TransactionModalTable, TransactionModalForm}
   }
 </script>

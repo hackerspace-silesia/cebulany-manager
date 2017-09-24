@@ -1,9 +1,9 @@
 <template lang="pug">
   .transactions
-    b-modal(v-model="showModal", ok-only, title="Transakcja" size="lg")
+    b-modal(v-model="showModal", title="Transakcja", size="lg", ok-only)
       TransactionModal(v-if='showModal', :item="modalItem")
     b-table(
-        hover, bordered, small,
+        hover, bordered, small, foot-clone
         @row-clicked.captured="rowClicked",
         :items="transactions",
         :fields="fields")
@@ -11,10 +11,8 @@
         span(:title="row.value") {{ row.value | truncate(50) }}
       template(slot="title", scope="row")
         span(:title="row.value") {{ row.value | truncate(50) }}
-      template(slot="cost", scope="row")
-        span.text-danger(v-if="row.value < 0") {{ row.value }} zł
-        span(v-else) {{ row.value }} zł
-      template(slot="left", scope="row") {{ computeLeftCost(row.item) }} zł
+      template(slot="cost", scope="row"): money-value(:value="row.value")
+      template(slot="left", scope="row"): money-value(:value="row.value")
       template(slot="types", scope="row")
         span(v-for="donation in row.item.donations")
           span.badge.badge-success(:title="donation | type_basic_title") D
@@ -24,14 +22,15 @@
           span.badge.badge-primary(:title="paidmonth | type_paid_title") S
         span(v-for="other in row.item.others")
           span.badge.badge-secondary(:title="other | type_basic_title") O
+      template(slot="FOOT_cost" scope="row"): money-value(:value="sum")
+      template(slot="FOOT_left" scope="row"): money-value(:value="sumLeft")
 
 </template>
 <script>
-  import Transaction from '@/models/transaction';
   import TransactionModal from './TransactionModal';
 
   export default {
-    props: ['transactions'],
+    props: ['transactions', 'sum', 'sumLeft'],
     components: {TransactionModal},
     data () {
       return {
@@ -48,7 +47,6 @@
       }
     },
     methods: {
-      computeLeftCost: Transaction.computeLeftCost,
       rowClicked (item) {
         this.showModal = true;
         this.modalItem = item;
@@ -64,8 +62,3 @@
     }
   }
 </script>
-
-<style>
-  .table-sm td { font-size: 8pt; }
-  .table-sm th { font-size: 8pt; }
-</style>
