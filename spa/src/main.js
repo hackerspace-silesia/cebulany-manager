@@ -9,6 +9,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import MoneyValue from './components/MoneyValue'
 import PromisedComponent from './components/PromisedComponent'
+import vSelect from 'vue-select'
 
 Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
@@ -23,6 +24,7 @@ Vue.filter('truncate', (string, value) => {
 
 Vue.component('money-value', MoneyValue);
 Vue.component('PromisedComponent', PromisedComponent);
+Vue.component('v-select', vSelect);
 
 /* eslint-disable no-new */
 new Vue({
