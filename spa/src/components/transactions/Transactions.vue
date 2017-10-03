@@ -2,7 +2,7 @@
   b-row
     b-col
       h1 Przelewy
-      TransactionForm
+      TransactionForm(@change="fetchTransactions")
       TransactionLegend
       PromisedComponent(:state="promiseState")
         TransactionTable(:transactions="transactions", :sum="sum", :sumLeft="sumLeft")
@@ -35,8 +35,8 @@ export default {
     this.fetchTransactions();
   },
   methods: {
-    fetchTransactions () {
-      linkVm(this, TransactionService.get())
+    fetchTransactions (params) {
+      linkVm(this, TransactionService.get(params))
         .then((response) => {
           this.transactions = response.data.transactions;
           this.sum = response.data.sum;

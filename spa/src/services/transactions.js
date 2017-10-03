@@ -2,9 +2,9 @@ import Transaction from '@/models/transaction';
 import axios from './base';
 
 export default {
-  get () {
+  get (params) {
     return axios
-      .get('/transactions')
+      .get('/transactions', {params: params})
       .then((response) => {
         let transactions = response.data.transactions;
         let sumLeft = 0;
