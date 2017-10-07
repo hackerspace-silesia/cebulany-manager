@@ -1,6 +1,9 @@
 import axios from './base';
 
 export default {
+  getTable () {
+    return axios.get('/paid_month/table')
+  },
   post ({transaction_id, member_id, date, cost}) {
     return axios.post('/paid_month', {transaction_id, member_id, date, cost})
   },

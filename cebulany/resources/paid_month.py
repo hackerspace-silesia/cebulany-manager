@@ -7,6 +7,7 @@ from itertools import groupby
 from cebulany.models import db, Member, PaidMonth, Transaction
 from cebulany.resources.model import ModelListResource, ModelResource
 from cebulany.resources.types import month_type
+from cebulany import fields as cebulany_fields
 
 parser = RequestParser()
 parser.add_argument('member_id', required=True, type=int)
@@ -36,15 +37,12 @@ paid_month_fields = {
     'member_id': fields.Integer,
     'member': member_fields,
     'transaction': fields.Nested(transaction_fields),
-    'cost': fields.Price,
+    'cost': fields.Price(2),
 }
 
 paid_month_sum_fields = {
     'member_id': fields.Integer,
-    'months': fields.List(fields.Nested({
-        'month': fields.String,
-        'sum': fields.Price,
-    }))
+    'months': cebulany_fields.Dict(fields.Price(2)),
 }
 
 
@@ -60,7 +58,7 @@ class PaidMonthTableResource(ModelListResource):
             Member.id,
             sql_func.sum(PaidMonth.cost),
             dt_col,
-        ).join(Member.months, isouter=True).order_by(
+        ).join(PaidMonth, isouter=True).order_by(
             Member.is_active.desc(),
             Member.join_date,
             Member.name,
@@ -72,10 +70,7 @@ class PaidMonthTableResource(ModelListResource):
         return [
             {
                 'member_id': member_id,
-                'months': [
-                    dict(sum=sum, month=month)
-                    for member_id, sum, month in data
-                ]
+                'months': {month: sum for _, sum, month in data}
             }
             for member_id, data in groupby(query.all(), lambda o: o[0])
         ]
