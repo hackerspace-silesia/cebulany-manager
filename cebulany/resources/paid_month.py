@@ -24,11 +24,17 @@ transaction_fields = {
     'title': fields.String,
 }
 
+member_fields = fields.Nested({
+    'name': fields.String,
+    'id': fields.Integer,
+})
+
 paid_month_fields = {
     'id': fields.Integer,
     'date': fields.DateTime(dt_format='iso8601'),
     'transaction_id': fields.Integer,
     'member_id': fields.Integer,
+    'member': member_fields,
     'transaction': fields.Nested(transaction_fields),
     'cost': fields.Price,
 }

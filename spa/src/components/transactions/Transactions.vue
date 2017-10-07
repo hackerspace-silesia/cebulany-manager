@@ -5,7 +5,7 @@
       TransactionForm(@change="fetchTransactions")
       TransactionLegend
       PromisedComponent(:state="promiseState")
-        TransactionTable(:transactions="transactions", :sum="sum", :sumLeft="sumLeft")
+        TransactionTable(:transactions="transactions", :sum="sum")
       TransactionLegend
 
 </template>

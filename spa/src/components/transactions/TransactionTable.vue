@@ -1,7 +1,7 @@
 <template lang="pug">
   .transactions
     b-modal(v-model="showModal", title="Transakcja", size="lg", ok-only)
-      TransactionModal(v-if='showModal', :item="modalItem")
+      TransactionModal(v-if='showModal', :item="modalItem", :sumLeft="sumLeft")
     b-table(
         hover, bordered, small, foot-clone
         @row-clicked.captured="rowClicked",
@@ -57,7 +57,7 @@
         return `${obj.name}\n${obj.cost} zł`;
       },
       type_paid_title (obj) {
-        return `${obj.member.name}\n${obj.date}\n${obj.cost} zł`;
+        return `${obj.member && obj.member.name}\n${obj.date}\n${obj.cost} zł`;
       }
     }
   }

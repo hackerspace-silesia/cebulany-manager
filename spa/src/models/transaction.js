@@ -9,7 +9,7 @@ let methods = {
   },
 
   computeLeftCost (obj) {
-    let left = obj.cost || 0;
+    let left = Number(obj.cost) || 0;
     let collections = methods.getListOfCollections(obj);
     collections.forEach((collection) => {
       collection.forEach((obj) => {

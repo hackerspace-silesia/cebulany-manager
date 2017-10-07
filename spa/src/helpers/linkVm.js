@@ -1,21 +1,21 @@
-export default function (vm, promise) {
-  vm.promiseState = { key: 'loading' };
+export default function (vm, promise, keyState = 'promiseState') {
+  vm[keyState] = { key: 'loading' };
   return promise
     .then((response) => {
-      vm.promiseState = null;
+      vm[keyState] = null;
       return response;
     })
     .catch((error) => {
       if (error.response) {
-        vm.promiseState = {
+        vm[keyState] = {
           key: 'error',
           code: error.response.status,
           msg: 'Api coś nie tak.'
         };
       } else if (error.request) {
-        vm.promiseState = { key: 'error', msg: 'Problem z połączeniem' };
+        vm[keyState] = { key: 'error', msg: 'Problem z połączeniem' };
       } else {
-        vm.promiseState = { key: 'error', msg: 'dziwny błąd' };
+        vm[keyState] = { key: 'error', msg: 'dziwny błąd' };
       }
       throw error;
     });

@@ -1,5 +1,5 @@
 <template lang="pug">
-  tr
+  PromisedRowComponent(:state="promiseState")
     td: b-form-select(size="sm", v-model="type", :options="typeOptions")
     td
       template(v-if="type == 'paid_month'")
@@ -8,7 +8,8 @@
           v-model="date", placeholder="miesiąc")
         v-select(
           size="sm", label="name", placeholder="członek",
-          :value.sync="member", :on-search="getMembers",
+          :value="member", :on-search="getMembers",
+          :on-change="selectMember",
           :options="memberOptions", :debounce="250")
       template(v-else): b-form-input(size="sm" v-model.trim="name")
     td: b-input-group(left="zł", size="sm")
@@ -18,18 +19,23 @@
 
 <script>
   import MemberService from '@/services/members'
-  import PaidMonthService from '@/services/paidmonth'
-  import BillService from '@/services/bill'
-  import DonationService from '@/services/donation'
-  import OtherService from '@/services/other'
+  import TransactionTypesService from '@/services/transactionTypes';
+  import linkVm from '@/helpers/linkVm'
+
   export default {
     props: ['item'],
     data () {
+      var member = null;
+      if (this.item.proposed_member && this.item.proposed_member.name) {
+        member = this.item.proposed_member;
+      }
+
       return {
+        promiseState: null,
         type: this.item.proposed_type || 'paid_month',
         cost: this.item.left || 0,
         name: this.item.proposed_type_name || '',
-        member: this.item.proposed_member || { id: 0, name: null },
+        member: member,
         memberOptions: [],
         date: (new Date()).toISOString().slice(0, 7),
         typeOptions: {
@@ -56,35 +62,30 @@
             loading(false);
           })
       },
+      selectMember (value) {
+        this.member = value;
+      },
       addType () {
+        let service = TransactionTypesService.getServiceByType(this.type);
         var promise = null;
-        console.log(this.date);
-        switch (this.type) {
-          case 'paid_month': promise = PaidMonthService.post({
+        if (this.type === 'paid_month') {
+          promise = service.post({
             transaction_id: this.item.id,
             member_id: this.member.id,
-            date: `${this.date}-01`,
+            date: this.date,
             cost: this.cost
-          }); break;
-          case 'bill': promise = BillService.post({
+          });
+        } else {
+          promise = service.post({
             transaction_id: this.item.id,
             name: this.name,
             cost: this.cost
-          }); break;
-          case 'donation': promise = DonationService.post({
-            transaction_id: this.item.id,
-            name: this.name,
-            cost: this.cost
-          }); break;
-          case 'other': promise = OtherService.post({
-            transaction_id: this.item.id,
-            name: this.name,
-            cost: this.cost
-          }); break;
+          });
         }
-        promise.then(response => {
+        linkVm(this, promise).then(response => {
           let container = this.containers[this.type];
-          this.item.left -= response.data.cost || 0;
+          let cost = Number(response.data.cost) || 0;
+          this.item.left -= cost;
           this.item[container].push(response.data);
           this.cost = this.item.left;
         })
