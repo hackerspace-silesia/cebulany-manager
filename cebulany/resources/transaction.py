@@ -98,4 +98,6 @@ class TransactionResource(Resource):
             ))
         if args['ordering']:
             query = query.order_by(*args['ordering'].split(','))
+        else:
+            query = query.order_by(model.date)
         return query
