@@ -40,9 +40,14 @@ paid_month_fields = {
     'cost': fields.Price(2),
 }
 
+month_fields = {
+    'sum': fields.Price(2),
+    'count': fields.Integer,
+}
+
 paid_month_sum_fields = {
     'member_id': fields.Integer,
-    'months': cebulany_fields.Dict(fields.Price(2)),
+    'months': cebulany_fields.Dict(fields.Nested(month_fields)),
 }
 
 
@@ -57,6 +62,7 @@ class PaidMonthTableResource(ModelListResource):
         query = db.session.query(
             Member.id,
             sql_func.sum(PaidMonth.cost),
+            sql_func.count(PaidMonth.cost),
             dt_col,
         ).join(PaidMonth, isouter=True).order_by(
             Member.is_active.desc(),
@@ -70,7 +76,10 @@ class PaidMonthTableResource(ModelListResource):
         return [
             {
                 'member_id': member_id,
-                'months': {month: sum for _, sum, month in data}
+                'months': {
+                    month: dict(sum=sum, count=count)
+                    for _, sum, count, month in data
+                }
             }
             for member_id, data in groupby(query.all(), lambda o: o[0])
         ]

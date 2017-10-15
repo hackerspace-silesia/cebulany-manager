@@ -1,4 +1,3 @@
-from flask_restful import marshal
 from flask_restful.fields import Raw, MarshallingException
 
 
@@ -19,8 +18,7 @@ class Dict(Raw):
 
     def format(self, value):
         return {
-            str(key): self.container.format(obj)
-            for key, obj in value.items()
-            if key is not None
+            str(key): self.container.output(key, value)
+            for key in value if key is not None
         }
 

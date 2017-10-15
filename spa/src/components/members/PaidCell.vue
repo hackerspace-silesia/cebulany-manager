@@ -1,7 +1,8 @@
 <template lang="pug">
-  td(v-if='!value', :class="notPayedInDate ? 'table-danger' : ''") -
+  td(v-if='!sum', :class="notPayedInDate ? 'table-danger' : ''") -
   td(v-else, :class="PayedInDate ? 'table-warning' : ''")
-    span(:id="popoverId") {{ Number(value).toFixed() }}
+    span(:id="popoverId") {{ Number(sum).toFixed() }}
+      small.text-warning(v-if="count > 1") &nbsp;({{ count }})
     b-popover(
         :target="popoverId", triggers="click",
         placement="bottom", @show="getTransactions()", @hide="clearTransactions()")
@@ -20,9 +21,11 @@
     data () {
       let key = `${this.year}-${this.month}`;
       let dt = `${key}-01`;
+      let obj = this.paidmonth.months[key] || {};
       return {
         promiseState: null,
-        value: this.paidmonth.months[key],
+        sum: obj.sum || null,
+        count: obj.count || 0,
         notPayedInDate: dt <= this.dtNow && this.member.join_date < dt,
         PayedInDate: dt <= this.dtNow && this.member.join_date > dt,
         popoverId: `id--${this.member.id}-${key}`,
