@@ -79,7 +79,6 @@ class ReportMonth(object):
         self.rows.append(Row(u'WPŁACIŁO', member_count))
         return paids_value
 
-
     def compute_bills(self):
         query = db.session.query(
             Bill.name,
@@ -159,7 +158,7 @@ class ReportMonth(object):
 
     @staticmethod
     def make_pie(title, values, labels):
-        fig = plt.figure(figsize=(4, 4))
+        fig = plt.figure(figsize=(3, 3))
         plt.title(title)
         patches, _, _ = plt.pie(values, autopct=u'%.0f%%')
         plt.tight_layout()
@@ -192,19 +191,29 @@ class Money(Row):
         return ''
 
 def get_costs_graph():
+    key_fields = (year_field, month_field)
     query_total = db.session.query(
         sql_func.sum(Transaction.cost),
-        year_field,
-        month_field,
-    ).group_by(
-        year_field, month_field
-    ).order_by(
-        year_field, month_field
-    )
+        *key_fields
+    ).group_by(*key_fields).order_by(*key_fields)
+    query_paids = db.session.query(
+        sql_func.sum(PaidMonth.cost), *key_fields
+    ).join(Transaction).group_by(*key_fields)
+    query_bills = db.session.query(
+        sql_func.sum(Bill.cost), *key_fields
+    ).join(Transaction).group_by(*key_fields)
     data = query_total.all()
-    labels = ['{}-{:02}'.format(o[1], o[2]) for o in data]
+    def format_key(o):
+        return '{}-{:02}'.format(o[1], o[2])
+    labels = [format_key(o) for o in data]
     label_indexs = range(len(labels))
-    values = [float(o[0]) for o in data]
+    def values_sorted_by_date(query):
+        data = {format_key(o): o[0] for o in query.all()}
+        return [data.get(key, 0) for key in labels]
+        
+    values = values_sorted_by_date(query_total)
+    paid_values = values_sorted_by_date(query_paids)
+    bill_values = values_sorted_by_date(query_bills)
     acc_values = accumulate_sum(values)
     min_value = int(floor(min(values) / 1000) * 1000)
     max_value = int(ceil(max(acc_values) / 1000) * 1000)
@@ -213,6 +222,8 @@ def get_costs_graph():
     plt.grid(which='major', color='silver', linestyle='--')
 
     plt.plot(values, label=u'Przychód / Strata')
+    plt.plot(paid_values, label=u'Składki', color='green')
+    plt.plot(bill_values, label=u'Rachunki', color='orange')
     plt.fill_between(label_indexs, 0, acc_values, color='deepskyblue', label='Stan konta')
     plt.xlim([0, len(labels) - 1])
     plt.ylim([min_value - 250, max_value + 250])
