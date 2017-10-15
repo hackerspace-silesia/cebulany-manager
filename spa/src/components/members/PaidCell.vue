@@ -1,23 +1,47 @@
 <template lang="pug">
   td(v-if='!value', :class="notPayedInDate ? 'table-danger' : ''") -
-  td(v-else, :class="PayedInDate ? 'table-warning' : ''", @click="lol()") {{ Number(value).toFixed() }}
+  td(v-else, :class="PayedInDate ? 'table-warning' : ''")
+    span(:id="popoverId") {{ Number(value).toFixed() }}
+    b-popover(
+        :target="popoverId", triggers="click",
+        placement="bottom", @show="getTransactions()", @hide="clearTransactions()")
+      PromisedComponent(:state="promiseState")
+        small: ol: li(v-for="transaction in transactions")
+          strong {{ transaction.transaction.date }}
+          | &nbsp; {{ transaction.transaction.title }}
+          | &nbsp; {{ transaction.cost }} zł
+
 </template>
 <script>
+  import PaidMonthService from '@/services/paidmonth';
+  import linkVm from '@/helpers/linkVm';
   export default {
     props: ['year', 'month', 'member', 'paidmonth', 'dtNow'],
     data () {
       let key = `${this.year}-${this.month}`;
       let dt = `${key}-01`;
       return {
+        promiseState: null,
         value: this.paidmonth.months[key],
         notPayedInDate: dt <= this.dtNow && this.member.join_date < dt,
-        PayedInDate: dt <= this.dtNow && this.member.join_date > dt
+        PayedInDate: dt <= this.dtNow && this.member.join_date > dt,
+        popoverId: `id--${this.member.id}-${key}`,
+        key: key,
+        transactions: []
       }
     },
     methods: {
-      lol () {
-        alert('lol')
+      getTransactions () {
+        let params = {member_id: this.member.id, month: this.key};
+        linkVm(this, PaidMonthService.get(params))
+          .then(resp => { this.transactions = resp.data; });
+      },
+      clearTransactions () {
+        this.transactions = [];
       }
     }
   }
 </script>
+<style>
+  .popover {max-width: none;}
+</style>
