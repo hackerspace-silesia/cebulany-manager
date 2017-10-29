@@ -1,5 +1,6 @@
 from flask_restful import Resource, fields, marshal, abort
 from flask_restful.reqparse import RequestParser
+from sqlalchemy.sql.elements import or_
 
 from cebulany.models import db, Transaction
 
@@ -20,6 +21,9 @@ parser.add_argument('name', required=True)
 parser.add_argument('cost', required=True, type=str)
 parser.add_argument('transaction_id', required=True, type=int)
 
+query_parser = RequestParser()
+query_parser.add_argument('name')
+
 
 class ModelListResource(Resource):
     cls = None
@@ -27,10 +31,11 @@ class ModelListResource(Resource):
     resource_fields = resource_fields
 
     def get_list_query(self):
-        return self.cls.query.all()
+        return self.cls.query
 
     def get(self):
-        return marshal(self.get_list_query(), self.resource_fields)
+        query = self.get_list_query()
+        return marshal(query.all(), self.resource_fields)
 
     def post(self):
         data = self.parser.parse_args()
@@ -45,11 +50,21 @@ class TransactionTypeListResource(ModelListResource):
 
     def get_list_query(self):
         cls = self.cls
-        return cls.query.join(
+        query = cls.query.join(
             cls.transaction
         ).order_by(
             Transaction.date.desc()
-        ).all()
+        )
+
+        args = query_parser.parse_args()
+        if args['name']:
+            arg = args['name'].replace('%',r'\%')
+            query = query.filter(or_(
+                Transaction.name.ilike('%%%s%%' % arg),
+                cls.name.ilike('%%%s%%' % arg),
+            ))
+
+        return query
 
     def post(self):
         data, status = super(TransactionTypeListResource, self).post()
@@ -66,7 +81,6 @@ class TransactionTypeListResource(ModelListResource):
         db.session.commit()
 
         return data, status
-
 
 
 class ModelResource(Resource):

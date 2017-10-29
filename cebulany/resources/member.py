@@ -1,10 +1,8 @@
-from flask_restful import Resource, fields, marshal_with
+from flask_restful import fields
 from flask_restful.reqparse import RequestParser
 from cebulany.resources.model import ModelResource, ModelListResource
-from sqlalchemy import or_, func as sql_func
-from datetime import datetime
 
-from cebulany.models import db, Member
+from cebulany.models import Member
 
 member_parser = RequestParser()
 member_parser.add_argument('name', required=True)
@@ -42,7 +40,7 @@ class MemberListResource(ModelListResource):
             ])
         if limit_arg is not None:
             query = query.limit(limit_arg)
-        return query.all()
+        return query
 
 
 class MemberResource(ModelResource):
