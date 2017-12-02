@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, safe_join
 from flask_restful import Api
 from cebulany.models import db
 
@@ -10,8 +10,12 @@ from cebulany.resources.donation import DonationListResource, DonationResource
 from cebulany.resources.other import OtherListResource, OtherResource
 from cebulany.resources.report import report_page
 
+from os import environ
+
+DATABASE_URI = environ.get('DATABSE_URI', 'sqlite:///test.db')
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 api = Api(app)
 db.init_app(app)
 
@@ -34,17 +38,13 @@ app.register_blueprint(report_page)
 
 @app.route('/')
 def index():
-    return send_from_directory('../spa', 'index.html')
+    return send_from_directory('../spa/dist', 'index.html')
 
 
-@app.route('/main.css')
-def css():
-    return send_from_directory('../spa', 'main.css')
+@app.route('/static/<mod>/<filename>')
+def pseudo_static(mod, filename):
+    return send_from_directory('../spa/dist/static/%s' % mod, filename)
 
-
-@app.route('/<path>/<file>')
-def pseudo_static(path, file):
-    return send_from_directory('../spa', '{}/{}'.format(path, file))
 
 if __name__ == "__main__":
     with app.app_context():
