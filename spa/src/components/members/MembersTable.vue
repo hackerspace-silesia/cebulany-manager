@@ -8,17 +8,18 @@
         template(v-for='year in years')
           th.text-center(v-for='month in months') {{ month }}
     tbody
-      template(v-for="paidmonth in paidmonths")
+      template(v-for="o in memberList")
         PaidRow(
-            :member="members[paidmonth.member_id]", :years="years",
-            :months="months", :paidmonth="paidmonth", :dtNow="dtNow",
+            v-if="o.filtered", :member="o.member", :years="years",
+            :months="months", :paidmonth="o.paidmonth", :dtNow="dtNow",
             @updateMember="updateMemberInTable")
 </template>
 <script>
+  //
   import PaidRow from './PaidRow';
 
   export default {
-    props: ['years', 'members', 'paidmonths', 'updateMember'],
+    props: ['years', 'members', 'paidmonths', 'updateMember', 'memberFilter'],
     data () {
       return {
         months: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
@@ -28,6 +29,21 @@
     methods: {
       updateMemberInTable (data) {
         this.$emit('updateMember', data)
+      }
+    },
+    computed: {
+      memberList () {
+        let members = this.members;
+        let memberFilter = this.memberFilter.toLowerCase();
+        return this.paidmonths.map(paidmonth => {
+          let member = members[paidmonth.member_id];
+          let name = member.name.toLowerCase();
+          return {
+            member: member,
+            paidmonth: paidmonth,
+            filtered: name.indexOf(memberFilter) !== -1
+          };
+        })
       }
     },
     components: {

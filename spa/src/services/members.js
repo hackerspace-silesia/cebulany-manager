@@ -8,7 +8,10 @@ export default {
   getAll () {
     return axios.get('/members');
   },
-  update ({id, data}) {
+  create (data) {
+    return axios.post(`/members`, data);
+  },
+  update (id, data) {
     return axios.put(`/members/${id}`, data);
   }
 }

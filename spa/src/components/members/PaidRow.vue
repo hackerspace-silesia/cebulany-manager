@@ -2,6 +2,7 @@
   tr(:class="!member.is_active ? 'table-active' : ''")
     th(:id="popoverId") {{ member.name }}
     b-popover(
+        title="Zaaktulizuj dane",
         :target="popoverId", triggers="focus click",
         placement="bottom")
       MemberForm(:member="member", @update="updateMemberInRow")
