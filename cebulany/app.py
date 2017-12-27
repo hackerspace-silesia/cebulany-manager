@@ -12,7 +12,7 @@ from cebulany.resources.report import report_page
 
 from os import environ
 
-DATABASE_URI = environ.get('DATABSE_URI', 'sqlite:///test.db')
+DATABASE_URI = environ.get('DATABASE_URI', 'sqlite:///test.db')
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI

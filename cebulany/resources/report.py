@@ -23,6 +23,7 @@ report_page = Blueprint('report_page', 'report', template_folder='../templates')
 month_field = sql_func.extract('month', Transaction.date)
 year_field = sql_func.extract('year', Transaction.date)
 
+
 def accumulate_sum(iterable):  # py2.7 why
     values = []
     s = 0.0
