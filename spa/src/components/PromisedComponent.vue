@@ -9,12 +9,12 @@
           strong Ugh Error ;_;
           template(v-if="state.code") &nbsp; HTTP: {{ state.code }}
           template(v-if="state.msg") &nbsp;{{ state.msg }}
-    template(v-else)
+    template(v-if="showOnPromise || !state")
       slot Insert Template Here.
 </template>
 
 <script>
   export default {
-    props: ['state']
+    props: ['state', 'showOnPromise']
   }
 </script>

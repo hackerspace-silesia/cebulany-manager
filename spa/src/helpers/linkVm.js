@@ -15,7 +15,7 @@ export default function (vm, promise, keyState = 'promiseState') {
       } else if (error.request) {
         vm[keyState] = { key: 'error', msg: 'Problem z połączeniem' };
       } else {
-        vm[keyState] = { key: 'error', msg: 'dziwny błąd' };
+        vm[keyState] = { key: 'error', msg: 'Dziwny błąd' };
       }
       throw error;
     });

@@ -3,11 +3,12 @@ from flask_restful.reqparse import RequestParser
 from cebulany.resources.model import ModelResource, ModelListResource
 
 from cebulany.models import Member
+from cebulany.resources.types import dt_type
 
 member_parser = RequestParser()
 member_parser.add_argument('name', required=True)
-member_parser.add_argument('join_date', required=True)
-member_parser.add_argument('is_active', type=bool)
+member_parser.add_argument('join_date', required=True, type=dt_type)
+member_parser.add_argument('is_active', required=True, type=bool)
 
 query_parser = RequestParser()
 query_parser.add_argument('q')

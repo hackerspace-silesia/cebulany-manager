@@ -7,5 +7,8 @@ export default {
   },
   getAll () {
     return axios.get('/members');
+  },
+  update ({id, data}) {
+    return axios.put(`/members/${id}`, data);
   }
 }

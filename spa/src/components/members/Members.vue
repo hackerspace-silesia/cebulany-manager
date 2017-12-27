@@ -5,7 +5,11 @@
         b-form-input(v-model="yearStart", type="number")
         b-form-input(v-model="yearEnd", type="number")
     PromisedComponent(:state="promiseState")
-      MembersTable(:members="members", :paidmonths="paidmonths", :years="years")
+      MembersTable(
+        :members="members",
+        :paidmonths="paidmonths",
+        :years="years",
+        @updateMember="updateMember")
 </template>
 <script>
   import MembersTable from './MembersTable';
@@ -53,6 +57,11 @@
               this.members[obj.id] = obj;
             });
           });
+      },
+      updateMember (obj) {
+        let newMembers = {};
+        newMembers[obj.id] = obj;
+        this.members = Object.assign({}, this.members, newMembers);
       }
     },
     components: {

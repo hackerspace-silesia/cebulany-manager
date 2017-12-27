@@ -100,9 +100,10 @@ class ModelResource(Resource):
             abort(404)
 
         data = self.parser.parse_args()
-        obj.__dict__.update(**data)
-        db.session.add(obj)
+        for key, value in data.items():
+            setattr(obj, key, value)
         db.session.commit()
+
         return marshal(obj, self.resource_fields)
 
     def delete(self, id):

@@ -11,17 +11,23 @@
       template(v-for="paidmonth in paidmonths")
         PaidRow(
             :member="members[paidmonth.member_id]", :years="years",
-            :months="months", :paidmonth="paidmonth", :dtNow="dtNow")
+            :months="months", :paidmonth="paidmonth", :dtNow="dtNow",
+            @updateMember="updateMemberInTable")
 </template>
 <script>
   import PaidRow from './PaidRow';
 
   export default {
-    props: ['years', 'members', 'paidmonths'],
+    props: ['years', 'members', 'paidmonths', 'updateMember'],
     data () {
       return {
         months: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
         dtNow: (new Date()).toISOString().slice(0, 10)
+      }
+    },
+    methods: {
+      updateMemberInTable (data) {
+        this.$emit('updateMember', data)
       }
     },
     components: {

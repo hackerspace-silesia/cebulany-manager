@@ -4,7 +4,7 @@
     span(:id="popoverId") {{ Number(sum).toFixed() }}
       small.text-warning(v-if="count > 1") &nbsp;({{ count }})
     b-popover(
-        :target="popoverId", triggers="blur click",
+        :target="popoverId", triggers="focus click",
         placement="bottom", @show="getTransactions()", @hide="clearTransactions()")
       PromisedComponent(:state="promiseState")
         small: ol: li(v-for="transaction in transactions")
