@@ -13,5 +13,10 @@ export default {
         response.data.sumLeft = sumLeft;
         return response;
       });
+  },
+  upload (file) {
+    let data = new FormData();
+    data.append('file', file);
+    return axios.post('/transactions/upload', data)
   }
 }

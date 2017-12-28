@@ -7,6 +7,7 @@
       PromisedComponent(:state="promiseState")
         TransactionTable(:transactions="transactions", :sum="sum")
       TransactionLegend
+      TransactionUploadForm(@upload="uploadTransactions")
 
 </template>
 
@@ -14,6 +15,7 @@
 import TransactionLegend from './TransactionLegend'
 import TransactionTable from './TransactionTable'
 import TransactionForm from './TransactionForm'
+import TransactionUploadForm from './TransactionUploadForm'
 import TransactionService from '@/services/transactions'
 import linkVm from '@/helpers/linkVm'
 
@@ -29,7 +31,8 @@ export default {
   components: {
     TransactionLegend,
     TransactionTable,
-    TransactionForm
+    TransactionForm,
+    TransactionUploadForm
   },
   created () {
     this.fetchTransactions();
@@ -42,6 +45,9 @@ export default {
           this.sum = response.data.sum;
           this.sumLeft = response.data.sumLeft;
         })
+    },
+    uploadTransactions () {
+      this.fetchTransactions();
     }
   }
 }

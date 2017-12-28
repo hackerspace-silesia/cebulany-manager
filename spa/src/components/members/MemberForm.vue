@@ -1,6 +1,6 @@
 <template lang="pug">
   PromisedComponent(:state="promiseState", show-on-promise)
-    b-alert(variant="success", :show="success") OK!
+    Alert(ref="successAlert")
     b-form(@submit="onSubmit")
       b-form-group(label="Nazwa")
         b-form-input(type="text", v-model="name", size="sm")
@@ -15,6 +15,8 @@
 
 <script>
   import memberService from '@/services/members'
+
+  import Alert from '@/components/Alert';
   import linkVm from '@/helpers/linkVm';
 
   export default {
@@ -25,8 +27,7 @@
           promiseState: null,
           name: '',
           join_date: '',
-          is_active: '',
-          success: false
+          is_active: ''
         }
       }
 
@@ -35,8 +36,7 @@
         promiseState: null,
         name: member.name,
         join_date: member.join_date,
-        is_active: member.is_active,
-        success: false
+        is_active: member.is_active
       }
     },
     watch: {
@@ -67,10 +67,13 @@
 
         linkVm(this, promise)
           .then(resp => {
-            this.success = true;
             this.$emit('update', resp.data);
+            this.$refs.successAlert.$emit('turnOn');
           })
       }
+    },
+    components: {
+      Alert
     }
   }
 </script>

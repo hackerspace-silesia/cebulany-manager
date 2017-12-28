@@ -7,9 +7,10 @@
             b-form-input(v-model="yearStart", type="number")
           b-form-group(label="Do")
             b-form-input(v-model="yearEnd", type="number")
-          b-form-group(label="Członek")
-            b-input-group(left="🔍")
-              b-form-input(v-model.trim="memberFilter", type="text")
+          b-form-group(label="Szukaj")
+            b-form-input(
+              v-model.trim="memberFilter", type="text",
+              placeholder="Szukaj...")
           b-form-group(label="*")
             b-button(id="new-member-form", variant="primary") Dodaj
             b-popover(

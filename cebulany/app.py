@@ -4,11 +4,16 @@ from cebulany.models import db
 
 from cebulany.resources.transaction import TransactionResource
 from cebulany.resources.member import MemberResource, MemberListResource
-from cebulany.resources.paid_month import PaidMonthListResource, PaidMonthResource, PaidMonthTableResource
+from cebulany.resources.paid_month import (
+    PaidMonthListResource,
+    PaidMonthResource,
+    PaidMonthTableResource,
+)
 from cebulany.resources.bill import BillListResource, BillResource
 from cebulany.resources.donation import DonationListResource, DonationResource
 from cebulany.resources.other import OtherListResource, OtherResource
 from cebulany.resources.report import report_page
+from cebulany.resources.upload import upload_page
 
 from os import environ
 
@@ -34,6 +39,7 @@ api.add_resource(OtherListResource, '/api/other')
 api.add_resource(OtherResource, '/api/other/<int:id>')
 
 app.register_blueprint(report_page)
+app.register_blueprint(upload_page)
 
 
 @app.route('/')
