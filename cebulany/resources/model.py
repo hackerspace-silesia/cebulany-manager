@@ -2,6 +2,7 @@ from flask_restful import Resource, fields, marshal, abort
 from flask_restful.reqparse import RequestParser
 from sqlalchemy.sql.elements import or_
 
+from cebulany.auth import token_required
 from cebulany.models import db, Transaction
 
 resource_fields = {
@@ -33,10 +34,12 @@ class ModelListResource(Resource):
     def get_list_query(self):
         return self.cls.query
 
+    @token_required
     def get(self):
         query = self.get_list_query()
         return marshal(query.all(), self.resource_fields)
 
+    @token_required
     def post(self):
         data = self.parser.parse_args()
         obj = self.cls(**data)
@@ -88,12 +91,14 @@ class ModelResource(Resource):
     parser = parser
     resource_fields = resource_fields
 
+    @token_required
     def get(self, id):
         obj = self.cls.query.get(id)
         if obj is None:
             abort(404)
         return marshal(obj, self.resource_fields)
 
+    @token_required
     def put(self, id):
         obj = self.cls.query.get(id)
         if obj is None:
@@ -106,6 +111,7 @@ class ModelResource(Resource):
 
         return marshal(obj, self.resource_fields)
 
+    @token_required
     def delete(self, id):
         query = self.cls.query.filter_by(id=id)
         is_exists = db.session.query(query.exists()).scalar()

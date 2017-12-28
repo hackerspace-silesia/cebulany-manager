@@ -4,6 +4,7 @@ from sqlalchemy import or_, func as sql_func
 from datetime import datetime
 from decimal import Decimal
 
+from cebulany.auth import token_required
 from cebulany.models import db, Transaction
 from cebulany.resources.types import dt_type
 
@@ -62,6 +63,7 @@ resource_fields = {
 class TransactionResource(Resource):
 
     @marshal_with(resource_fields)
+    @token_required
     def get(self):
         args = transaction_parser.parse_args()
         model = Transaction

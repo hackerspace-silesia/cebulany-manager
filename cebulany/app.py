@@ -14,6 +14,7 @@ from cebulany.resources.donation import DonationListResource, DonationResource
 from cebulany.resources.other import OtherListResource, OtherResource
 from cebulany.resources.report import report_page
 from cebulany.resources.upload import upload_page
+from cebulany.resources.login import LoginResource
 
 from os import environ
 
@@ -21,6 +22,9 @@ DATABASE_URI = environ.get('DATABASE_URI', 'sqlite:///test.db')
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+app.config['CEBULANY_TOKEN'] = environ.get('CEBULANY_TOKEN', 'socek')
+app.config['CEBULANY_LOGIN'] = environ.get('CEBULANY_LOGIN', 'socek')
+app.config['CEBULANY_PASSWD'] = environ.get('CEBULANY_PASSWD', 'socek')
 api = Api(app)
 db.init_app(app)
 
@@ -37,6 +41,8 @@ api.add_resource(DonationListResource, '/api/donation')
 api.add_resource(DonationResource, '/api/donation/<int:id>')
 api.add_resource(OtherListResource, '/api/other')
 api.add_resource(OtherResource, '/api/other/<int:id>')
+
+api.add_resource(LoginResource, '/api/login')
 
 app.register_blueprint(report_page)
 app.register_blueprint(upload_page)

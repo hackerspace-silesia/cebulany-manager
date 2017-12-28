@@ -4,6 +4,7 @@ from sqlalchemy import or_, func as sql_func, extract as sql_extract
 from datetime import datetime
 from itertools import groupby
 
+from cebulany.auth import token_required
 from cebulany.models import db, Member, PaidMonth, Transaction
 from cebulany.resources.model import ModelListResource, ModelResource
 from cebulany.resources.types import month_type
@@ -57,6 +58,7 @@ class PaidMonthTableResource(ModelListResource):
     resource_fields = paid_month_fields
 
     @marshal_with(paid_month_sum_fields)
+    @token_required
     def get(self):
         dt_col = sql_func.strftime('%Y-%m', PaidMonth.date)
         query = db.session.query(
@@ -111,6 +113,7 @@ class PaidMonthListResource(ModelListResource):
             )
         return query
 
+    @token_required
     def post(self):
         data, status = super(PaidMonthListResource, self).post()
         args = self.parser.parse_args()
