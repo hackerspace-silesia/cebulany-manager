@@ -1,22 +1,13 @@
-import Transaction from '@/models/transaction';
 import axios from './base';
 
 export default {
-  get (params) {
+  login (login, password) {
+    let data = {login, password};
     return axios
-      .get('/transactions', {params: params})
+      .post('/login', data)
       .then((response) => {
-        let transactions = response.data.transactions;
-        let sumLeft = 0;
-        transactions.forEach(Transaction.computeLeftCost);
-        transactions.forEach((obj) => { sumLeft += obj.left; });
-        response.data.sumLeft = sumLeft;
-        return response;
+        let token = response.data.token;
+        axios.defaults.headers['Authorization'] = `Socek ${token}`;
       });
-  },
-  upload (file) {
-    let data = new FormData();
-    data.append('file', file);
-    return axios.post('/transactions/upload', data)
   }
 }

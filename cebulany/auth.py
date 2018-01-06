@@ -10,6 +10,6 @@ def token_required(view):
         token = app.config['CEBULANY_TOKEN']
         if header != 'Socek %s' % token:
             abort(401)
-        view(*args, **kwargs)
+        return view(*args, **kwargs)
 
     return inner
