@@ -42,10 +42,11 @@ thead {
 </style>
 </head>
 <div id='main'>
-<div id="plot-main" style="width:100%;height:500px;"></div>
+<div id="plot-main" style="width:900px;height:300px;"></div>
 <script>
     plot('plot-main', {
-        legend: {traceorder: 'normal', x: 0, y: 1,  bgcolor: '#f2f2f2'}
+        legend: {x: 0, y: 1, bgcolor: '#f2f2f2'},
+        margin: {l: 50, r: 0, b: 25, t: 25, pad: 4}
     }, [
         {
             name: 'Stan konta',
@@ -59,7 +60,7 @@ thead {
             mode: 'scatter',
             x: {{ main_plot.dates | tojson | safe}},
             y: {{ main_plot.moneys | tojson | safe}},
-            line: { color: '#1E90FF', width: 2}
+            line: { color: '#1E90FF', width: 1}
         }, {
             name: 'Rachunki',
             mode: 'scatter',
@@ -71,7 +72,7 @@ thead {
             mode: 'scatter',
             x: {{ main_plot.dates | tojson | safe}},
             y: {{ main_plot.paids | tojson | safe}},
-            line: { color: '#29AB87', width: 2}
+            line: { color: '#29AB87', width: 1}
         }
     ]);
 </script>
@@ -97,8 +98,32 @@ thead {
         {% endfor %}
     </tbody>
 </table>
-<img src="data:image/png;base64,{{ report.graphs['positive'] }}"\>
-<img src="data:image/png;base64,{{ report.graphs['negative'] }}"\>
+<div id="plot-month-pos-{{report.month}}" style="width:300px;height:300px;"></div>
+<div id="plot-month-neg-{{report.month}}" style="width:300px;height:300px;"></div>
+<script>
+    plot('plot-month-pos-{{report.month}}', {
+        title: '{{report.graphs.positive.title }}',
+        showlegend: false,
+        margin: {l: 50, r: 0, b: 25, t: 25, pad: 4}
+    }, [
+        {
+            type: 'pie',
+            values: {{ report.graphs.positive.vals | tojson | safe}},
+            labels: {{ report.graphs.positive.labels | tojson | safe}},
+        }
+    ]);
+    plot('plot-month-neg-{{report.month}}', {
+        title: '{{report.graphs.negative.title }}',
+        showlegend: false,
+        margin: {l: 50, r: 0, b: 25, t: 25, pad: 4}
+    }, [
+        {
+            type: 'pie',
+            values: {{ report.graphs.negative.vals | tojson | safe}},
+            labels: {{ report.graphs.negative.labels | tojson | safe}},
+        }
+    ]);
+</script>
 <hr/>
 </div>
 {% endfor %}

@@ -159,13 +159,11 @@ class ReportMonth(object):
 
     @staticmethod
     def make_pie(title, values, labels):
-        fig = plt.figure(figsize=(3, 3))
-        plt.title(title)
-        patches, _, _ = plt.pie(values, autopct=u'%.0f%%')
-        plt.tight_layout()
-        plt.legend(patches, labels, loc='best', fontsize='x-small')
-        return save_plot(fig)
-
+        return {
+            'title': title,
+            'vals': [float(val) for val in values],
+            'labels': labels,
+        }
 
 
 class Row(object):
