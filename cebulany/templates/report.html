@@ -1,3 +1,10 @@
+<head>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+<script>
+    function plot (domId, conf, data) {
+        return Plotly.newPlot(domId, data, conf);
+    }
+</script>
 <style>
 body {
     font-family: 'Arial';
@@ -33,8 +40,41 @@ thead {
     color: #B2140C;
 }
 </style>
+</head>
 <div id='main'>
-<img src="data:image/png;base64,{{ fig_total }}"\>
+<div id="plot-main" style="width:100%;height:500px;"></div>
+<script>
+    plot('plot-main', {
+        legend: {traceorder: 'normal', x: 0, y: 1,  bgcolor: '#f2f2f2'}
+    }, [
+        {
+            name: 'Stan konta',
+            mode: 'scatter',
+            x: {{ main_plot.dates | tojson | safe}},
+            y: {{ main_plot.acc | tojson | safe}},
+            line: {color: '#76D7EA', width: 0},
+            fill: 'tozeroy'
+        }, {
+            name: 'Przychód / Strata',
+            mode: 'scatter',
+            x: {{ main_plot.dates | tojson | safe}},
+            y: {{ main_plot.moneys | tojson | safe}},
+            line: { color: '#1E90FF', width: 2}
+        }, {
+            name: 'Rachunki',
+            mode: 'scatter',
+            x: {{ main_plot.dates | tojson | safe}},
+            y: {{ main_plot.bills | tojson | safe}},
+            line: { color: '#FFBF00', width: 2}
+        }, {
+            name: 'Składki',
+            mode: 'scatter',
+            x: {{ main_plot.dates | tojson | safe}},
+            y: {{ main_plot.paids | tojson | safe}},
+            line: { color: '#29AB87', width: 2}
+        }
+    ]);
+</script>
 {% for report in months %}
 <div class='month'>
 <table>

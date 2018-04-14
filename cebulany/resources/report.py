@@ -191,7 +191,8 @@ class Money(Row):
             return 'negative'
         return ''
 
-def get_costs_graph():
+
+def get_costs_plot_data():
     key_fields = (year_field, month_field)
     query_total = db.session.query(
         sql_func.sum(Transaction.cost),
@@ -210,34 +211,20 @@ def get_costs_graph():
     label_indexs = range(len(labels))
     def values_sorted_by_date(query):
         data = {format_key(o): o[0] for o in query.all()}
-        return [data.get(key, 0) for key in labels]
+        return [float(data.get(key, 0)) for key in labels]
         
     values = values_sorted_by_date(query_total)
     paid_values = values_sorted_by_date(query_paids)
     bill_values = values_sorted_by_date(query_bills)
     acc_values = accumulate_sum(values)
-    min_value = int(floor(min(values) / 1000) * 1000)
-    max_value = int(ceil(max(acc_values) / 1000) * 1000)
 
-    fig, ax = plt.subplots(figsize=(8, 3))
-    plt.grid(which='major', color='silver', linestyle='--')
-
-    plt.plot(values, label=u'Przychód / Strata')
-    plt.plot(paid_values, label=u'Składki', color='green')
-    plt.plot(bill_values, label=u'Rachunki', color='orange')
-    plt.fill_between(label_indexs, 0, acc_values, color='deepskyblue', label='Stan konta')
-    plt.xlim([0, len(labels) - 1])
-    plt.ylim([min_value - 250, max_value + 250])
-
-    plt.xticks(label_indexs, labels, rotation=45)
-    ax.yaxis.set_major_formatter(FormatStrFormatter(u'%.0f zł'))
-    plt.yticks(range(min_value, max_value, 500))
-    plt.tick_params(axis='x', labelsize='x-small')
-    plt.tick_params(axis='y', labelsize='x-small')
-    plt.axhline(color='r')
-    plt.tight_layout()
-    plt.legend(loc='upper left')
-    return save_plot(fig)
+    return {
+        'dates': labels,
+        'paids': paid_values,
+        'bills': bill_values,
+        'moneys': values,
+        'acc': acc_values,
+    }
 
 
 @report_page.route('/report')
@@ -270,4 +257,8 @@ def basic():
     ]"""
 
 
-    return render_template('report.html', months=months, fig_total=get_costs_graph())
+    return render_template(
+        'report.html',
+        months=months,
+        main_plot=get_costs_plot_data()
+    )
