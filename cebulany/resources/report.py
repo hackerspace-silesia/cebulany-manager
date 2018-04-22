@@ -3,8 +3,6 @@ from flask import Blueprint, render_template
 from sqlalchemy import func as sql_func
 from sqlalchemy import distinct
 from decimal import Decimal
-from matplotlib import pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
 from io import BytesIO
 from base64 import b64encode
 from datetime import date
@@ -148,21 +146,20 @@ class ReportMonth(object):
         if paids_values > 0:
             labels.insert(0, u'SKŁADKI')
             values.insert(0, paids_values)
-        self.graphs['positive'] = self.make_pie(u'PRZYCHÓD', values, labels)
+        self.graphs['positive'] = self.make_pie(values, labels)
 
     def add_negative_graph(self, bills, others):
         labels = [obj.name for obj in bills] + [
                 obj.name for obj in others if int(obj.value) < 0]
         values = [-obj.value for obj in bills] + [
                 -obj.value for obj in others if int(obj.value) < 0]
-        self.graphs['negative'] = self.make_pie(u'WYDATKI', values, labels)
+        self.graphs['negative'] = self.make_pie(values, labels)
 
     @staticmethod
-    def make_pie(title, values, labels):
+    def make_pie(values, labels):
         return {
-            'title': title,
             'vals': [float(val) for val in values],
-            'labels': labels,
+            'labels': [label.upper() for label in labels],
         }
 
 

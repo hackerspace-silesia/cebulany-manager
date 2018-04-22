@@ -1,4 +1,5 @@
 <head>
+<meta charset="UTF-8" />
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
 <script>
     function plot (domId, conf, data) {
@@ -26,10 +27,10 @@ table, th, td {
     border-collapse: collapse;
 }
 td.name {
-    width: 500px;
+    width: 600px;
 }
 td.value {
-    width: 100px;
+    width: 300px;
     text-align: right;
 }
 thead {
@@ -42,7 +43,7 @@ thead {
 </style>
 </head>
 <div id='main'>
-<div id="plot-main" style="width:900px;height:300px;"></div>
+<div id="plot-main" style="width:100%;height:300px;"></div>
 <script>
     plot('plot-main', {
         legend: {x: 0, y: 1, bgcolor: '#f2f2f2'},
@@ -60,13 +61,13 @@ thead {
             mode: 'scatter',
             x: {{ main_plot.dates | tojson | safe}},
             y: {{ main_plot.moneys | tojson | safe}},
-            line: { color: '#1E90FF', width: 1}
+            line: { color: '#1E90FF', width: 2}
         }, {
             name: 'Rachunki',
             mode: 'scatter',
             x: {{ main_plot.dates | tojson | safe}},
             y: {{ main_plot.bills | tojson | safe}},
-            line: { color: '#FFBF00', width: 2}
+            line: { color: '#FFBF00', width: 1}
         }, {
             name: 'Składki',
             mode: 'scatter',
@@ -98,27 +99,23 @@ thead {
         {% endfor %}
     </tbody>
 </table>
-<div id="plot-month-pos-{{report.month}}" style="width:300px;height:300px;"></div>
-<div id="plot-month-neg-{{report.month}}" style="width:300px;height:300px;"></div>
+<br />
+<div id="plot-month-{{report.year}}-{{report.month}}" style="width:100%;height:300px;"></div>
 <script>
-    plot('plot-month-pos-{{report.month}}', {
-        title: '{{report.graphs.positive.title }}',
-        showlegend: false,
-        margin: {l: 50, r: 0, b: 25, t: 25, pad: 4}
+    plot('plot-month-{{report.year}}-{{report.month}}', {
+        title: 'Dochód / Wydatki',
+        margin: {l: 50, r: 0, b: 25, t: 50, pad: 4}
     }, [
         {
+            name: 'Dochód',
             type: 'pie',
+            domain: {x: [0.0, 0.48], y: [0.0, 1.0]},
             values: {{ report.graphs.positive.vals | tojson | safe}},
             labels: {{ report.graphs.positive.labels | tojson | safe}},
-        }
-    ]);
-    plot('plot-month-neg-{{report.month}}', {
-        title: '{{report.graphs.negative.title }}',
-        showlegend: false,
-        margin: {l: 50, r: 0, b: 25, t: 25, pad: 4}
-    }, [
-        {
+        }, {
+            name: 'Wydatki',
             type: 'pie',
+            domain: {x: [0.5, 1.0], y: [0.0, 1.0]},
             values: {{ report.graphs.negative.vals | tojson | safe}},
             labels: {{ report.graphs.negative.labels | tojson | safe}},
         }
