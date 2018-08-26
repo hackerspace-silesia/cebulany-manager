@@ -8,11 +8,12 @@ requires = [
     'Flask-RESTful==0.3.5',
     'Flask-SQLAlchemy==2.1',
     'uwsgi==2.0.15',
+    'alembic==1.0.0',
 ]
 
 setup(
     name='cebulany manager',
-    version='0.0.1',
+    version='0.0.3',
     classifiers=[],
     author='Firemark',
     author_email='marpiechula@gmail.com',

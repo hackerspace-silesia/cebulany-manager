@@ -1,9 +1,19 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
-from sqlalchemy import Table
+from sqlalchemy.sql.schema import MetaData
 
-db = SQLAlchemy()
+db = SQLAlchemy(
+    metadata=MetaData(
+        naming_convention={
+            "ix": 'ix_%(column_0_label)s',
+            "uq": "uq_%(table_name)s_%(column_0_name)s",
+            "ck": "ck_%(table_name)s_%(column_0_name)s",
+            "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+            "pk": "pk_%(table_name)s"
+        }
+    )
+)
 
 
 class Base(db.Model):
@@ -28,7 +38,6 @@ class BaseWithTransaction(Base):
 
 class Transaction(Base):
     __abstract__ = False
-    type = db.Column(db.String(20))
     line_num = db.Column(db.Integer, index=True, nullable=False)
     date = db.Column(db.Date, index=True, nullable=False)
     title = db.Column(db.String(300))
@@ -39,9 +48,12 @@ class Transaction(Base):
     ref_id = db.Column(db.String(100), index=True)
     proposed_member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
     proposed_type_name = db.Column(db.String(300))
-    proposed_type = db.Column(db.String(300))
+    proposed_type_id = db.Column(db.Integer, db.ForeignKey('paymenttype.id'))
+    proposed_budget_id = db.Column(db.Integer, db.ForeignKey('budget.id'))
 
     proposed_member = relationship('Member')
+    proposed_payment_type = relationship('PaymentType')
+    proposed_budget = relationship('Budget')
 
 
 class Member(Base):
@@ -51,29 +63,31 @@ class Member(Base):
     join_date = db.Column(db.Date, nullable=False)
 
 
-class PaidMonth(BaseWithTransaction):
+class Payment(Base):
     __abstract__ = False
-    member_id = db.Column(db.Integer, db.ForeignKey('member.id'), nullable=False)
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
+    name = db.Column(db.String(300), index=True, nullable=False)
+    payment_type_id = db.Column(db.Integer, db.ForeignKey('paymenttype.id'), nullable=False)
+    budget_id = db.Column(db.Integer, db.ForeignKey('budget.id'), nullable=False)
+    member_id = db.Column(db.Integer, db.ForeignKey('member.id'), nullable=True)
     date = db.Column(db.Date, nullable=False)
     cost = db.Column(db.Numeric(precision=2), nullable=False)
 
-    member = relationship(Member, backref='months')
+    member = relationship(Member, backref='payments')
 
 
-class Donation(BaseWithTransaction):
+class PaymentType(Base):
     __abstract__ = False
-    name = db.Column(db.String(300), nullable=False)
-    cost = db.Column(db.Numeric(precision=2), nullable=False)
+    name = db.Column(db.String(300), index=True, nullable=False)
+    color = db.Column(db.String(6), nullable=False)
+    has_members = db.Column(db.Boolean, default=False, nullable=False)
+    show_details_in_report = db.Column(db.Boolean, default=False, nullable=False)
+    show_count_in_report = db.Column(db.Boolean, default=False, nullable=False)
 
 
-class Bill(BaseWithTransaction):
+class Budget(Base):
     __abstract__ = False
-    name = db.Column(db.String(300), nullable=False)
-    cost = db.Column(db.Numeric(precision=2), nullable=False)
-
-
-class Other(BaseWithTransaction):
-    __abstract__ = False
-    name = db.Column(db.String(300), nullable=False)
-    cost = db.Column(db.Numeric(precision=2), nullable=False)
-
+    name = db.Column(db.String(300), index=True, nullable=False)
+    color = db.Column(db.String(6), nullable=False)
+    show_details_in_report = db.Column(db.Boolean, default=False, nullable=False)
+    show_count_in_report = db.Column(db.Boolean, default=False, nullable=False)
