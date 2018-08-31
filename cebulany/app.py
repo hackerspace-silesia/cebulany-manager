@@ -4,17 +4,14 @@ from cebulany.models import db
 
 from cebulany.resources.transaction import TransactionResource
 from cebulany.resources.member import MemberResource, MemberListResource
-from cebulany.resources.paid_month import (
-    PaidMonthListResource,
-    PaidMonthResource,
-    PaidMonthTableResource,
-)
-from cebulany.resources.bill import BillListResource, BillResource
-from cebulany.resources.donation import DonationListResource, DonationResource
-from cebulany.resources.other import OtherListResource, OtherResource
+from cebulany.resources.paid_month import PaymentTableResource
 from cebulany.resources.report import report_page
 from cebulany.resources.upload import upload_page
 from cebulany.resources.login import LoginResource
+from cebulany.resources.budget import BudgetListResource, BudgetResource
+from cebulany.resources.payment_type import PaymentTypeListResource
+from cebulany.resources.payment_type import PaymentTypeResource
+from cebulany.resources.payment import PaymentListResource, PaymentResource
 
 from os import environ
 
@@ -32,15 +29,13 @@ api.add_resource(TransactionResource, '/api/transactions')
 api.add_resource(MemberListResource, '/api/members')
 api.add_resource(MemberResource, '/api/members/<int:id>')
 
-api.add_resource(PaidMonthListResource, '/api/paid_month')
-api.add_resource(PaidMonthTableResource, '/api/paid_month/table')
-api.add_resource(PaidMonthResource, '/api/paid_month/<int:id>')
-api.add_resource(BillListResource, '/api/bill')
-api.add_resource(BillResource, '/api/bill/<int:id>')
-api.add_resource(DonationListResource, '/api/donation')
-api.add_resource(DonationResource, '/api/donation/<int:id>')
-api.add_resource(OtherListResource, '/api/other')
-api.add_resource(OtherResource, '/api/other/<int:id>')
+api.add_resource(PaymentTableResource, '/api/payment/table')
+api.add_resource(PaymentListResource, '/api/payment/')
+api.add_resource(PaymentResource, '/api/payment/<int:id>')
+api.add_resource(BudgetListResource, '/api/budget/')
+api.add_resource(BudgetResource, '/api/budget/<int:id>')
+api.add_resource(PaymentTypeListResource, '/api/payment_type/')
+api.add_resource(PaymentTypeResource, '/api/payment_type/<int:id>')
 
 api.add_resource(LoginResource, '/api/login')
 

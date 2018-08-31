@@ -6,16 +6,8 @@ from decimal import Decimal
 from io import BytesIO
 from base64 import b64encode
 from datetime import date
-from math import ceil, floor
 
-from cebulany.models import (
-    db,
-    Transaction,
-    PaidMonth,
-    Bill,
-    Donation,
-    Other,
-)
+from cebulany.models import db, Transaction, Budget, Payment
 
 report_page = Blueprint('report_page', 'report', template_folder='../templates')
 month_field = sql_func.extract('month', Transaction.date)

@@ -25,17 +25,6 @@ class Base(db.Model):
         return cls.__name__.lower()
 
 
-class BaseWithTransaction(Base):
-    __abstract__ = True
-    @declared_attr
-    def transaction_id(cls):
-        return db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
-    
-    @declared_attr
-    def transaction(cls):
-        return relationship('Transaction', backref='%ss' % cls.__tablename__)
-
-
 class Transaction(Base):
     __abstract__ = False
     line_num = db.Column(db.Integer, index=True, nullable=False)
@@ -63,6 +52,15 @@ class Member(Base):
     join_date = db.Column(db.Date, nullable=False)
 
 
+class PaymentType(Base):
+    __abstract__ = False
+    name = db.Column(db.String(300), index=True, nullable=False)
+    color = db.Column(db.String(6), nullable=False)
+    has_members = db.Column(db.Boolean, default=False, nullable=False)
+    show_details_in_report = db.Column(db.Boolean, default=False, nullable=False)
+    show_count_in_report = db.Column(db.Boolean, default=False, nullable=False)
+
+
 class Payment(Base):
     __abstract__ = False
     transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
@@ -74,15 +72,8 @@ class Payment(Base):
     cost = db.Column(db.Numeric(precision=2), nullable=False)
 
     member = relationship(Member, backref='payments')
-
-
-class PaymentType(Base):
-    __abstract__ = False
-    name = db.Column(db.String(300), index=True, nullable=False)
-    color = db.Column(db.String(6), nullable=False)
-    has_members = db.Column(db.Boolean, default=False, nullable=False)
-    show_details_in_report = db.Column(db.Boolean, default=False, nullable=False)
-    show_count_in_report = db.Column(db.Boolean, default=False, nullable=False)
+    transaction = relationship(Transaction, backref='payments')
+    payment_type = relationship(PaymentType, backref='payments')
 
 
 class Budget(Base):

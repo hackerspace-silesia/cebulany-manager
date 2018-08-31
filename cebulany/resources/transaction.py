@@ -19,25 +19,26 @@ transaction_parser.add_argument('cost_le', type=Decimal)
 transaction_parser.add_argument('cost_ge', type=Decimal)
 transaction_parser.add_argument('ordering')
 
-
-simple_fields = fields.Nested({
-    'name': fields.String,
-    'cost': fields.Price(decimals=2),
-    'id': fields.Integer,
-})
-
-
 member_fields = fields.Nested({
-    'name': fields.String,
     'id': fields.Integer,
+    'name': fields.String,
 })
 
-paid_month_fields = fields.Nested({
+payment_type_fields = fields.Nested({
+    'id': fields.Integer,
+    'color': fields.String,
+    'name': fields.String,
+})
+
+payment_fields = fields.Nested({
+    'name': fields.String,
+    'id': fields.Integer,
     'member': member_fields,
+    'payment_type': payment_type_fields,
     'date': fields.DateTime(dt_format='iso8601'),
     'cost': fields.Price(decimals=2),
-    'id': fields.Integer,
 })
+
 
 resource_fields = {
     'transactions': fields.List(fields.Nested({
@@ -47,13 +48,11 @@ resource_fields = {
         'name': fields.String(),
         'cost': fields.Price(decimals=2),
         'iban': fields.String(),
-        'donations': fields.List(simple_fields),
-        'bills': fields.List(simple_fields),
-        'others': fields.List(simple_fields),
-        'paidmonths': fields.List(paid_month_fields),
+        'payments': fields.List(payment_fields),
         'proposed_member_id': fields.String,
-        'proposed_type_name': fields.String,
         'proposed_type': fields.String,
+        'proposed_type_id': fields.Integer,
+        'proposed_budget_id': fields.Integer,
         'proposed_member': member_fields,
     })),
     'sum': fields.Price(decimals=2),
