@@ -1,15 +1,7 @@
 <template lang="pug">
   PromisedRowComponent(:state="promiseState")
-    td: b-form-select(size="sm", v-model="paymentTypeId")
-      option(
-        v-for="type in paymentTypes",
-        :style="type | colorOption",
-        :value="type.id") {{type.name}}
-    td: b-form-select(size="sm", v-model="budgetId")
-      option(
-        v-for="budget in budgets",
-        :style="budget | colorOption",
-        :value="budget.id") {{budget.name}}
+    td: TypeSelect(:types="paymentTypes", v-model="paymentTypeId")
+    td: TypeSelect(:types="budgets", v-model="budgetId")
     td
       template(v-if="paymentType && paymentType.has_members")
         v-select(
@@ -25,12 +17,15 @@
 </template>
 
 <script>
+  import TypeSelect from '@/components/inputs/TypeSelect';
+
   import MemberService from '@/services/members'
   import PaymentService from '@/services/payment'
   import linkVm from '@/helpers/linkVm'
 
   export default {
     props: ['item', 'budgets', 'paymentTypes'],
+    components: {TypeSelect},
     data () {
       var member = null;
       if (this.item.proposed_member && this.item.proposed_member.name) {
@@ -59,11 +54,6 @@
       },
       paymentTypeId (value) {
         this.paymentType = this.paymentTypes[value];
-      }
-    },
-    filters: {
-      colorOption (obj) {
-        return {backgroundColor: `#${obj.color}`};
       }
     },
     methods: {
