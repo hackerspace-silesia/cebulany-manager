@@ -30,11 +30,18 @@ payment_type_fields = fields.Nested({
     'name': fields.String,
 })
 
+budget_fields = fields.Nested({
+    'id': fields.Integer,
+    'color': fields.String,
+    'name': fields.String,
+})
+
 payment_fields = fields.Nested({
     'name': fields.String,
     'id': fields.Integer,
     'member': member_fields,
     'payment_type': payment_type_fields,
+    'budget': budget_fields,
     'date': fields.DateTime(dt_format='iso8601'),
     'cost': fields.Price(decimals=2),
 })
@@ -50,7 +57,7 @@ resource_fields = {
         'iban': fields.String(),
         'payments': fields.List(payment_fields),
         'proposed_member_id': fields.String,
-        'proposed_type': fields.String,
+        'proposed_type_name': fields.String,
         'proposed_type_id': fields.Integer,
         'proposed_budget_id': fields.Integer,
         'proposed_member': member_fields,

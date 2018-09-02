@@ -19,8 +19,9 @@ def fill_transactions(data):
                 )
                 if last_transaction is not None:
                     record['proposed_member_id'] = last_transaction.proposed_member_id
+                    record['proposed_budget'] = last_transaction.proposed_budget
+                    record['proposed_type_id'] = last_transaction.proposed_type_id
                     record['proposed_type_name'] = last_transaction.proposed_type_name
-                    record['proposed_type'] = last_transaction.proposed_type
                 db.session.add(Transaction(**record))
             else:
                 transaction_query.update(record)

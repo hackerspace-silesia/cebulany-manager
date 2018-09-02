@@ -98,7 +98,7 @@ def upgrade():
         )
 
     type_id = _first("select id from paymenttype where \"name\" == 'DAROWIZNY'")
-    budget_id = _first("select id from paymenttype where \"name\" == 'DAROWIZNY'")
+    budget_id = _first("select id from budget where \"name\" == 'DAROWIZNY'")
     rows = list(connection.execute('''
         select 
           aa."name" as "name", aa."cost" as "cost", "transaction_id", "date"
@@ -119,7 +119,7 @@ def upgrade():
         )
 
     type_id = _first("select id from paymenttype where \"name\" == 'INNE'")
-    budget_id = _first("select id from paymenttype where \"name\" == 'SKŁADKI'")
+    budget_id = _first("select id from budget where \"name\" == 'SKŁADKI'")
     rows = list(connection.execute('''
         select 
           aa."name" as "name", aa."cost" as "cost", "transaction_id", "date"
@@ -140,7 +140,7 @@ def upgrade():
         )
 
     type_id = _first("select id from paymenttype where \"name\" == 'SKŁADKI'")
-    budget_id = _first("select id from paymenttype where \"name\" == 'SKŁADKI'")
+    budget_id = _first("select id from budget where \"name\" == 'SKŁADKI'")
     rows = list(connection.execute('select * from paidmonth'))
     for row in rows:
         connection.execute(

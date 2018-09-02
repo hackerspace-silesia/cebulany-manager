@@ -16,6 +16,16 @@ resource_fields = {
     'member': fields.Nested({
         'name': fields.String,
     }),
+    'payment_type_id': fields.Integer(),
+    'payment_type': fields.Nested({
+        'name': fields.String,
+        'color': fields.String,
+    }),
+    'budget_id': fields.Integer(),
+    'budget': fields.Nested({
+        'name': fields.String,
+        'color': fields.String,
+    }),
     'transaction': fields.Nested({
         'date': fields.DateTime(dt_format='iso8601'),
         'name': fields.String,
@@ -81,7 +91,7 @@ class PaymentListResource(ModelListResource):
             proposed_member_id=data['member_id'],
         )
         if data['member_id'] is not None:
-            data_to_update['proposed_type_id'] = data['member_id']
+            data_to_update['proposed_member_id'] = data['member_id']
 
         (
             db.session

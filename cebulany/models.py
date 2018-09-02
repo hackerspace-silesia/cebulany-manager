@@ -61,6 +61,14 @@ class PaymentType(Base):
     show_count_in_report = db.Column(db.Boolean, default=False, nullable=False)
 
 
+class Budget(Base):
+    __abstract__ = False
+    name = db.Column(db.String(300), index=True, nullable=False)
+    color = db.Column(db.String(6), nullable=False)
+    show_details_in_report = db.Column(db.Boolean, default=False, nullable=False)
+    show_count_in_report = db.Column(db.Boolean, default=False, nullable=False)
+
+
 class Payment(Base):
     __abstract__ = False
     transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
@@ -74,11 +82,4 @@ class Payment(Base):
     member = relationship(Member, backref='payments')
     transaction = relationship(Transaction, backref='payments')
     payment_type = relationship(PaymentType, backref='payments')
-
-
-class Budget(Base):
-    __abstract__ = False
-    name = db.Column(db.String(300), index=True, nullable=False)
-    color = db.Column(db.String(6), nullable=False)
-    show_details_in_report = db.Column(db.Boolean, default=False, nullable=False)
-    show_count_in_report = db.Column(db.Boolean, default=False, nullable=False)
+    budget = relationship(Budget, backref='payments')
