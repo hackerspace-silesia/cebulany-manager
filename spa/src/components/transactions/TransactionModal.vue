@@ -2,83 +2,62 @@
   div
     TransactionModalTable(:item="item")
     h5 Rozliczenia
-    table.table.table-bordered
+    table.table.table-bordered.table-sm
       thead: tr
         th Typ
+        th Budżet
         th Nazwa
+        th Data
         th Kwota
         th *
       tbody
-        TransactionModalForm(:item="item")
-        tr(v-for="bill in item.bills")
-          td: span.badge.badge-danger Rachunek
-          td {{bill.name}}
-          td.text-right {{bill.cost}} zł
-          td: PromisedComponent(:state="promiseState"): b-btn(
-            size="sm" variant="danger",
-            @click="remove('bill', bill.id)") usuń
-        tr(v-for="paidmonth in item.paidmonths")
-          td: span.badge.badge-primary Składka
+        TransactionModalForm(:item="item", :budgets="budgets", :paymentTypes="paymentTypes")
+        tr(v-for="payment in item.payments")
+          td.white(:style="payment.payment_type | colorCell") {{payment.payment_type.name}}
+          td.white(:style="payment.budget | colorCell") {{payment.budget.name}}
           td
-            strong {{paidmonth.date.slice(0, 7)}}
-            span &nbsp; {{paidmonth.member.name}}
-          td.text-right {{paidmonth.cost}} zł
-          td: PromisedComponent(:state="promiseState"): b-btn(
-            size="sm" variant="danger",
-            @click="remove('paid_month', paidmonth.id)") usuń
-        tr(v-for="other in item.others")
-          td: span.badge.badge-danger Inne
-          td {{other.name}}
-          td.text-right {{other.cost}} zł
-          td: PromisedComponent(:state="promiseState"): b-btn(
-            size="sm" variant="danger",
-            @click="remove('other', other.id)") usuń
-        tr(v-for="donation in item.donations")
-          td: span.badge.badge-success Dotacja
-          td {{donation.name}}
-          td.text-right {{donation.cost}} zł
-          td: PromisedComponent(:state="promiseState"): b-btn(
-            size="sm" variant="danger",
-            @click="remove('donation', donation.id)") usuń
+            span(v-if="payment.member.name") {{payment.member.name}}&nbsp;
+            span(v-else) {{payment.name}}
+          td {{payment.date}}
+          td.text-right {{payment.cost}} zł
+          td: PromisedComponent(:state="promiseState")
+            b-btn(size="sm" variant="danger", @click="remove(payment.id)") usuń
 
 
 </template>
 <script>
   import TransactionModalTable from './TransactionModalTable';
   import TransactionModalForm from './TransactionModalForm';
-  import TransactionTypesService from '@/services/transactionTypes';
   import linkVm from '@/helpers/linkVm';
 
+  import PaymentService from '@/services/payment';
+
   export default {
-    props: ['item'],
+    props: ['item', 'budgets', 'paymentTypes'],
     data () {
       return {
         promiseState: null
       }
     },
     components: {TransactionModalTable, TransactionModalForm},
+    filters: {
+      colorCell (obj) {
+        return {backgroundColor: `#${obj.color}`};
+      }
+    },
     methods: {
-      remove (type, pk) {
-        let service = TransactionTypesService.getServiceByType(type);
-        if (service === null) {
-          return;
-        }
-        linkVm(this, service.delete(pk)).then(response => {
-          var container = null;
-          switch (type) {
-            case 'paid_month': container = 'paidmonths'; break;
-            case 'bill': container = 'bills'; break;
-            case 'donation': container = 'donations'; break;
-            case 'other': container = 'others'; break;
-            default: container = null;
-          }
+      remove (pk) {
+        linkVm(this, PaymentService.delete(pk)).then(response => {
           let item = this.item;
-          let oldObj = item[container].find(obj => obj.id === pk);
-          let cost = Number(oldObj.cost);
-          item.left += cost;
-          item[container] = item[container].filter(obj => obj.id !== pk);
+          let oldObj = item.payments.find(obj => obj.id === pk);
+          item.left += Number(oldObj.cost);
+          item.payments = item.payments.filter(obj => obj.id !== pk);
         });
       }
     }
   }
 </script>
+
+<style scoped>
+  td.white {color: white;}
+</style>

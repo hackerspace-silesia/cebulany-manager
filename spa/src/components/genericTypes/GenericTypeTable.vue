@@ -1,8 +1,8 @@
 <template lang="pug">
   b-table(hover, bordered, :items="items", :fields="fields")
-    template(slot="cost" scope="row"): money-value(:value="row.value")
-    template(slot="date" scope="row") {{ row.item.transaction.date }}
-    template(slot="transactionName" scope="row")
+    template(slot="cost" slot-scope="row"): money-value(:value="row.value")
+    template(slot="date" slot-scope="row") {{ row.item.transaction.date }}
+    template(slot="transactionName" slot-scope="row")
       span(:title="row.item.transaction.name")
         | {{ row.item.transaction.name | truncate(50) }}
 </template>

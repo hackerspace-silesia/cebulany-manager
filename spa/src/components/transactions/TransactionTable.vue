@@ -1,36 +1,37 @@
 <template lang="pug">
   .transactions
     b-modal(v-model="showModal", title="Transakcja", size="lg", ok-only)
-      TransactionModal(v-if='showModal', :item="modalItem", :sumLeft="sumLeft")
+      TransactionModal(
+        v-if='showModal',
+        :item="modalItem",
+        :budgets="budgets",
+        :paymentTypes="paymentTypes",
+        :sumLeft="sumLeft")
     b-table(
         hover, bordered, small, foot-clone
         @row-clicked.captured="rowClicked",
         :items="transactions",
         :fields="fields")
-      template(slot="name", scope="row")
+      template(slot="name", slot-scope="row")
         span(:title="row.value") {{ row.value | truncate(50) }}
-      template(slot="title", scope="row")
+      template(slot="title", slot-scope="row")
         span(:title="row.value") {{ row.value | truncate(50) }}
-      template(slot="cost", scope="row"): money-value(:value="row.value")
-      template(slot="left", scope="row"): money-value(:value="row.value")
-      template(slot="types", scope="row")
-        span(v-for="donation in row.item.donations")
-          span.badge.badge-success(:title="donation | type_basic_title") D
-        span(v-for="bill in row.item.bills")
-          span.badge.badge-danger(:title="bill | type_basic_title") R
-        span(v-for="paidmonth in row.item.paidmonths")
-          span.badge.badge-primary(:title="paidmonth | type_paid_title") S
-        span(v-for="other in row.item.others")
-          span.badge.badge-secondary(:title="other | type_basic_title") O
-      template(slot="FOOT_cost" scope="row"): money-value(:value="sum")
-      template(slot="FOOT_left" scope="row"): money-value(:value="sumLeft")
+      template(slot="cost", slot-scope="row"): money-value(:value="row.value")
+      template(slot="left", slot-scope="row"): money-value(:value="row.value")
+      template(slot="types", slot-scope="row")
+        span(v-for="payment in row.item.payments")
+          span.transaction-badge(
+            :title="payment | paymentTitle",
+            :style="payment | paymentStyle") {{payment | paymentName}}
+      template(slot="FOOT_cost" slot-scope="row"): money-value(:value="sum")
+      template(slot="FOOT_left" slot-scope="row"): money-value(:value="sumLeft")
 
 </template>
 <script>
   import TransactionModal from './TransactionModal';
 
   export default {
-    props: ['transactions', 'sum', 'sumLeft'],
+    props: ['transactions', 'sum', 'sumLeft', 'budgets', 'paymentTypes'],
     components: {TransactionModal},
     data () {
       return {
@@ -53,11 +54,18 @@
       }
     },
     filters: {
-      type_basic_title (obj) {
-        return `${obj.name}\n${obj.cost} zł`;
+      paymentStyle (payment) {
+        return {
+          backgroundColor: `#${payment.payment_type.color}`,
+          borderColor: `#${payment.budget.color}`
+        };
       },
-      type_paid_title (obj) {
-        return `${obj.member && obj.member.name}\n${obj.date}\n${obj.cost} zł`;
+      paymentTitle (payment) {
+        return payment.payment_type.name;
+      },
+      paymentName (payment) {
+        let name = payment.payment_type.name;
+        return name ? name.charAt(0).toUpperCase() : '?';
       }
     }
   }
