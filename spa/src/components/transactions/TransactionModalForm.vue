@@ -99,7 +99,3 @@
     }
   }
 </script>
-
-<style>
-  option {color: white;}
-</style>

@@ -10,6 +10,7 @@
       template(v-for='month in months')
         PaidCell(
             :member="member", :year="year", :dtNow="dtNow",
+            :paymentTypeId="paymentTypeId",
             :paidmonth="paidmonth", :month="month")
 </template>
 <script>
@@ -17,7 +18,7 @@
   import MemberForm from './MemberForm';
 
   export default {
-    props: ['years', 'months', 'member', 'paidmonth', 'dtNow', 'updateMember'],
+    props: ['years', 'months', 'member', 'paidmonth', 'dtNow', 'updateMember', 'paymentTypeId'],
     data () {
       return {
         popoverId: `id--${this.member.id}--form`

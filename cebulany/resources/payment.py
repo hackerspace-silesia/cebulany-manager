@@ -1,6 +1,6 @@
 from flask_restful import fields
 from flask_restful.reqparse import RequestParser
-from sqlalchemy.sql.elements import or_
+from sqlalchemy import or_, func as sql_func
 
 from cebulany.models import db, Transaction, Payment
 from cebulany.resources.model import ModelListResource, ModelResource
@@ -46,6 +46,9 @@ parser.add_argument('date', required=False, type=dt_type)
 query_parser = RequestParser()
 query_parser.add_argument('name')
 query_parser.add_argument('payment_type_id', type=int)
+query_parser.add_argument('budget_id', type=int)
+query_parser.add_argument('member_id', type=int)
+query_parser.add_argument('month')
 
 
 class PaymentListResource(ModelListResource):
@@ -60,7 +63,6 @@ class PaymentListResource(ModelListResource):
             .join(cls.transaction)
             .join(cls.member)
             .order_by(Transaction.date.desc())
-            .limit(10)
         )
 
         args = query_parser.parse_args()
@@ -70,10 +72,18 @@ class PaymentListResource(ModelListResource):
                 Transaction.name.ilike('%%%s%%' % arg),
                 cls.name.ilike('%%%s%%' % arg),
             ))
-        if args['payment_type_id']:
+        if args['payment_type_id'] is not None:
             query = query.filter(cls.payment_type_id == args['payment_type_id'])
+        if args['budget_id'] is not None:
+            query = query.filter(cls.budget_id == args['budget_id'])
+        if args['month'] is not None:
+            query = query.filter(
+                sql_func.strftime('%Y-%m', cls.date) == args['month']
+            )
+        if args['member_id'] is not None:
+            query = query.filter(cls.member_id == args['member_id'])
 
-        return query
+        return query.limit(20)
 
     def post(self):
         data, status = super(PaymentListResource, self).post()

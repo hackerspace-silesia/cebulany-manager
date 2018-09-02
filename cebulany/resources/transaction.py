@@ -19,6 +19,7 @@ transaction_parser.add_argument('cost_le', type=Decimal)
 transaction_parser.add_argument('cost_ge', type=Decimal)
 transaction_parser.add_argument('ordering')
 
+
 member_fields = fields.Nested({
     'id': fields.Integer,
     'name': fields.String,
@@ -101,7 +102,7 @@ class TransactionResource(Resource):
             query = query.filter(model.cost >= args['cost_ge'])
         if args['text']:
             query = query.filter(or_(
-                model.main_line.like('%%%s%%' % word.replace('%',r'\%'))
+                model.main_line.like('%%%s%%' % word.replace('%', r'\%'))
                 for word in args['text'].upper().split()
             ))
         if args['ordering']:

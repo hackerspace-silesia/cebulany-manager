@@ -1,12 +1,14 @@
 <template lang="pug">
   b-container
     b-row: b-col
-      PromisedComponent(:state="promiseMemberState")
+      PromisedComponent(:state="promiseInnerState")
         b-form(inline)
           b-form-group(label="Od")
             b-form-input(v-model="yearStart", type="number")
           b-form-group(label="Do")
             b-form-input(v-model="yearEnd", type="number")
+          b-form-group(label="Typ")
+            TypeSelect(:types="paymentTypes", v-model="paymentTypeId")
           b-form-group(label="Szukaj")
             b-form-input(
               v-model.trim="memberFilter", type="text",
@@ -26,6 +28,7 @@
         MembersTable(
           :members="members",
           :paidmonths="paidmonths",
+          :paymentTypeId="paymentTypeId",
           :years="years",
           :memberFilter="memberFilter",
           @updateMember="updateMember")
@@ -33,8 +36,12 @@
 <script>
   import MembersTable from './MembersTable';
   import MemberForm from './MemberForm';
+  import TypeSelect from '@/components/inputs/TypeSelect';
+
   import MembersService from '@/services/members';
-  import PaidMonthService from '@/services/paidmonth';
+  import PaymentService from '@/services/payment';
+  import PaymentTypeService from '@/services/paymentType';
+
   import linkVm from '@/helpers/linkVm';
 
   export default {
@@ -42,8 +49,11 @@
       let now = new Date();
       return {
         promiseState: null,
+        promiseInnerState: null,
         members: {},
         paidmonths: [],
+        paymentTypes: {},
+        paymentTypeId: null,
         memberFilter: '',
         showNewMemberForm: false,
         yearEnd: now.getFullYear(),
@@ -51,34 +61,48 @@
       }
     },
     created () {
-      this.getMembers();
+      this.fetchInit();
     },
     computed: {
-      years: (obj) => {
+      years () {
+        if (this.paymentTypeId === null) {
+          return;
+        }
         let years = [];
-        let yearEnd = parseInt(obj.yearEnd);
-        let yearStart = parseInt(obj.yearStart);
+        let yearEnd = parseInt(this.yearEnd);
+        let yearStart = parseInt(this.yearStart);
         let range = yearEnd - yearStart;
         for (let i = 0; i <= range; i++) {
           years.push(i + yearStart);
         }
-        obj.getPaidMonths(yearStart, yearEnd);
+        this.getPaidMonths(yearStart, yearEnd);
         return years;
       }
     },
     methods: {
-      getPaidMonths () {
-        linkVm(this, PaidMonthService.getTable())
-          .then(resp => { this.paidmonths = resp.data; });
-      },
-      getMembers () {
-        linkVm(this, MembersService.getAll(), 'promiseMemberState')
-          .then(resp => {
+      fetchInit () {
+        let promises = [
+          PaymentTypeService.getAll({has_members: true}),
+          MembersService.getAll()
+        ];
+        linkVm(this, Promise.all(promises), 'promiseInnerState')
+          .then(responses => {
+            let [paymentTypeResponse, memberResponse] = responses;
+            this.paymentTypes = paymentTypeResponse.data;
+            let paymentType = this.paymentTypes[0];
+            this.paymentTypeId = paymentType ? paymentType.id : null;
             this.members = {};
-            resp.data.forEach(obj => {
-              this.members[obj.id] = obj;
+            memberResponse.data.forEach(member => {
+              this.members[member.id] = member;
             });
-          });
+          })
+      },
+      getPaidMonths () {
+        let promise = PaymentService.getTable({
+          payment_type_id: this.paymentTypeId
+        });
+        linkVm(this, promise)
+          .then(resp => { this.paidmonths = resp.data; });
       },
       updateMember (obj) {
         let newMembers = {};
@@ -93,7 +117,8 @@
     },
     components: {
       MembersTable,
-      MemberForm
+      MemberForm,
+      TypeSelect
     }
   }
 </script>

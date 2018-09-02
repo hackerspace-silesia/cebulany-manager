@@ -10,16 +10,16 @@
     tbody
       template(v-for="o in memberList")
         PaidRow(
-            v-if="o.filtered", :member="o.member", :years="years",
+            :member="o.member", :years="years",
             :months="months", :paidmonth="o.paidmonth", :dtNow="dtNow",
+            :paymentTypeId="paymentTypeId",
             @updateMember="updateMemberInTable")
 </template>
 <script>
-  //
   import PaidRow from './PaidRow';
 
   export default {
-    props: ['years', 'members', 'paidmonths', 'updateMember', 'memberFilter'],
+    props: ['years', 'members', 'paidmonths', 'updateMember', 'memberFilter', 'paymentTypeId'],
     data () {
       return {
         months: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
@@ -35,15 +35,19 @@
       memberList () {
         let members = this.members;
         let memberFilter = this.memberFilter.toLowerCase();
-        return this.paidmonths.map(paidmonth => {
-          let member = members[paidmonth.member_id];
-          let name = member.name.toLowerCase();
-          return {
-            member: member,
-            paidmonth: paidmonth,
-            filtered: name.indexOf(memberFilter) !== -1
-          };
-        })
+        return this.paidmonths
+          .filter(paidmonth => {
+            let member = members[paidmonth.member_id];
+            let name = member.name.toLowerCase();
+            return name.indexOf(memberFilter) !== -1
+          })
+          .map(paidmonth => {
+            let member = members[paidmonth.member_id];
+            return {
+              member: member,
+              paidmonth: paidmonth
+            };
+          })
       }
     },
     components: {
