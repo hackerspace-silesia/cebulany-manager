@@ -1,13 +1,12 @@
 #! coding: utf-8
 from flask import Blueprint, render_template
 from sqlalchemy import func as sql_func
-from sqlalchemy import distinct
 from decimal import Decimal
 from io import BytesIO
 from base64 import b64encode
 from datetime import date
 
-from cebulany.models import db, Transaction, Budget, Payment
+from cebulany.models import db, Transaction, Payment, PaymentType
 
 report_page = Blueprint('report_page', 'report', template_folder='../templates')
 month_field = sql_func.extract('month', Transaction.date)
@@ -37,86 +36,58 @@ class ReportMonth(object):
         self.rows = []
         self.graphs = {}
 
-        paids_value = self.compute_paids()
-        donations_value = self.compute_donations()
-        bills_value, bills = self.compute_bills()
-        others_value, others = self.compute_others()
+        positive_graphs = []
+        negative_graphs = []
 
-        self.add_positive_graph(paids_value, donations_value, others) 
-        self.add_negative_graph(bills, others) 
+        types = db.session.query(PaymentType).order_by(PaymentType.name)
+        for payment_type in types:
+            if payment_type.show_details_in_report:
+                query = (
+                    db.session
+                    .query(Payment.name, sql_func.sum(Payment.cost))
+                    .join(Payment.transaction)
+                    .filter(Payment.payment_type_id == payment_type.id)
+                    .group_by(sql_func.upper(Payment.name))
+                )
+                query = self.filterize_query(query)
+                fname = payment_type.name.upper()
 
-        values = sum([
-            paids_value,
-            donations_value,
-            bills_value,
-            others_value,
-        ])
+                payments = [Money(fname + ': ' + name, cost) for name, cost in query.all()]
+                if len(payments) == 0:
+                    continue
+                total = sum((Decimal(obj.value) for obj in payments), Decimal('0.00'))
+                self.rows += payments
+                self.rows.append(Money(fname + u': SUMA', total))
+                positive_graphs += [payment for payment in payments if payment.value > 0]
+                negative_graphs += [payment for payment in payments if payment.value < 0]
+            else:
+                query = (
+                    db.session
+                    .query(sql_func.sum(Payment.cost))
+                    .join(Payment.transaction)
+                    .filter(Payment.payment_type_id == payment_type.id)
+                )
+                query = self.filterize_query(query)
+                name = payment_type.name.upper()
+                cost = query.first()[0]
+                if cost is None:
+                    continue
+                payment = Money(name, cost)
 
-        diff = total - values
-        if abs(diff) > Decimal('0.01'):
-            self.rows.append(Money(u'NIE ROZLICZONE', diff))
-        self.rows.append(Money(u'RAZEM', total))
+                self.rows.append(payment)
 
-    def compute_paids(self):
-        query = db.session.query(
-            sql_func.sum(PaidMonth.cost),
-            sql_func.count(distinct(PaidMonth.member_id)),
-        ).join(
-            PaidMonth.transaction
-        )
+                if cost > 0:
+                    positive_graphs.append(payment)
+                elif cost < 0:
+                    negative_graphs.append(payment)
 
-        paids_value, member_count = self.filterize_query(query).first()
-        self.rows.append(Money(u'SKŁADKI', paids_value))
-        self.rows.append(Row(u'WPŁACIŁO', member_count))
-        return paids_value
+        self.add_graph('positive', positive_graphs)
+        self.add_graph('negative', negative_graphs)
 
-    def compute_bills(self):
-        query = db.session.query(
-            Bill.name,
-            sql_func.sum(Bill.cost),
-        ).join(
-            Bill.transaction
-        ).group_by(sql_func.upper(Bill.name))
-        query = self.filterize_query(query)
-
-        bills = [Money(name, cost) for name, cost in query.all()]
-        total = sum((Decimal(obj.value) for obj in bills), Decimal('0.00'))
-
-        self.rows += bills
-
-        self.rows.append(Money(u'SUMA RACHUNKÓW', total))
-
-        return total, bills
-
-    def compute_donations(self):
-        query = db.session.query(
-            sql_func.sum(Donation.cost),
-        ).join(
-            Donation.transaction
-        )
-
-        donations_value = self.filterize_query(query).scalar() or 0
-        if donations_value > 0:
-            self.rows.append(Money(u'DAROWIZNY', donations_value))
-        return donations_value
-
-    def compute_others(self):
-        query = db.session.query(
-            Other.name,
-            sql_func.sum(Other.cost),
-        ).join(
-            Other.transaction
-        ).group_by(
-            sql_func.upper(Other.name)
-        )
-        query = self.filterize_query(query)
-
-        others = [Money(name, cost) for name, cost in query.all()]
-        total = sum((Decimal(obj.value) for obj in others), Decimal('0.00'))
-
-        self.rows += others
-
-        return total, others
+        # diff = total - values
+        # if abs(diff) > Decimal('0.01'):
+        #     self.rows.append(Money(u'NIE ROZLICZONE', diff))
+        # self.rows.append(Money(u'RAZEM', total))
 
     def filterize_query(self, query):
         if self.month is None:
@@ -129,23 +100,10 @@ class ReportMonth(object):
                 month_field == self.month,
             )
 
-    def add_positive_graph(self, paids_values, donations_values, others):
-        labels = [obj.name for obj in others if int(obj.value) > 0]
-        values = [obj.value for obj in others if int(obj.value) > 0]
-        if donations_values > 0:
-            labels.insert(0, u'DOTACJE')
-            values.insert(0, donations_values)
-        if paids_values > 0:
-            labels.insert(0, u'SKŁADKI')
-            values.insert(0, paids_values)
-        self.graphs['positive'] = self.make_pie(values, labels)
-
-    def add_negative_graph(self, bills, others):
-        labels = [obj.name for obj in bills] + [
-                obj.name for obj in others if int(obj.value) < 0]
-        values = [-obj.value for obj in bills] + [
-                -obj.value for obj in others if int(obj.value) < 0]
-        self.graphs['negative'] = self.make_pie(values, labels)
+    def add_graph(self, name, graphs):
+        labels = [obj.name for obj in graphs]
+        values = [obj.value for obj in graphs]
+        self.graphs[name] = self.make_pie(values, labels)
 
     @staticmethod
     def make_pie(values, labels):
@@ -185,30 +143,22 @@ def get_costs_plot_data():
         sql_func.sum(Transaction.cost),
         *key_fields
     ).group_by(*key_fields).order_by(*key_fields)
-    query_paids = db.session.query(
-        sql_func.sum(PaidMonth.cost), *key_fields
-    ).join(Transaction).group_by(*key_fields)
-    query_bills = db.session.query(
-        sql_func.sum(Bill.cost), *key_fields
-    ).join(Transaction).group_by(*key_fields)
     data = query_total.all()
+
     def format_key(o):
         return '{}-{:02}'.format(o[1], o[2])
+
     labels = [format_key(o) for o in data]
-    label_indexs = range(len(labels))
+
     def values_sorted_by_date(query):
         data = {format_key(o): o[0] for o in query.all()}
         return [float(data.get(key, 0)) for key in labels]
         
     values = values_sorted_by_date(query_total)
-    paid_values = values_sorted_by_date(query_paids)
-    bill_values = values_sorted_by_date(query_bills)
     acc_values = accumulate_sum(values)
 
     return {
         'dates': labels,
-        'paids': paid_values,
-        'bills': bill_values,
         'moneys': values,
         'acc': acc_values,
     }

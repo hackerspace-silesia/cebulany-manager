@@ -62,18 +62,6 @@ thead {
             x: {{ main_plot.dates | tojson | safe}},
             y: {{ main_plot.moneys | tojson | safe}},
             line: { color: '#1E90FF', width: 2}
-        }, {
-            name: 'Rachunki',
-            mode: 'scatter',
-            x: {{ main_plot.dates | tojson | safe}},
-            y: {{ main_plot.bills | tojson | safe}},
-            line: { color: '#FFBF00', width: 1}
-        }, {
-            name: 'Składki',
-            mode: 'scatter',
-            x: {{ main_plot.dates | tojson | safe}},
-            y: {{ main_plot.paids | tojson | safe}},
-            line: { color: '#29AB87', width: 1}
         }
     ]);
 </script>
