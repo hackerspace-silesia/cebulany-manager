@@ -1,6 +1,6 @@
 <template lang="pug">
   td(v-if='!sum', :class="notPayedInDate ? 'table-danger' : ''") -
-  td(v-else, :class="PayedInDate ? 'table-warning' : ''")
+  td(v-else, :class="payedInDate ? 'table-warning' : ''")
     span(:id="popoverId") {{ Number(sum).toFixed() }}
       small.text-warning(v-if="count > 1") &nbsp;({{ count }})
     b-popover(
@@ -24,28 +24,16 @@
         payments: []
       }
     },
-    computed: {
-      sum () {
-        let obj = this.paidmonth.months[this.getKey()] || {};
-        return obj.sum || '';
-      },
-      count () {
-        let obj = this.paidmonth.months[this.getKey()] || {};
-        return obj.count || 0;
-      },
-      popoverId () {
-        let key = this.getKey();
-        return `id--${this.member.id}-${key}`;
-      },
-      notPayedInDate () {
-        let dt = `${this.getKey()}-01`;
-        return dt <= this.dtNow && this.member.join_date < dt;
-      },
-      PayedInDate () {
-        let dt = `${this.getKey()}-01`;
-        return dt <= this.dtNow && this.member.join_date > dt;
-      }
+    changed () {
+      let obj = this.paidmonth.months[this.getKey()] || {};
+      let key = this.getKey();
+      let dt = `${key}-01`;
 
+      this.sum = obj.sum || '';
+      this.count = obj.count || 0;
+      this.popoverId = `id--${this.member.id}-${key}`;
+      this.notPayedInDate = dt <= this.dtNow && this.member.join_date < dt;
+      this.payedInDate = dt <= this.dtNow && this.member.join_date > dt;
     },
     methods: {
       getKey () {
