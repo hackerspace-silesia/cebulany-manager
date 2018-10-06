@@ -39,70 +39,85 @@ class ReportMonth(object):
         positive_graphs = []
         negative_graphs = []
 
+        rest_cost = 0
+
         types = db.session.query(PaymentType).order_by(PaymentType.name)
         for payment_type in types:
             if payment_type.show_details_in_report:
-                query = (
-                    db.session
-                    .query(Payment.name, sql_func.sum(Payment.cost))
-                    .join(Payment.transaction)
-                    .filter(Payment.payment_type_id == payment_type.id)
-                    .group_by(sql_func.upper(Payment.name))
-                )
-                query = self.filterize_query(query)
-                fname = payment_type.name.upper()
-
-                payments = [Money(fname + ': ' + name, cost) for name, cost in query.all()]
-                if len(payments) == 0:
-                    continue
-                total = sum((Decimal(obj.value) for obj in payments), Decimal('0.00'))
-                self.rows += payments
-                self.rows.append(Money(fname + u': SUMA', total))
-                positive_graphs += [payment for payment in payments if payment.value > 0]
-                negative_graphs += [payment for payment in payments if payment.value < 0]
+                cost, rows, graphs = self.get_payments_with_details(payment_type)
             else:
-                query = (
-                    db.session
-                    .query(sql_func.sum(Payment.cost))
-                    .join(Payment.transaction)
-                    .filter(Payment.payment_type_id == payment_type.id)
-                )
-                query = self.filterize_query(query)
-                name = payment_type.name.upper()
-                cost = query.first()[0]
-                if cost is None:
-                    continue
-                payment = Money(name, cost)
+                cost, rows, graphs = self.get_total_payments(payment_type)
 
-                self.rows.append(payment)
-
-                if cost > 0:
-                    positive_graphs.append(payment)
-                elif cost < 0:
-                    negative_graphs.append(payment)
+            rest_cost += cost
+            positive_graphs += [payment for payment in graphs if payment.value > 0]
+            negative_graphs += [payment for payment in graphs if payment.value < 0]
+            self.rows += rows
 
         self.add_graph('positive', positive_graphs)
-        self.add_graph('negative', negative_graphs)
+        self.add_graph('negative', negative_graphs, multiple=-1)
 
-        # diff = total - values
-        # if abs(diff) > Decimal('0.01'):
-        #     self.rows.append(Money(u'NIE ROZLICZONE', diff))
-        # self.rows.append(Money(u'RAZEM', total))
+        diff = total - rest_cost
+        if abs(diff) > Decimal('0.01'):
+            self.rows.append(Money(u'NIE ROZLICZONE', diff))
+        self.rows.append(Money(u'RAZEM', total))
+
+    def get_total_payments(self, payment_type):
+        query = (
+            db.session
+            .query(sql_func.sum(Payment.cost), sql_func.count(Payment.id))
+            .join(Payment.transaction)
+            .filter(Payment.payment_type_id == payment_type.id)
+        )
+        query = self.filterize_query(query)
+        name = payment_type.name.upper()
+        query_row = query.first()
+        cost, count = query_row
+        if cost is None:
+            return 0, [], []
+        payment = Money(name, cost)
+        rows = [payment]
+
+        # broken - todo fix
+        #if payment_type.show_count_in_report:
+        #    rows.append(Row(u'{}: {}'.format(name, u'ILOŚĆ'), count))
+
+        return cost, rows, [payment]
+
+    def get_payments_with_details(self, payment_type):
+        query = (
+            db.session
+            .query(Payment.name, sql_func.sum(Payment.cost))
+            .join(Payment.transaction)
+            .filter(Payment.payment_type_id == payment_type.id)
+            .group_by(sql_func.upper(Payment.name))
+        )
+        query = self.filterize_query(query)
+        payment_type_name = payment_type.name.upper()
+
+        payments = [
+            Money(u'{}: {}'.format(payment_type_name, name), cost)
+            for name, cost in query.all()
+        ]
+
+        if len(payments) == 0:
+            return 0, [], []
+        total = sum((Decimal(obj.value) for obj in payments), Decimal('0.00'))
+        rows = payments + [Money(payment_type_name + u': SUMA', total)]
+
+        return total, rows, payments
 
     def filterize_query(self, query):
         if self.month is None:
-            return query.filter(
-                year_field == self.year,
-            )
+            return query.filter(year_field == self.year)
         else:
             return query.filter(
                 year_field == self.year,
                 month_field == self.month,
             )
 
-    def add_graph(self, name, graphs):
+    def add_graph(self, name, graphs, multiple=1):
         labels = [obj.name for obj in graphs]
-        values = [obj.value for obj in graphs]
+        values = [obj.value * multiple for obj in graphs]
         self.graphs[name] = self.make_pie(values, labels)
 
     @staticmethod
@@ -124,6 +139,10 @@ class Row(object):
 
     def get_classes(self):
         return ''
+
+    def __repr__(self):
+        name = self.__class__.__name__
+        return u'{}<{!r}, {!r}>'.format(name, self.name, self.value)
 
 
 class Money(Row):
