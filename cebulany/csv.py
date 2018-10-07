@@ -11,26 +11,26 @@ import itertools
 
 TRANSACTION_TYPES = {
     u'PRZELEW UZNANIOWY': re_compile(
-        ur'(?P<type>PRZELEW UZNANIOWY) '
-        ur'(\(NADANO (?P<send_date>[\d ]+-[\d ]+-[\d ]+)\) )?'
-        ur'(?P<title>.+?)(  +|$)'
-        ur'(?P<name>.+)?'
+        r'(?P<type>PRZELEW UZNANIOWY) '
+        r'(\(NADANO (?P<send_date>[\d ]+-[\d ]+-[\d ]+)\) )?'
+        r'(?P<title>.+?)(  +|$)'
+        r'(?P<name>.+)?'
     ),
     u'PRZELEW OBCIĄŻENIOWY': re_compile(
-        ur'(?P<type>PRZELEW OBCIĄŻENIOWY) '
-        ur'(\(NADANO (?P<send_date>[\d ]+-[\d ]+-[\d ]+)\) )?'
-        ur'(?P<title>.+?)(  +|$)'
-        ur'(?P<name>.*)?'
+        r'(?P<type>PRZELEW OBCIĄŻENIOWY) '
+        r'(\(NADANO (?P<send_date>[\d ]+-[\d ]+-[\d ]+)\) )?'
+        r'(?P<title>.+?)(  +|$)'
+        r'(?P<name>.*)?'
     ),
     u'WPŁATA GOTÓWKOWA': re_compile(
-        ur'(?P<type>WPŁATA GOTÓWKOWA)'
-        ur'(?P<name>.+?)  +'
-        ur'(?P<title>.+)'
+        r'(?P<type>WPŁATA GOTÓWKOWA)'
+        r'(?P<name>.+?)  +'
+        r'(?P<title>.+)'
     ),
     u'': re_compile(
-        ur'(?P<type>)'
-        ur'(?P<name>)'
-        ur'(?P<title>)'
+        r'(?P<type>)'
+        r'(?P<name>)'
+        r'(?P<title>)'
     ),
 }
 
