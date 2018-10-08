@@ -1,1 +1,5 @@
-INSERT INTO alembic_version (version_num) VALUES ('415d32f993b8');
+SELECT b.name, sum(p.cost) from budget b
+join payment p on b.id = p.budget_id
+join "transaction" t on p.transaction_id = t.id
+where strftime('%Y', t."date") == '2018'
+group by b.id
