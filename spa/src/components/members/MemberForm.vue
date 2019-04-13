@@ -6,7 +6,9 @@
         b-form-input(type="text", v-model="name", size="sm")
       b-form-group(label="Data przystąpienia")
         b-form-input(type="date", v-model="join_date", size="sm")
-      b-form-checkbox(v-model="is_active") Aktywny?
+      label
+        input(type="checkbox", v-model="is_active") 
+        span Aktywny?
       b-form-group
         b-button(
           type="submit",
