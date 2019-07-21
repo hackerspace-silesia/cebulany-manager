@@ -84,6 +84,8 @@ celerybeat-schedule
 
 # virtualenv
 venv/
+venv3/
+venv3.7/
 ENV/
 
 # Spyder project settings
@@ -94,3 +96,7 @@ ENV/
 
 # vim swap files
 *.swp
+
+# IDE files
+.idea
+.vscode
