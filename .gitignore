@@ -1,3 +1,4 @@
+*.idea
 mock.csv
 cebulany/test.db
 spa/node_modules
