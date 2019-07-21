@@ -23,11 +23,20 @@
         promiseState: null
       }
     },
+    mounted () {
+      const success = loginService.loginFromSession();
+      if (success) {
+        this.$emit('onSuccess');
+      }
+    },
     methods: {
       onSubmit (evt) {
         evt.preventDefault();
-        linkVm(this, loginService.login(this.login, this.password))
-          .then(response => { this.$emit('onSuccess'); })
+        linkVm(this, loginService.getToken(this.login, this.password))
+          .then(token => {
+            loginService.setTokenIntoSession(token);
+            this.$emit('onSuccess');
+          })
       }
     }
   }

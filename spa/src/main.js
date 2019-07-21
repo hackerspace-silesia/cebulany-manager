@@ -1,16 +1,16 @@
-import Vue from 'vue'
-import BootstrapVue from 'bootstrap-vue'
+import Vue from 'vue';
+import BootstrapVue from 'bootstrap-vue';
 
-import App from './App'
-import router from './router'
+import App from './App';
+import router from './router';
 
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
 
-import MoneyValue from './components/MoneyValue'
-import PromisedComponent from './components/PromisedComponent'
-import PromisedRowComponent from './components/PromisedRowComponent'
-import vSelect from 'vue-select'
+import MoneyValue from './components/MoneyValue';
+import PromisedComponent from './components/PromisedComponent';
+import PromisedRowComponent from './components/PromisedRowComponent';
+import vSelect from 'vue-select';
 
 Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
