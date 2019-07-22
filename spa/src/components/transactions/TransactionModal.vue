@@ -12,7 +12,7 @@
         th *
       tbody
         TransactionModalForm(:item="item", :budgets="budgets", :paymentTypes="paymentTypes")
-        tr(v-for="payment in item.payments")
+        tr(v-for="payment in item.payments", :key="payment.id")
           td.white(:style="payment.payment_type | colorCell") {{payment.payment_type.name}}
           td.white(:style="payment.budget | colorCell") {{payment.budget.name}}
           td
