@@ -30,10 +30,14 @@
       updateMemberInTable (data) {
         this.$emit('updateMember', data)
       },
-      fillWithEmptyMembers (members, memberList) {
+      fillWithEmptyMembers (members, memberList, memberFilter) {
         Object
           .values(members)
           .filter(member => {
+            const name = member.name.toLowerCase();
+            if (name.indexOf(memberFilter) === -1) {
+              return false;
+            }
             const isMemberExists = memberList.find(o => o.member.id === member.id);
             return !isMemberExists;
           })
@@ -76,7 +80,7 @@
             return name.indexOf(memberFilter) !== -1;
           });
 
-        this.fillWithEmptyMembers(members, memberList);
+        this.fillWithEmptyMembers(members, memberList, memberFilter);
         this.sortMemberList(memberList);
         return memberList;
       }
