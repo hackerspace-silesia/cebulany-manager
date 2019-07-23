@@ -87,7 +87,7 @@ class TransactionResource(Resource):
         model = Transaction
         query = (
             Transaction.query
-            .join(model.payments)
+            .outerjoin(model.payments)
             .options(contains_eager(model.payments))
         )
         if args['date_start'] and args['date_end']:
