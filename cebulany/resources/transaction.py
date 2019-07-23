@@ -93,8 +93,12 @@ class TransactionResource(Resource):
         if args['date_start'] and args['date_end']:
             query = query.filter(model.date >= args['date_start'])
             query = query.filter(model.date <= args['date_end'])
+        elif args['month']:
+            query = query.filter(
+                sql_func.strftime('%Y-%m', model.date) == args['month']
+            )
         elif not args['member_id']:
-            month = args['month'] or datetime.today().strftime('%Y-%m')
+            month = datetime.today().strftime('%Y-%m')
             query = query.filter(
                 sql_func.strftime('%Y-%m', model.date) == month
             )
