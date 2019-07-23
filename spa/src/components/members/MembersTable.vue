@@ -29,25 +29,60 @@
     methods: {
       updateMemberInTable (data) {
         this.$emit('updateMember', data)
+      },
+      fillWithEmptyMembers (members, memberList, memberFilter) {
+        Object
+          .values(members)
+          .filter(member => {
+            const name = member.name.toLowerCase();
+            if (name.indexOf(memberFilter) === -1) {
+              return false;
+            }
+            const isMemberExists = memberList.find(o => o.member.id === member.id);
+            return !isMemberExists;
+          })
+          .forEach(member => {
+            const paidmonth = { months: [] };
+            memberList.push({ member, paidmonth });
+          });
+      },
+      sortMemberList (memberList) {
+        memberList.sort((a, b) => {
+          const memberA = a.member;
+          const memberB = b.member;
+          const isLower = (attr) => memberA[attr] < memberB[attr] ? -1 : 0;
+          const isGreater = (attr) => memberA[attr] > memberB[attr] ? 1 : 0;
+          const isDifferent = (attr) => isLower(attr) || isGreater(attr);
+          const isDifferentRev = (attr) => isDifferent(attr) * -1;
+
+          return (
+            isDifferentRev('is_active') ||
+            isDifferent('join_date') ||
+            isDifferent('name')
+          );
+        });
       }
     },
     computed: {
       memberList () {
-        let members = this.members;
-        let memberFilter = this.memberFilter.toLowerCase();
-        return this.paidmonths
-          .filter(paidmonth => {
-            let member = members[paidmonth.member_id];
-            let name = member.name.toLowerCase();
-            return name.indexOf(memberFilter) !== -1
-          })
+        const members = this.members;
+        const memberFilter = this.memberFilter.toLowerCase();
+        const memberList = this.paidmonths
           .map(paidmonth => {
-            let member = members[paidmonth.member_id];
+            const member = members[paidmonth.member_id];
             return {
               member: member,
               paidmonth: paidmonth
             };
           })
+          .filter(({member}) => {
+            const name = member.name.toLowerCase();
+            return name.indexOf(memberFilter) !== -1;
+          });
+
+        this.fillWithEmptyMembers(members, memberList, memberFilter);
+        this.sortMemberList(memberList);
+        return memberList;
       }
     },
     components: {
