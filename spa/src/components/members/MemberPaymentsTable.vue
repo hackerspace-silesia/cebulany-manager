@@ -1,18 +1,18 @@
 <template lang="pug">
   PromisedComponent(:state="promiseState")
-    div.block
-      table.table.table-bordered.table-sm
-        thead: tr
-          th Budżet
-          th Nazwa
-          th Data płatności
-          th Data transakcji
-          th Kwota
-        tbody(v-for="transaction in transactions", :key="transaction.id")
-          tr(v-for="payment in transaction.payments", :key="payment.id")
+    .content: table.table.table-bordered.table-sm
+      thead: tr
+        th Budżet
+        th Nazwa
+        th Data płatności
+        th Data transakcji
+        th Kwota
+      tbody
+        template(v-for="transaction in transactions")
+          tr(v-for="payment in transaction.payments", :key="`${transaction.id}-${payment.id}`")
             td.white(:style="payment.budget | colorCell") {{payment.budget.name}}
             td {{transaction.title}}
-            td {{payment.date | onlyDate }}
+            td {{payment.date}}
             td {{transaction.date}}
             td.text-right {{payment.cost}} zł
 
@@ -32,9 +32,6 @@
     filters: {
       colorCell (obj) {
         return {backgroundColor: `#${obj.color}`};
-      },
-      onlyDate (value) {
-        return value.substr(0, 7);
       }
     },
     watch: {
@@ -58,7 +55,6 @@
         linkVm(this, TransactionService.get(params))
           .then(resp => {
             this.transactions = resp.data.transactions;
-            console.log(this.transactions);
           })
       }
     }
@@ -67,5 +63,8 @@
 
 <style scoped>
   td.white {color: white;}
-  .block { max-height: 400px; overflow-y: auto;}
+  .content {
+    max-height: 400px;
+    overflow-y: auto;
+  }
 </style>
