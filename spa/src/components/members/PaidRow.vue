@@ -1,11 +1,9 @@
 <template lang="pug">
-  tr(:class="!member.is_active ? 'table-active' : ''")
+  tr(
+      @click="updateMemberInRow",
+      :class="!member.is_active ? 'table-active' : ''"
+    )
     th(:id="popoverId") {{ member.name }}
-    b-popover(
-        title="Zaaktulizuj dane",
-        :target="popoverId", triggers="focus click",
-        placement="bottom")
-      MemberForm(:member="member", @update="updateMemberInRow")
     template(v-for='year in years')
       template(v-for='month in months')
         PaidCell(
@@ -25,8 +23,8 @@
       }
     },
     methods: {
-      updateMemberInRow (data) {
-        this.$emit('updateMember', data)
+      updateMemberInRow () {
+        this.$emit('updateMember', this.member)
       }
     },
     components: {
