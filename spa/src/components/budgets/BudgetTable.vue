@@ -8,12 +8,12 @@
       template(slot="name", slot-scope="row")
         span(:title="row.value") {{ row.value }}
       template(slot="color", slot-scope="row")
-        span(:title="row.value") {{ row.value }}
+        b-form-input( :id="type-color" type="color" :value="getColor(row.value)")
       template(slot="show_details_in_report", slot-scope="row")
-        span(:title="row.value") {{ row.value }}  
+        input(type="checkbox" v-model="selectAll" :value="row.value")
 
       template(slot="show_count_in_report", slot-scope="row")
-        span(:title="row.value") {{ row.value }}
+        input(type="checkbox" v-model="selectAll" :value="row.value")
 
 </template>
 <script>
@@ -33,6 +33,9 @@
       rowClicked (item) {
         this.showModal = true;
         this.modalItem = item;
+      },
+      getColor (color) {
+        return '#' + color
       }
     },
     filters: {
