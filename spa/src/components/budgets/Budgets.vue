@@ -5,6 +5,7 @@
       PromisedComponent(:state="promiseState")
         BudgetTable(
           :budgets="budgets"
+          :update="update"
           )
 </template>
 
@@ -37,14 +38,18 @@ export default {
       });
       return obj;
     },
-    fetchBudgets (params) {
+    fetchBudgets () {
       linkVm(this, BudgetService.getAll())
         .then((response) => {
           this.budgets = response.data;
         })
     },
-    uploadBudgets () {
-      this.fetchBudgets();
+    update (data) {
+      console.log(data);
+      BudgetService.update(data.item.id, data.item)
+        .then((response) => {
+          console.log(response.data);
+        })
     }
   }
 }
