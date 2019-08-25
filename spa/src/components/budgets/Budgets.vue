@@ -5,8 +5,8 @@
       PromisedComponent(:state="promiseState")
         BudgetTable(
           :budgets="budgets"
-          :update="update"
-          )
+          @row-update="update",
+        )
 </template>
 
 <script>
@@ -46,7 +46,7 @@ export default {
     },
     update (data) {
       console.log(data);
-      BudgetService.update(data.item.id, data.item)
+      BudgetService.update(data.id, data)
         .then((response) => {
           console.log(response.data);
         })
