@@ -9,13 +9,13 @@ RUN npm install -g http-server yarn
 WORKDIR /app
 
 # copy both 'package.json' and 'package-lock.json' (if available)
-COPY package*.json ./
+COPY /spa/package*.json ./
 
 # install project dependencies
 RUN yarn install
 
 # copy project files and folders to the current working directory (i.e. 'app' folder)
-COPY . .
+COPY /spa .
 
 # build app for production with minification
 RUN yarn build
