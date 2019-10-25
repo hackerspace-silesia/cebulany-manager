@@ -42,6 +42,4 @@ FLASK_DEBUG=1 FLASK_APP=app.py flask run
 ```
 cd spa
 yarn run dev
-# unfortunately we don't have CORS headers in backend server
-# so you need CORS plugin in browser
 ```
