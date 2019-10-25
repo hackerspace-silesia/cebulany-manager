@@ -1,24 +1,13 @@
-FROM node:lts-alpine
-
-ENV NODE_ENV=development
-
-# install simple http server for serving static content
-RUN npm install -g http-server yarn
-
-# make the 'app' folder the current working directory
+FROM tiangolo/uwsgi-nginx-flask
+COPY setup.py /app
+COPY create_mock.py /app
+COPY alembic.ini /app
+COPY uwsgi-me.sh /app
+COPY /migrations /app/migrations
+COPY /cebulany /app/cebulany
 WORKDIR /app
-
-# copy both 'package.json' and 'package-lock.json' (if available)
-COPY spa/package*.json ./
-
-# install project dependencies
-RUN yarn install
-
-# copy project files and folders to the current working directory (i.e. 'app' folder)
-COPY /spa .
-
-# build app for production with minification
-RUN yarn build
-
-EXPOSE 8080
-CMD [ "http-server", "dist" ]
+RUN python setup.py install
+EXPOSE 5000
+RUN alembic upgrade head
+RUN python create_mock.py > mock.csv
+CMD ./uwsgi-me.sh
