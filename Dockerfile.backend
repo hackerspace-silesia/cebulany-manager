@@ -8,6 +8,5 @@ COPY /cebulany /app/cebulany
 WORKDIR /app
 RUN python setup.py install
 EXPOSE 5000
-RUN alembic upgrade head
 RUN python create_mock.py > mock.csv
 CMD ./uwsgi-me.sh
