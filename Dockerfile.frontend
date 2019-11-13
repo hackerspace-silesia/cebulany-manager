@@ -9,7 +9,7 @@ RUN npm install -g http-server yarn
 WORKDIR /app
 
 # copy both 'package.json' and 'package-lock.json' (if available)
-COPY spa/package*.json ./
+COPY /spa/package*.json ./
 
 # install project dependencies
 RUN yarn install
