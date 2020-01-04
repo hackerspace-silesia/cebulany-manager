@@ -2,9 +2,9 @@
   PromisedComponent(:state="promiseState", show-on-promise)
     Alert(ref="successAlert")
     b-form(@submit="onSubmit")
-      b-form-group(label="Nazwa")
+      b-form-group(label="Nazwa", label-size="sm")
         b-form-input(type="text", v-model="name", size="sm")
-      b-form-group(label="Data przystąpienia")
+      b-form-group(label="Data przystąpienia", label-size="sm")
         b-form-input(type="date", v-model="join_date", size="sm")
       label
         input(type="checkbox", v-model="is_active") 
@@ -12,7 +12,7 @@
       b-form-group
         b-button(
           type="submit",
-          :disable="promiseState && promiseState.key === 'loading'") Dodaj
+          :disable="promiseState && promiseState.key === 'loading'") {{ isNew? 'Dodaj' : 'Aktualizuj' }}
 </template>
 
 <script>
@@ -22,14 +22,17 @@
   import linkVm from '@/helpers/linkVm';
 
   export default {
-    props: ['member', 'update', 'isNew'],
+    props: {
+      member: Object,
+      isNew: Boolean
+    },
     data () {
       if (this.isNew) {
         return {
           promiseState: null,
           name: '',
           join_date: '',
-          is_active: ''
+          is_active: true
         }
       }
 
@@ -43,7 +46,11 @@
     },
     watch: {
       member () {
-        if (this.isNew) { return; }
+        if (this.isNew) {
+          this.name = '';
+          this.join_date = '';
+          this.is_active = true;
+        }
         let member = this.member;
         this.name = member.name;
         this.join_date = member.join_date;

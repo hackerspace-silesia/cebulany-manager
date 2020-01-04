@@ -53,6 +53,16 @@ def pseudo_static(mod, filename):
     return send_from_directory('../spa/dist/static/%s' % mod, filename)
 
 
+if app.debug:
+    @app.after_request
+    def add_cors(response):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, PATCH, PUT, DELETE, GET, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return response
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

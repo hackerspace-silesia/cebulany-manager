@@ -1,11 +1,13 @@
-from flask_restful import Resource, fields, marshal_with
-from flask_restful.reqparse import RequestParser
-from sqlalchemy import or_, func as sql_func
 from datetime import datetime
 from decimal import Decimal
 
+from flask_restful import Resource, fields, marshal_with
+from flask_restful.reqparse import RequestParser
+from sqlalchemy import or_, func as sql_func
+from sqlalchemy.orm import contains_eager
+
 from cebulany.auth import token_required
-from cebulany.models import db, Transaction
+from cebulany.models import Transaction, Payment
 from cebulany.resources.types import dt_type
 
 transaction_parser = RequestParser()
@@ -18,6 +20,7 @@ transaction_parser.add_argument('positive')
 transaction_parser.add_argument('cost_le', type=Decimal)
 transaction_parser.add_argument('cost_ge', type=Decimal)
 transaction_parser.add_argument('ordering')
+transaction_parser.add_argument('member_id', type=int)
 
 
 member_fields = fields.Nested({
@@ -73,25 +76,34 @@ class TransactionResource(Resource):
     @token_required
     def get(self):
         args = transaction_parser.parse_args()
-        model = Transaction
-        query = model.query
-        query_sum = db.session.query(sql_func.sum(model.cost))
+        transactions = self.get_transactions(args)
         return {
-            'transactions': self.filtering_query(query, args).all(),
-            'sum': self.filtering_query(query_sum, args).scalar(),
+            'transactions': transactions,
+            'sum': sum(transaction.cost for transaction in transactions),
         }
 
     @staticmethod
-    def filtering_query(query, args):
+    def get_transactions(args):
         model = Transaction
+        query = (
+            Transaction.query
+            .outerjoin(model.payments)
+            .options(contains_eager(model.payments))
+        )
         if args['date_start'] and args['date_end']:
             query = query.filter(model.date >= args['date_start'])
             query = query.filter(model.date <= args['date_end'])
-        else:
-            month = args['month'] or datetime.today().strftime('%Y-%m')
+        elif args['month']:
+            query = query.filter(
+                sql_func.strftime('%Y-%m', model.date) == args['month']
+            )
+        elif not args['member_id']:
+            month = datetime.today().strftime('%Y-%m')
             query = query.filter(
                 sql_func.strftime('%Y-%m', model.date) == month
             )
+        if args['member_id']:
+            query = query.filter(Payment.member_id == args['member_id'])
         if args['negative'] == 't':
             query = query.filter(model.cost < 0)
         if args['positive'] == 't':
@@ -109,4 +121,5 @@ class TransactionResource(Resource):
             query = query.order_by(*args['ordering'].split(','))
         else:
             query = query.order_by(model.date)
-        return query
+
+        return query.all()
