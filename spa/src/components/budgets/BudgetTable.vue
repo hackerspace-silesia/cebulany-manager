@@ -7,11 +7,28 @@
       template(slot="name", slot-scope="row")
         span(:title="row.value") {{ row.value }}
       template(slot="color", slot-scope="row")
-        b-form-input( type="color" :value="getColor(row.value)")
+        b-form-input(
+          type="color"
+          :value="getColor(row.value)"
+          @input="row.item.color = $event.substring(1)"
+          @change="update(row.item)"
+        )
       template(slot="show_details_in_report", slot-scope="row")
-        input(type="checkbox" v-model="row.item.show_details_in_report" :true-value="true" :false-value="false" @change="update(row.item)" )
+        input(
+          type="checkbox"
+          v-model="row.item.show_details_in_report"
+          :true-value="true"
+          :false-value="false"
+          @change="update(row.item)"
+        )
       template(slot="show_count_in_report", slot-scope="row")
-        input(type="checkbox" v-model="row.item.show_count_in_report" :true-value="true" :false-value="false" @change="update(row.item)" )
+        input(
+          type="checkbox"
+          v-model="row.item.show_count_in_report"
+          :true-value="true"
+          :false-value="false"
+          @change="update(row.item)"
+        )
 
 </template>
 <script>

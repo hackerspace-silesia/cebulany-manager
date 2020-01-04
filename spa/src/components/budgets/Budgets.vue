@@ -48,7 +48,7 @@ export default {
       console.log(data);
       BudgetService.update(data.id, data)
         .then((response) => {
-          console.log(response.data);
+          console.info('Budget updated');
         })
     }
   }
