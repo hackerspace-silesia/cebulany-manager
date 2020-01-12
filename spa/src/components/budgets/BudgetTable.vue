@@ -14,7 +14,7 @@
           @change="update(row.item)"
         )
       template(slot="show_details_in_report", slot-scope="row")
-        input(
+        b-form-input(
           type="checkbox"
           v-model="row.item.show_details_in_report"
           :true-value="true"
@@ -22,7 +22,7 @@
           @change="update(row.item)"
         )
       template(slot="show_count_in_report", slot-scope="row")
-        input(
+        b-form-input(
           type="checkbox"
           v-model="row.item.show_count_in_report"
           :true-value="true"

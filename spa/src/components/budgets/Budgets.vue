@@ -31,13 +31,6 @@ export default {
     this.fetchBudgets();
   },
   methods: {
-    transformArrayToMap (array) {
-      let obj = {};
-      array.forEach((item) => {
-        obj[`${item.id}`] = item;
-      });
-      return obj;
-    },
     fetchBudgets () {
       linkVm(this, BudgetService.getAll())
         .then((response) => {
@@ -45,11 +38,7 @@ export default {
         })
     },
     update (data) {
-      console.log(data);
       BudgetService.update(data.id, data)
-        .then((response) => {
-          console.info('Budget updated');
-        })
     }
   }
 }

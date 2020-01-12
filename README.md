@@ -21,7 +21,6 @@ yarn run dev
 # Init
 
 ```
-# in root
 alembic upgrade head
 python create_mock.py > mock.csv
 ./uwsgi-me.sh
