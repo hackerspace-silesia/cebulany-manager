@@ -9,7 +9,7 @@ export default {
     return axios.post('/budget/', data);
   },
   update (id, data) {
-    return axios.post(`/budget/${id}`, data);
+    return axios.put(`/budget/${id}`, data);
   },
   delete (id) {
     return axios.delete(`/budget/${id}`);

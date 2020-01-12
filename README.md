@@ -3,15 +3,22 @@
 # Build
 
 ```
+
 # make virtualenv
 virtualenv venv -ppython3.7
 source venv/bin/activate
 python setup.py install
 cd spa/
+yarn install
 yarn run build
 ```
 
-# Init 
+to run front-end in developming mode
+```
+yarn run dev
+```
+
+# Init
 
 ```
 alembic upgrade head

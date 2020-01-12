@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Transactions from '@/components/transactions/Transactions';
 import Members from '@/components/members/Members';
+import Budgets from '@/components/budgets/Budgets'
 
 Vue.use(Router);
 
@@ -16,6 +17,11 @@ export default new Router({
       path: '/members',
       name: 'Members',
       component: Members
+    },
+    {
+      path: '/budgets',
+      name: 'Budgets',
+      component: Budgets
     }
   ]
 })
