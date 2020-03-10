@@ -1,25 +1,19 @@
 #! coding: utf-8
-from flask import Blueprint, render_template
-from sqlalchemy import func as sql_func
-from decimal import Decimal
 from io import BytesIO
 from base64 import b64encode
-from datetime import date
+from datetime import date, timedelta
+from itertools import accumulate
+from decimal import Decimal
 
-from cebulany.models import db, Transaction, Payment, PaymentType
+from flask import Blueprint, render_template
+from sqlalchemy import func as sql_func
+
+from cebulany.models import db, Transaction, Payment, Budget, PaymentType
+
 
 report_page = Blueprint('report_page', 'report', template_folder='../templates')
 month_field = sql_func.extract('month', Transaction.date)
 year_field = sql_func.extract('year', Transaction.date)
-
-
-def accumulate_sum(iterable):  # py2.7 why
-    values = []
-    s = 0.0
-    for i in iterable:
-        s += float(i)
-        values.append(s)
-    return values
 
 
 def save_plot(fig):
@@ -156,12 +150,19 @@ class Money(Row):
         return ''
 
 
-def get_costs_plot_data():
-    key_fields = (year_field, month_field)
-    query_total = db.session.query(
-        sql_func.sum(Transaction.cost),
-        *key_fields
-    ).group_by(*key_fields).order_by(*key_fields)
+def get_costs_plot_data(day):
+    KEY_FIELDS = (year_field, month_field)
+
+    query_total = (
+        db.session
+        .query(
+            sql_func.sum(Transaction.cost),
+            *KEY_FIELDS,
+        )
+        .filter(Transaction.date >= day)
+        .group_by(*KEY_FIELDS)
+        .order_by(*KEY_FIELDS)
+    )
     data = query_total.all()
 
     def format_key(o):
@@ -172,19 +173,86 @@ def get_costs_plot_data():
     def values_sorted_by_date(query):
         data = {format_key(o): o[0] for o in query.all()}
         return [float(data.get(key, 0)) for key in labels]
+
+    def values_on_budget_query(budget):
+        query = (
+            db.session
+            .query(
+                sql_func.sum(Payment.cost),
+                *KEY_FIELDS,
+            )
+            .join(Transaction)
+            .filter(
+                Transaction.date >= day,
+                Payment.budget == budget,
+            )
+            .group_by(*KEY_FIELDS)
+            .order_by(*KEY_FIELDS)
+        )
+        return {
+            'name': budget.name,
+            'color': '#' + budget.color,
+            'moneys': values_sorted_by_date(query)
+        }
+
+    def values_on_type_query(payment_type):
+        query = (
+            db.session
+            .query(
+                sql_func.sum(Payment.cost),
+                *KEY_FIELDS,
+            )
+            .join(Transaction)
+            .filter(
+                Transaction.date >= day,
+                Payment.payment_type == payment_type,
+            )
+            .group_by(*KEY_FIELDS)
+            .order_by(*KEY_FIELDS)
+        )
+        return {
+            'name': payment_type.name,
+            'color': '#' + payment_type.color,
+            'moneys': values_sorted_by_date(query)
+        }
+
+    start_value = float(
+        db.session
+        .query(sql_func.sum(Transaction.cost))
+        .filter(Transaction.date < day)
+        .scalar()
+    )
         
     values = values_sorted_by_date(query_total)
-    acc_values = accumulate_sum(values)
+    acc_values = [x + start_value for x in accumulate(values)]
 
     return {
         'dates': labels,
         'moneys': values,
         'acc': acc_values,
+        'budgets': [
+            values_on_budget_query(budget)
+            for budget in (
+                db.session
+                .query(Budget)
+                .filter(Budget.show_count_in_report == True)
+            )
+        ],
+        'payment_types': [
+            values_on_type_query(payment_type)
+            for payment_type in (
+                db.session
+                .query(PaymentType)
+                .filter(PaymentType.show_count_in_report == True)
+            )
+        ]
     }
 
 
 @report_page.route('/report')
 def basic():
+    day = date.today() - timedelta(days=365 * 2)
+    day = day.replace(day=1)
     query_dates = db.session.query(
         year_field,
         month_field,
@@ -193,7 +261,7 @@ def basic():
         year_field, month_field,
     ).order_by(
         year_field.desc(), month_field.desc(),
-    ).filter(Transaction.date >= date(2015, 4, 1))
+    ).filter(Transaction.date >= day)
     months = [
         ReportMonth(year, month, total)
         for year, month, total in query_dates.all()
@@ -212,9 +280,8 @@ def basic():
         for year, total in query_dates.all()
     ]"""
 
-
     return render_template(
         'report.html',
         months=months,
-        main_plot=get_costs_plot_data()
+        main_plot=get_costs_plot_data(day)
     )
