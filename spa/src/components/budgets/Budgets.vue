@@ -6,6 +6,7 @@
         BudgetTable(
           :budgets="budgets"
           @row-update="update",
+          @row-remove="remove",
         )
 </template>
 
@@ -38,7 +39,18 @@ export default {
         })
     },
     update (data) {
-      BudgetService.update(data.id, data)
+      if (!data.id) {
+        BudgetService.post(data).then(obj => {
+          this.budgets.push(obj.data);
+        });
+      } else {
+        BudgetService.update(data.id, data);
+      }
+    },
+    remove (data) {
+      BudgetService.delete(data.id).then(() => {
+        this.budgets = this.budgets.filter(obj => obj.id !== data.id);
+      });
     }
   }
 }
