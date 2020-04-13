@@ -16,7 +16,7 @@ resource_fields = {
     'member_id': fields.Integer(),
     'member': fields.Nested({
         'name': fields.String,
-    }),
+    }, allow_null=True),
     'payment_type_id': fields.Integer(),
     'payment_type': fields.Nested({
         'name': fields.String,
@@ -64,7 +64,9 @@ class PaymentListResource(ModelListResource):
         query = (
             cls.query
             .join(cls.transaction)
-            .join(cls.member)
+            .join(cls.member, isouter=True)
+            .join(cls.payment_type)
+            .join(cls.budget)
             .order_by(Transaction.date.desc())
         )
 
