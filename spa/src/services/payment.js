@@ -1,7 +1,7 @@
 import axios from './base';
 
 export default {
-  get (params) {
+  getAll (params) {
     return axios.get('/payment/', {params: params})
   },
   getTable (params) {

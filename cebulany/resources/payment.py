@@ -1,7 +1,8 @@
-from flask_restful import fields
+from flask_restful import fields, marshal
 from flask_restful.reqparse import RequestParser
 from sqlalchemy import or_, func as sql_func
 
+from cebulany.auth import token_required
 from cebulany.models import db, Transaction, Payment
 from cebulany.resources.model import ModelListResource, ModelResource
 from cebulany.resources.types import dt_type
@@ -49,12 +50,14 @@ query_parser.add_argument('payment_type_id', type=int)
 query_parser.add_argument('budget_id', type=int)
 query_parser.add_argument('member_id', type=int)
 query_parser.add_argument('month')
+query_parser.add_argument('page', type=int, default=1)
 
 
 class PaymentListResource(ModelListResource):
     cls = Payment
     parser = parser
     resource_fields = resource_fields
+    ITEMS_PER_PAGE = 50
 
     def get_list_query(self):
         cls = self.cls
@@ -77,16 +80,37 @@ class PaymentListResource(ModelListResource):
         if args['budget_id'] is not None:
             query = query.filter(cls.budget_id == args['budget_id'])
         if args['month'] is not None:
-            query = query.filter(
-                sql_func.strftime('%Y-%m', cls.date) == args['month']
-            )
+            if '-' in args['month']:
+                query = query.filter(
+                    sql_func.strftime('%Y-%m', cls.date) == args['month']
+                )
+            else:
+                query = query.filter(
+                    sql_func.strftime('%Y', cls.date) == args['month']
+                )
+
         if args['member_id'] is not None:
             query = query.filter(cls.member_id == args['member_id'])
 
-        return query.limit(20)
+        return query, args['page']
+
+    @token_required
+    def get(self):
+        query, page = self.get_list_query()
+        return {
+            'data': marshal(
+                query
+                    .limit(self.ITEMS_PER_PAGE)
+                    .offset(self.ITEMS_PER_PAGE * (page - 1))
+                    .all(),
+                self.resource_fields,
+            ),
+            'items_per_page': self.ITEMS_PER_PAGE,
+            'count': query.count(),
+        }
 
     def post(self):
-        data, status = super(PaymentListResource, self).post()
+        data, status = super().post()
         name = data['name']
         iban = (
             db.session

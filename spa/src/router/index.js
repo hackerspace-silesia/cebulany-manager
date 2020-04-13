@@ -4,6 +4,7 @@ import Transactions from '@/components/transactions/Transactions';
 import Members from '@/components/members/Members';
 import Budgets from '@/components/budgets/Budgets';
 import PaymentTypes from '@/components/paymentTypes/PaymentTypes';
+import Payments from '@/components/payments/Payments';
 
 Vue.use(Router);
 
@@ -18,6 +19,11 @@ export default new Router({
       path: '/members',
       name: 'Members',
       component: Members
+    },
+    {
+      path: '/payments',
+      name: 'Payments',
+      component: Payments
     },
     {
       path: '/budgets',

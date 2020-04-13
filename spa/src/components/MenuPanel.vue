@@ -6,6 +6,7 @@
       b-navbar-nav
         b-nav-item(href="#/") Przelewy
         b-nav-item(href="#/members") Członkowie
+        b-nav-item(href="#/payments") Płatności
         b-nav-item(href="#/budgets") Budżety
         b-nav-item(href="#/payment-types") Typy płatności
 </template>

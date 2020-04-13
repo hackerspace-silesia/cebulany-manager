@@ -20,8 +20,6 @@ export default {
   data () {
     return {
       budgets: [],
-      sum: 0,
-      sumLeft: 0,
       promiseState: null
     }
   },

@@ -20,8 +20,6 @@ export default {
   data () {
     return {
       paymentTypes: [],
-      sum: 0,
-      sumLeft: 0,
       promiseState: null
     }
   },
@@ -29,10 +27,10 @@ export default {
     PaymentTypesTable
   },
   created () {
-    this.fetchBudgets();
+    this.fetchPaymentTypes();
   },
   methods: {
-    fetchBudgets () {
+    fetchPaymentTypes () {
       linkVm(this, PaymentTypeService.getAll())
         .then((response) => {
           this.paymentTypes = response.data;
