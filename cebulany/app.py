@@ -1,6 +1,7 @@
 from flask import Flask, send_from_directory, safe_join
 from flask_restful import Api
 from cebulany.models import db
+from cebulany.resources.payment_summary import PaymentSummaryResource
 
 from cebulany.resources.transaction import TransactionResource
 from cebulany.resources.member import MemberResource, MemberListResource
@@ -30,6 +31,7 @@ api.add_resource(MemberListResource, '/api/members')
 api.add_resource(MemberResource, '/api/members/<int:id>')
 
 api.add_resource(PaymentTableResource, '/api/payment/table')
+api.add_resource(PaymentSummaryResource, '/api/payment/summary')
 api.add_resource(PaymentListResource, '/api/payment/')
 api.add_resource(PaymentResource, '/api/payment/<int:id>')
 api.add_resource(BudgetListResource, '/api/budget/')

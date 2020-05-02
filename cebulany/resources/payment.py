@@ -102,15 +102,16 @@ class PaymentListResource(ModelListResource):
         return {
             'data': marshal(
                 query
-                    .limit(self.ITEMS_PER_PAGE)
-                    .offset(self.ITEMS_PER_PAGE * (page - 1))
-                    .all(),
+                .limit(self.ITEMS_PER_PAGE)
+                .offset(self.ITEMS_PER_PAGE * (page - 1))
+                .all(),
                 self.resource_fields,
             ),
             'items_per_page': self.ITEMS_PER_PAGE,
             'count': query.count(),
         }
 
+    @token_required
     def post(self):
         data, status = super().post()
         name = data['name']
