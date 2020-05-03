@@ -64,7 +64,6 @@
     font-family: monospace;
     font-weight: bold;
     vertical-align: middle;
-    width: 70px;
   }
   .pos-cell {
     background-color: #cef3d2;

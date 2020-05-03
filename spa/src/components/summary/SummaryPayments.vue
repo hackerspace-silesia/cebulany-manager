@@ -6,8 +6,8 @@
       PromisedComponent(:state="promiseState")
         h2 Płatności
         SummaryTable(
-          :budgets="budgets"
-          :payment-types="paymentTypes"
+          :budgets="filteredBudgets"
+          :payment-types="filteredPaymentTypes"
           :payments="payments"
         )
         h2 Bilans
@@ -70,6 +70,18 @@ export default {
       this.payments = summaryResp.data.payments;
       this.balances = summaryResp.data.balances;
       this.outstandingCost = summaryResp.data.outstanding_cost;
+    }
+  },
+  computed: {
+    filteredPaymentTypes () {
+      return this.paymentTypes.filter(({id}) =>
+        this.payments.findIndex(payment => payment.payment_type_id === id) > -1
+      )
+    },
+    filteredBudgets () {
+      return this.budgets.filter(({id}) =>
+        this.payments.findIndex(payment => payment.budget_id === id) > -1
+      )
     }
   }
 }
