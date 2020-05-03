@@ -23,6 +23,8 @@ resource_fields = {
         'prev_end_year': fields.Price(decimals=2),
         'diff_start_year': fields.Price(decimals=2),
         'diff_end_year': fields.Price(decimals=2),
+        'diff_prev_start_year': fields.Price(decimals=2),
+        'diff_prev_end_year': fields.Price(decimals=2),
     }),
     'outstanding_cost': fields.Price(decimals=2),
 }
@@ -119,11 +121,14 @@ class PaymentSummaryResource(ModelListResource):
     @classmethod
     def _get_balances(cls, year: int):
         last_year = year - 1
+        last_last_year = year - 2
 
         curr_start_year = cls._get_balance(get_start_year_day(year))
         curr_end_year = cls._get_balance(get_end_year_day(year))
         prev_start_year = cls._get_balance(get_start_year_day(last_year))
         prev_end_year = cls._get_balance(get_end_year_day(last_year))
+        prev_prev_start_year = cls._get_balance(get_start_year_day(last_last_year))
+        prev_prev_end_year = cls._get_balance(get_end_year_day(last_last_year))
 
         return {
             'curr_start_year': curr_start_year,
@@ -132,4 +137,6 @@ class PaymentSummaryResource(ModelListResource):
             'prev_end_year': prev_end_year,
             'diff_start_year': curr_start_year - prev_start_year,
             'diff_end_year': curr_end_year - prev_end_year,
+            'diff_prev_start_year': prev_start_year - prev_prev_start_year,
+            'diff_prev_end_year': prev_end_year - prev_prev_end_year,
         }

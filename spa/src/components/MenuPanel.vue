@@ -9,4 +9,5 @@
         b-nav-item(href="#/payments") Płatności
         b-nav-item(href="#/budgets") Budżety
         b-nav-item(href="#/payment-types") Typy płatności
+        b-nav-item(href="#/summary") Podsumowanie
 </template>

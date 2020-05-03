@@ -72,7 +72,7 @@ class PaymentListResource(ModelListResource):
 
         args = query_parser.parse_args()
         if args['name']:
-            arg = args['name'].replace('%',r'\%')
+            arg = args['name'].replace('%', r'\%')
             query = query.filter(or_(
                 Transaction.name.ilike('%%%s%%' % arg),
                 cls.name.ilike('%%%s%%' % arg),
