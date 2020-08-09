@@ -1,8 +1,8 @@
 import axios from './base';
 
 export default {
-  getToken (login, password) {
-    let data = {login, password};
+  getToken (login, password, token) {
+    let data = {login, password, token};
     return axios
       .post('/login', data)
       .then(response => response.data.token);

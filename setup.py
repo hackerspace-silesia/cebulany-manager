@@ -9,6 +9,7 @@ requires = [
     'Flask-SQLAlchemy==2.1',
     'uwsgi==2.0.15',
     'alembic==1.0.0',
+    'onetimepass==1.0.1',
 ]
 
 setup(
