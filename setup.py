@@ -10,6 +10,7 @@ requires = [
     'flask-cors==3.0.8',
     'uwsgi==2.0.19.1',
     'alembic==1.4.2'
+    'onetimepass==1.0.1',
 ]
 
 setup(
