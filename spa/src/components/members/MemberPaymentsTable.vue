@@ -1,37 +1,52 @@
-<template lang="pug">
-  PromisedComponent(:state="promiseState")
-    .content: table.table.table-bordered.table-sm
-      thead: tr
-        th Budżet
-        th Nazwa
-        th Data płatności
-        th Data transakcji
-        th Kwota
-      tbody
-        template(v-for="transaction in transactions")
-          tr(v-for="payment in transaction.payments", :key="`${transaction.id}-${payment.id}`")
-            td.white(:style="payment.budget | colorCell") {{payment.budget.name}}
-            td {{transaction.title}}
-            td {{payment.date}}
-            td {{transaction.date}}
-            td.text-right {{payment.cost}} zł
-
+<template>
+  <PromisedComponent :state="promiseState">
+    <div class="content">
+      <table class="table table-bordered table-sm">
+        <thead>
+          <tr>
+            <th>Budżet</th>
+            <th>Nazwa</th>
+            <th>Data płatności</th>
+            <th>Data transakcji</th>
+            <th>Kwota</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="transaction in transactions">
+            <tr
+              v-for="payment in transaction.payments"
+              :key="`${transaction.id}-${payment.id}`"
+            >
+              <td
+                class="white"
+                :style="payment.budget | colorCell"
+              >
+                {{ payment.budget.name }}
+              </td><td>{{ transaction.title }}</td><td>{{ payment.date }}</td><td>{{ transaction.date }}</td><td class="text-right">
+                {{ payment.cost }} zł
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+  </PromisedComponent>
 </template>
 <script>
   import linkVm from '@/helpers/linkVm'
   import TransactionService from '@/services/transactions'
 
   export default {
+    filters: {
+      colorCell (obj) {
+        return {backgroundColor: `#${obj.color}`};
+      }
+    },
     props: ['member'],
     data () {
       return {
         promiseState: null,
         transactions: []
-      }
-    },
-    filters: {
-      colorCell (obj) {
-        return {backgroundColor: `#${obj.color}`};
       }
     },
     watch: {

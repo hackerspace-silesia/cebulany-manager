@@ -1,11 +1,11 @@
-<template lang="pug">
-  b-pagination(
-    :value="value",
-    :total-rows="count",
-    :per-page="itemsPerPage",
-    align="center",
-    @input="input",
-  )
+<template>
+  <b-pagination
+    :value="value"
+    :total-rows="count"
+    :per-page="itemsPerPage"
+    align="center"
+    @input="input"
+  />
 </template>
 <script>
   export default {

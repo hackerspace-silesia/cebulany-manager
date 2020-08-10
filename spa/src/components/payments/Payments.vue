@@ -1,14 +1,23 @@
-<template lang="pug">
-  b-row
-    b-col
-      h1 Płatności
-      PaymentsForm(v-model="query")
-      PaymentsNavigation(v-model="page", :count="count", :items-per-page="itemsPerPage")
-      PromisedComponent(:state="promiseState")
-        PaymentsTable(
-          :payments="payments"
-        )
-      PaymentsNavigation(v-model="page", :count="count", :items-per-page="itemsPerPage")
+<template>
+  <b-row>
+    <b-col>
+      <h1>Płatności</h1>
+      <PaymentsForm v-model="query" />
+      <PaymentsNavigation
+        v-model="page"
+        :count="count"
+        :items-per-page="itemsPerPage"
+      />
+      <PromisedComponent :state="promiseState">
+        <PaymentsTable :payments="payments" />
+      </PromisedComponent>
+      <PaymentsNavigation
+        v-model="page"
+        :count="count"
+        :items-per-page="itemsPerPage"
+      />
+    </b-col>
+  </b-row>
 </template>
 
 <script>
@@ -20,6 +29,11 @@ import linkVm from '@/helpers/linkVm'
 import PaymentService from '@/services/payment'
 
 export default {
+  components: {
+    PaymentsTable,
+    PaymentsNavigation,
+    PaymentsForm
+  },
   data () {
     return {
       payments: [],
@@ -29,11 +43,6 @@ export default {
       itemsPerPage: 1,
       promiseState: null
     }
-  },
-  components: {
-    PaymentsTable,
-    PaymentsNavigation,
-    PaymentsForm
   },
   watch: {
     page () {

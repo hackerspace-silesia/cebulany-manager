@@ -1,49 +1,79 @@
-<template lang="pug">
-  .paymentTypes
-    b-button(@click="addPaymentType") Dodaj nowy rekord
-    b-table(
-        hover, bordered, small, foot-clone
-        :items="paymentTypes",
-        :fields="fields")
-      template(slot="name", slot-scope="row")
-        b-form-input(
+<template>
+  <div class="paymentTypes">
+    <b-button @click="addPaymentType">
+      Dodaj nowy rekord
+    </b-button>
+    <b-table
+      hover="hover"
+      bordered="bordered"
+      small="small"
+      foot-clone="foot-clone"
+      :items="paymentTypes"
+      :fields="fields"
+    >
+      <template
+        slot="name"
+        slot-scope="row"
+      >
+        <b-form-input
           v-model.lazy.trim="row.item.name"
           @change="update(row.item)"
-        )
-      template(slot="color", slot-scope="row")
-        input(
+        />
+      </template><template
+        slot="color"
+        slot-scope="row"
+      >
+        <input
           type="color"
           :value="getColor(row.value)"
           @input="row.item.color = $event.substring(1)"
           @change="update(row.item)"
-        )
-      template(slot="show_details_in_report", slot-scope="row")
-        input(
-          type="checkbox"
+        >
+      </template>
+      <template
+        slot="show_details_in_report"
+        slot-scope="row"
+      >
+        <input
           v-model="row.item.show_details_in_report"
+          type="checkbox"
           :true-value="true"
           :false-value="false"
           @change="update(row.item)"
-        )
-      template(slot="show_count_in_report", slot-scope="row")
-        input(
-          type="checkbox"
+        >
+      </template><template
+        slot="show_count_in_report"
+        slot-scope="row"
+      >
+        <input
           v-model="row.item.show_count_in_report"
-          :true-value="true"
-          :false-value="false"
-          @change="update(row.item)"
-        )
-      template(slot="has_members", slot-scope="row")
-        input(
           type="checkbox"
-          v-model="row.item.has_members"
           :true-value="true"
           :false-value="false"
           @change="update(row.item)"
-        )
-      template(slot="action", slot-scope="row")
-        b-button(@click='removePaymentType(row.item)') Skasuj
-
+        >
+      </template>
+      <template
+        slot="has_members"
+        slot-scope="row"
+      >
+        <input
+          v-model="row.item.has_members"
+          type="checkbox"
+          :true-value="true"
+          :false-value="false"
+          @change="update(row.item)"
+        >
+      </template><template
+        slot="action"
+        slot-scope="row"
+      >
+        <b-button @click="removePaymentType(row.item)">
+          Skasuj
+        </b-button>
+      </template>
+    </b-table>
+  </div>
 </template>
 <script>
   export default {

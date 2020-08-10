@@ -1,12 +1,13 @@
-<template lang="pug">
-  .legend
-    strong Legenda: &nbsp;
-    span.badge.badge-success D
-    span &nbsp; Darowizna &nbsp;
-    span.badge.badge-danger R
-    span &nbsp; Rachunek &nbsp;
-    span.badge.badge-primary S
-    span &nbsp; Składka &nbsp;
-    span.badge.badge-secondary O
-    span &nbsp; Inne &nbsp;
+<template>
+  <div class="legend">
+    <strong>Legenda: &nbsp;</strong>
+    <span class="badge badge-success">D</span>
+    <span>&nbsp; Darowizna &nbsp;</span>
+    <span class="badge badge-danger">R</span>
+    <span>&nbsp; Rachunek &nbsp;</span>
+    <span class="badge badge-primary">S</span>
+    <span>&nbsp; Składka &nbsp;</span>
+    <span class="badge badge-secondary">O</span>
+    <span>&nbsp; Inne &nbsp;</span>
+  </div>
 </template>

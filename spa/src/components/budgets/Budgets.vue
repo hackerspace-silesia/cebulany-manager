@@ -1,13 +1,16 @@
-<template lang="pug">
-  b-row
-    b-col
-      h1 Budżety
-      PromisedComponent(:state="promiseState")
-        BudgetTable(
+<template>
+  <b-row>
+    <b-col>
+      <h1>Budżety</h1>
+      <PromisedComponent :state="promiseState">
+        <BudgetTable
           :budgets="budgets"
-          @row-update="update",
-          @row-remove="remove",
-        )
+          @row-update="update"
+          @row-remove="remove"
+        />
+      </PromisedComponent>
+    </b-col>
+  </b-row>
 </template>
 
 <script>
@@ -17,14 +20,14 @@ import linkVm from '@/helpers/linkVm'
 import BudgetService from '@/services/budget'
 
 export default {
+  components: {
+    BudgetTable
+  },
   data () {
     return {
       budgets: [],
       promiseState: null
     }
-  },
-  components: {
-    BudgetTable
   },
   created () {
     this.fetchBudgets();

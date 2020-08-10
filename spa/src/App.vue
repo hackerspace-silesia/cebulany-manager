@@ -1,27 +1,28 @@
-<template lang="pug">
-  #app
-    MenuPanel(v-if="logged")
-    br
-    b-container(v-if="logged")
-      router-view
-    b-container(v-else)
-      LoginView(@onSuccess="logged = true")
-
+<template>
+  <div id="app">
+    <MenuPanel v-if="logged" /><br>
+    <b-container v-if="logged">
+      <router-view />
+    </b-container>
+    <b-container v-else>
+      <LoginView @onSuccess="logged = true" />
+    </b-container>
+  </div>
 </template>
 
 <script>
 import MenuPanel from '@/components/MenuPanel'
 import LoginView from '@/components/Login'
 export default {
-  name: 'app',
+  name: 'App',
+  components: {
+    MenuPanel,
+    LoginView
+  },
   data () {
     return {
       logged: false
     }
-  },
-  components: {
-    MenuPanel,
-    LoginView
   }
 }
 </script>

@@ -1,18 +1,27 @@
-<template lang="pug">
-  b-row
-    b-col
-      h1 Przelewy
-      TransactionForm(@change="fetchTransactions")
-      TransactionLegend(:budgets="budgets", :paymentTypes="paymentTypes")
-      PromisedComponent(:state="promiseState")
-        TransactionTable(
-          :transactions="transactions",
-          :budgets="budgets",
-          :paymentTypes="paymentTypes",
-          :sum="sum")
-      TransactionLegend(:budgets="budgets", :paymentTypes="paymentTypes")
-      TransactionUploadForm(@upload="uploadTransactions")
-
+<template>
+  <b-row>
+    <b-col>
+      <h1>Przelewy</h1>
+      <TransactionForm @change="fetchTransactions" />
+      <TransactionLegend
+        :budgets="budgets"
+        :payment-types="paymentTypes"
+      />
+      <PromisedComponent :state="promiseState">
+        <TransactionTable
+          :transactions="transactions"
+          :budgets="budgets"
+          :payment-types="paymentTypes"
+          :sum="sum"
+        />
+      </PromisedComponent>
+      <TransactionLegend
+        :budgets="budgets"
+        :payment-types="paymentTypes"
+      />
+      <TransactionUploadForm @upload="uploadTransactions" />
+    </b-col>
+  </b-row>
 </template>
 
 <script>
@@ -27,6 +36,12 @@ import BudgetService from '@/services/budget'
 import PaymentTypeService from '@/services/paymentType'
 
 export default {
+  components: {
+    TransactionLegend,
+    TransactionTable,
+    TransactionForm,
+    TransactionUploadForm
+  },
   data () {
     return {
       transactions: [],
@@ -36,12 +51,6 @@ export default {
       sumLeft: 0,
       promiseState: null
     }
-  },
-  components: {
-    TransactionLegend,
-    TransactionTable,
-    TransactionForm,
-    TransactionUploadForm
   },
   created () {
     this.fetchInit();

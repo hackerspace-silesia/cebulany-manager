@@ -1,18 +1,43 @@
-<template lang="pug">
-  PromisedComponent(:state="promiseState", show-on-promise)
-    Alert(ref="successAlert")
-    b-form(@submit="onSubmit")
-      b-form-group(label="Nazwa", label-size="sm")
-        b-form-input(type="text", v-model="name", size="sm")
-      b-form-group(label="Data przystąpienia", label-size="sm")
-        b-form-input(type="date", v-model="join_date", size="sm")
-      label
-        input(type="checkbox", v-model="is_active") 
-        span Aktywny?
-      b-form-group
-        b-button(
-          type="submit",
-          :disable="promiseState && promiseState.key === 'loading'") {{ isNew? 'Dodaj' : 'Aktualizuj' }}
+<template>
+  <PromisedComponent
+    :state="promiseState"
+    show-on-promise="show-on-promise"
+  >
+    <Alert ref="successAlert" />
+    <b-form @submit="onSubmit">
+      <b-form-group
+        label="Nazwa"
+        label-size="sm"
+      >
+        <b-form-input
+          v-model="name"
+          type="text"
+          size="sm"
+        />
+      </b-form-group>
+      <b-form-group
+        label="Data przystąpienia"
+        label-size="sm"
+      >
+        <b-form-input
+          v-model="join_date"
+          type="date"
+          size="sm"
+        />
+      </b-form-group><label><input
+        v-model="is_active"
+        type="checkbox"
+      ><span>Aktywny?</span></label>
+      <b-form-group>
+        <b-button
+          type="submit"
+          :disable="promiseState &amp;&amp; promiseState.key === 'loading'"
+        >
+          {{ isNew? 'Dodaj' : 'Aktualizuj' }}
+        </b-button>
+      </b-form-group>
+    </b-form>
+  </PromisedComponent>
 </template>
 
 <script>
@@ -22,6 +47,9 @@
   import linkVm from '@/helpers/linkVm';
 
   export default {
+    components: {
+      Alert
+    },
     props: {
       member: Object,
       isNew: Boolean
@@ -80,9 +108,6 @@
             this.$refs.successAlert.$emit('turnOn');
           })
       }
-    },
-    components: {
-      Alert
     }
   }
 </script>
