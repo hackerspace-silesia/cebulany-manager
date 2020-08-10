@@ -1,17 +1,31 @@
-<template lang="pug">
-  td(v-if='!sum', :class="notPaidInDate ? 'table-danger' : ''") -
-  td(v-else, :class="PaidInDate ? 'table-warning' : ''")
-    span(:id="popoverId") {{ Number(sum).toFixed() }}
-      small.text-warning(v-if="count > 1") &nbsp;({{ count }})
-    b-popover(
-        :target="popoverId", triggers="focus click",
-        placement="bottom", @show="getPayments()", @hide="clearPayments()")
-      PromisedComponent(:state="promiseState")
-        small: ol: li(v-for="payment in payments")
-          strong {{ payment.transaction.date }}
-          | &nbsp; {{ payment.transaction.title }}
-          | &nbsp; {{ payment.cost }} zł
-
+<template>
+  <td
+    v-if="!sum"
+    :class="notPaidInDate ? 'table-danger' : ''"
+  >
+    -
+  </td>
+  <td
+    v-else
+    :class="PaidInDate ? 'table-warning' : ''"
+  >
+    <span :id="popoverId">{{ Number(sum).toFixed() }}<small
+      v-if="count &gt; 1"
+      class="text-warning"
+    >&nbsp;({{ count }})</small></span>
+    <b-popover
+      :target="popoverId"
+      triggers="focus click"
+      placement="bottom"
+      @show="getPayments()"
+      @hide="clearPayments()"
+    >
+      <PromisedComponent :state="promiseState">
+        <small><ol><li v-for="payment in payments"><strong>{{ payment.transaction.date }}</strong>&nbsp; {{ payment.transaction.title }}
+          &nbsp; {{ payment.cost }} zł</li></ol></small>
+      </PromisedComponent>
+    </b-popover>
+  </td>
 </template>
 <script>
   import PaymentService from '@/services/payment';

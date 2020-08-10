@@ -1,19 +1,68 @@
-<template lang="pug">
-  PromisedRowComponent(:state="promiseState")
-    td: TypeSelect(:types="paymentTypes", v-model="paymentTypeId")
-    td: TypeSelect(:types="budgets", v-model="budgetId")
-    td
-      template(v-if="paymentType && paymentType.has_members")
-        v-select(
-          size="sm", label="name", placeholder="członek",
-          :value="member", :on-search="getMembers",
-          :on-change="selectMember",
-          :options="memberOptions", :debounce="250")
-      template(v-else): b-form-input(size="sm" v-model.trim="name")
-    td: b-form-input(size="sm", type="date", v-model="date")
-    td: b-input-group(right="zł", size="sm")
-      b-form-input(size="sm", type="number", v-model.trim="cost")
-    td: b-btn(size="sm" variant="primary", @click="addType()") dodaj
+<template>
+  <PromisedRowComponent :state="promiseState">
+    <td>
+      <TypeSelect
+        v-model="paymentTypeId"
+        :types="paymentTypes"
+      />
+    </td>
+    <td>
+      <TypeSelect
+        v-model="budgetId"
+        :types="budgets"
+      />
+    </td>
+    <td>
+      <template v-if="paymentType &amp;&amp; paymentType.has_members">
+        <v-select
+          size="sm"
+          label="name"
+          placeholder="członek"
+          :value="member"
+          :on-search="getMembers"
+          :on-change="selectMember"
+          :options="memberOptions"
+          :debounce="250"
+        />
+      </template>
+      <template
+        v-else
+      >
+        <b-form-input
+          v-model.trim="name"
+          size="sm"
+        />
+      </template>
+    </td>
+    <td>
+      <b-form-input
+        v-model="date"
+        size="sm"
+        type="date"
+      />
+    </td>
+    <td>
+      <b-input-group
+        right="zł"
+        size="sm"
+      >
+        <b-form-input
+          v-model.trim="cost"
+          size="sm"
+          type="number"
+        />
+      </b-input-group>
+    </td>
+    <td>
+      <b-btn
+        size="sm"
+        variant="primary"
+        @click="addType()"
+      >
+        dodaj
+      </b-btn>
+    </td>
+  </PromisedRowComponent>
 </template>
 
 <script>
@@ -24,8 +73,8 @@
   import linkVm from '@/helpers/linkVm'
 
   export default {
-    props: ['item', 'budgets', 'paymentTypes'],
     components: {TypeSelect},
+    props: ['item', 'budgets', 'paymentTypes'],
     data () {
       var member = null;
       if (this.item.proposed_member && this.item.proposed_member.name) {

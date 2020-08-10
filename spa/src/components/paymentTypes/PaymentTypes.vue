@@ -1,13 +1,16 @@
-<template lang="pug">
-  b-row
-    b-col
-      h1 Typy płatności
-      PromisedComponent(:state="promiseState")
-        PaymentTypesTable(
-          :paymentTypes="paymentTypes"
-          @row-update="update",
-          @row-remove="remove",
-        )
+<template>
+  <b-row>
+    <b-col>
+      <h1>Typy płatności</h1>
+      <PromisedComponent :state="promiseState">
+        <PaymentTypesTable
+          :payment-types="paymentTypes"
+          @row-update="update"
+          @row-remove="remove"
+        />
+      </PromisedComponent>
+    </b-col>
+  </b-row>
 </template>
 
 <script>
@@ -17,14 +20,14 @@ import linkVm from '@/helpers/linkVm'
 import PaymentTypeService from '@/services/paymentType'
 
 export default {
+  components: {
+    PaymentTypesTable
+  },
   data () {
     return {
       paymentTypes: [],
       promiseState: null
     }
-  },
-  components: {
-    PaymentTypesTable
   },
   created () {
     this.fetchPaymentTypes();

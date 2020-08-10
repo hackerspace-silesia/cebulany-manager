@@ -1,12 +1,24 @@
-<template lang="pug">
-  b-card: PromisedComponent(:state="promiseState", show-on-promise)
-    Alert(ref="successAlert")
-    b-form(@submit="uploadFile")
-      b-form-group(label="Wrzuć plik z transakcjami")
-        b-form-file(size="sm", v-model="file", accept=".csv")
-        | &nbsp;
-        b-button(type="submit") Wrzuć
-
+<template>
+  <b-card>
+    <PromisedComponent
+      :state="promiseState"
+      show-on-promise="show-on-promise"
+    >
+      <Alert ref="successAlert" />
+      <b-form @submit="uploadFile">
+        <b-form-group label="Wrzuć plik z transakcjami">
+          <b-form-file
+            v-model="file"
+            size="sm"
+            accept=".csv"
+          />&nbsp;
+          <b-button type="submit">
+            Wrzuć
+          </b-button>
+        </b-form-group>
+      </b-form>
+    </PromisedComponent>
+  </b-card>
 </template>
 <script>
   import Alert from '@/components/Alert';
@@ -14,6 +26,9 @@
   import linkVm from '@/helpers/linkVm';
 
   export default {
+    components: {
+      Alert
+    },
     props: ['upload'],
     data () {
       return {
@@ -31,9 +46,6 @@
             this.$emit('upload');
           })
       }
-    },
-    components: {
-      Alert
     }
   }
 </script>

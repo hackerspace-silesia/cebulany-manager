@@ -1,9 +1,17 @@
-<template lang="pug">
-  b-form-row
-    b-col(cols="3"): b-form-group(label="Rok", label-size="sm")
-      b-form-input(
-        v-model="query.year",
-        type="number")
+<template>
+  <b-form-row>
+    <b-col cols="3">
+      <b-form-group
+        label="Rok"
+        label-size="sm"
+      >
+        <b-form-input
+          v-model="query.year"
+          type="number"
+        />
+      </b-form-group>
+    </b-col>
+  </b-form-row>
 </template>
 <script>
   export default {

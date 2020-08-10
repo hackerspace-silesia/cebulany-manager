@@ -1,6 +1,13 @@
-<template lang="pug">
-  .text-danger(v-if="value < 0") {{ value }} zł
-  div(v-else) {{ value }} zł
+<template>
+  <div
+    v-if="value &lt; 0"
+    class="text-danger"
+  >
+    {{ value }} zł
+  </div>
+  <div v-else>
+    {{ value }} zł
+  </div>
 </template>
 
 <script>

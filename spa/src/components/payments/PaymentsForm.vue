@@ -1,30 +1,62 @@
-<template lang="pug">
-  PromisedComponent(:state="promiseState"): b-form
-    b-form-row
-      b-col: b-form-group(label="Budżet", label-size="sm")
-        type-select(
-          :types="budgets",
-          hasNullOption,
-          v-model="query.budget_id")
-      b-col: b-form-group(label="Typ", label-size="sm")
-        type-select(
-          :types="paymentTypes",
-          hasNullOption,
-          v-model="query.payment_type_id")
-      b-col: b-form-group(label="Miesiąc / Rok", label-size="sm")
-        b-select(v-model="withMonth" size="sm")
-          option(:value="true") Miesiąc
-          option(:value="false") Rok
-        b-form-input(
-          v-if="withMonth",
-          v-model="month",
-          type="month")
-        b-form-input(
-          v-if="!withMonth",
-          v-model="year",
-          type="number")
-
-
+<template>
+  <PromisedComponent :state="promiseState">
+    <b-form>
+      <b-form-row>
+        <b-col>
+          <b-form-group
+            label="Budżet"
+            label-size="sm"
+          >
+            <type-select
+              v-model="query.budget_id"
+              :types="budgets"
+              has-null-option="hasNullOption"
+            />
+          </b-form-group>
+        </b-col>
+        <b-col>
+          <b-form-group
+            label="Typ"
+            label-size="sm"
+          >
+            <type-select
+              v-model="query.payment_type_id"
+              :types="paymentTypes"
+              has-null-option="hasNullOption"
+            />
+          </b-form-group>
+        </b-col>
+        <b-col>
+          <b-form-group
+            label="Miesiąc / Rok"
+            label-size="sm"
+          >
+            <b-select
+              v-model="withMonth"
+              size="sm"
+            >
+              <option :value="true">
+                Miesiąc
+              </option>
+              <option :value="false">
+                Rok
+              </option>
+            </b-select>
+            <b-form-input
+              v-if="withMonth"
+              v-model="month"
+              type="month"
+            />
+            <b-form-input
+              v-if="!withMonth"
+              v-model="year"
+              type="number"
+            />
+          </b-form-group>
+        </b-col>
+      </b-form-row>
+    </b-form>
+  </PromisedComponent>
 </template>
 <script>
   import TypeSelect from '@/components/inputs/TypeSelect';
@@ -56,10 +88,6 @@
         budgets: []
       };
     },
-    created () {
-      this.setQuery();
-      this.fetchInit();
-    },
     watch: {
       query: {
         deep: true,
@@ -76,6 +104,10 @@
       withMonth (withMonth) {
         this.query.month = withMonth ? this.month : this.year;
       }
+    },
+    created () {
+      this.setQuery();
+      this.fetchInit();
     },
     methods: {
       fetchInit () {

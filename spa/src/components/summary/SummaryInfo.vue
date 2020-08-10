@@ -1,11 +1,20 @@
-<template lang="pug">
-  table.table.table-bordered.table-condensed.table-hover.table-sm
-    tr(v-for="[name, value] in tableData")
-      td(
+<template>
+  <table class="table table-bordered table-condensed table-hover table-sm">
+    <tr v-for="[name, value] in tableData">
+      <td
         :class="value !== undefined ? '' : 'title'"
-        :colspan="value !== undefined ? 1 : 2") {{ name }}
-      td(v-if="value !== undefined").text-right:  money-value(:value="value")
-
+        :colspan="value !== undefined ? 1 : 2"
+      >
+        {{ name }}
+      </td>
+      <td
+        v-if="value !== undefined"
+        class="text-right"
+      >
+        <money-value :value="value" />
+      </td>
+    </tr>
+  </table>
 </template>
 <script>
   export default {

@@ -1,28 +1,66 @@
-<template lang="pug">
-  .members
-    b-modal(v-model="showModal", title="Edycja", size="lg", ok-only)
-      MemberModal(v-if="showModal", :item="modalMember", @update="updateForm")
-    table.table-sm.table.table-bordered.table-condensed.table-hover.table-members
-      thead
-        tr
-          th(rowspan=2) Członek
-          th(v-for="year in years", colspan="12") {{ year }}
-        tr
-          template(v-for='year in years')
-            th.text-center(v-for='month in months') {{ month }}
-      tbody
-        template(v-for="o in memberList")
-          PaidRow(
-              :member="o.member", :years="years",
-              :months="months", :paidmonth="o.paidmonth", :dtNow="dtNow",
-              :paymentTypeId="paymentTypeId",
-              @updateMember="updateMemberInTable")
+<template>
+  <div class="members">
+    <b-modal
+      v-model="showModal"
+      title="Edycja"
+      size="lg"
+      ok-only="ok-only"
+    >
+      <MemberModal
+        v-if="showModal"
+        :item="modalMember"
+        @update="updateForm"
+      />
+    </b-modal>
+    <table class="table-sm table table-bordered table-condensed table-hover table-members">
+      <thead>
+        <tr>
+          <th rowspan="2">
+            Członek
+          </th>
+          <th
+            v-for="year in years"
+            colspan="12"
+          >
+            {{ year }}
+          </th>
+        </tr>
+        <tr>
+          <template v-for="year in years">
+            <th
+              v-for="month in months"
+              class="text-center"
+            >
+              {{ month }}
+            </th>
+          </template>
+        </tr>
+      </thead>
+      <tbody>
+        <template v-for="o in memberList">
+          <PaidRow
+            :member="o.member"
+            :years="years"
+            :months="months"
+            :paidmonth="o.paidmonth"
+            :dt-now="dtNow"
+            :payment-type-id="paymentTypeId"
+            @updateMember="updateMemberInTable"
+          />
+        </template>
+      </tbody>
+    </table>
+  </div>
 </template>
 <script>
   import PaidRow from './PaidRow';
   import MemberModal from './MemberModal';
 
   export default {
+    components: {
+      PaidRow,
+      MemberModal
+    },
     props: ['years', 'members', 'paidmonths', 'updateMember', 'memberFilter', 'paymentTypeId'],
     data () {
       return {
@@ -30,6 +68,28 @@
         dtNow: (new Date()).toISOString().slice(0, 10),
         showModal: false,
         modalMember: null
+      }
+    },
+    computed: {
+      memberList () {
+        const members = this.members;
+        const memberFilter = this.memberFilter.toLowerCase();
+        const memberList = this.paidmonths
+          .map(paidmonth => {
+            const member = members[paidmonth.member_id];
+            return {
+              member: member,
+              paidmonth: paidmonth
+            };
+          })
+          .filter(({member}) => {
+            const name = member.name.toLowerCase();
+            return name.indexOf(memberFilter) !== -1;
+          });
+
+        this.fillWithEmptyMembers(members, memberList, memberFilter);
+        this.sortMemberList(memberList);
+        return memberList;
       }
     },
     methods: {
@@ -72,32 +132,6 @@
           );
         });
       }
-    },
-    computed: {
-      memberList () {
-        const members = this.members;
-        const memberFilter = this.memberFilter.toLowerCase();
-        const memberList = this.paidmonths
-          .map(paidmonth => {
-            const member = members[paidmonth.member_id];
-            return {
-              member: member,
-              paidmonth: paidmonth
-            };
-          })
-          .filter(({member}) => {
-            const name = member.name.toLowerCase();
-            return name.indexOf(memberFilter) !== -1;
-          });
-
-        this.fillWithEmptyMembers(members, memberList, memberFilter);
-        this.sortMemberList(memberList);
-        return memberList;
-      }
-    },
-    components: {
-      PaidRow,
-      MemberModal
     }
   }
 </script>

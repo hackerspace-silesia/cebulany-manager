@@ -1,8 +1,13 @@
-<template lang="pug">
-  b-alert(
-      :variant="variant", :show="counter", dismissible,
-      @dismissed="counter = 0", @dismiss-count-down="countDown")
-    template OK!
+<template>
+  <b-alert
+    :variant="variant"
+    :show="counter"
+    dismissible="dismissible"
+    @dismissed="counter = 0"
+    @dismiss-count-down="countDown"
+  >
+    <template>OK!</template>
+  </b-alert>
 </template>
 <script>
   export default {
