@@ -1,4 +1,5 @@
 from flask import Flask, send_from_directory, safe_join
+from flask_cors import CORS
 from flask_restful import Api
 from cebulany.models import db
 from cebulany.resources.payment_summary import PaymentSummaryResource
@@ -22,6 +23,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 app.config['TOKEN_TIME'] = int(environ.get('CEBULANY_TOKEN_TIME', '600'))
 app.config['APP_NAME'] = environ.get('CEBULANY_APP_NAME', 'cebulany manager')
+CORS(app)
 api = Api(app)
 db.init_app(app)
 

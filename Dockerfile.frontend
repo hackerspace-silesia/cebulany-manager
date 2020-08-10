@@ -3,7 +3,7 @@ FROM node:lts-alpine
 ENV NODE_ENV=development
 
 # install simple http server for serving static content
-RUN npm install -g http-server yarn
+RUN npm install -g http-server
 
 # make the 'app' folder the current working directory
 WORKDIR /app
