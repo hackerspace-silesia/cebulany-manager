@@ -13,21 +13,19 @@
       />
     </td>
     <td>
-      <template v-if="paymentType &amp;&amp; paymentType.has_members">
+      <template v-if="paymentType && paymentType.has_members">
         <v-select
           size="sm"
           label="name"
           placeholder="członek"
           :value="member"
-          :on-search="getMembers"
-          :on-change="selectMember"
+          @search="getMembers"
+          @input="selectMember"
           :options="memberOptions"
           :debounce="250"
         />
       </template>
-      <template
-        v-else
-      >
+      <template v-else>
         <b-form-input
           v-model.trim="name"
           size="sm"

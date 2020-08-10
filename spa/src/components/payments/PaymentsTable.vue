@@ -8,37 +8,22 @@
       :items="payments"
       :fields="fields"
     >
-      <template
-        slot="name"
-        slot-scope="row"
-      >
+      <template v-slot:cell(name)="row">
         <span v-if="!row.item.member">{{ row.value }}</span><span v-else>{{ row.item.member.name }}</span>
-      </template><template
-        slot="budget"
-        slot-scope="row"
-      >
+      </template>
+      <template v-slot:cell(budget)="row">
         <strong :style="getBgColorStyle(row.value.color)">{{ row.value.name }}</strong>
       </template>
-      <template
-        slot="payment_type"
-        slot-scope="row"
-      >
+      <template v-slot:cell(payment_type)="row">
         <strong :style="getBgColorStyle(row.value.color)">{{ row.value.name }}</strong>
-      </template><template
-        slot="transaction_date"
-        slot-scope="row"
-      >
+      </template>
+      <template v-slot:cell(transaction_date)="row">
         <span>{{ row.item.transaction.date }}</span>
-      </template><template
-        slot="transaction_title"
-        slot-scope="row"
-      >
+      </template>
+      <template v-slot:cell(transaction_title)="row">
         <span>{{ row.item.transaction.title }}</span>
       </template>
-      <template
-        slot="cost"
-        slot-scope="row"
-      >
+      <template v-slot:cell(cost)="row">
         <span class="float-right">{{ row.value }} PLN</span>
       </template>
     </b-table>
@@ -49,15 +34,15 @@
     props: ['payments'],
     data () {
       return {
-        fields: {
-          'name': {label: 'Nazwa / członek'},
-          'budget': {label: 'Budżet'},
-          'payment_type': {label: 'Typ'},
-          'date': {label: 'Data płatności'},
-          'transaction_date': {label: 'Data transakcji'},
-          'transaction_title': {label: 'Tytuł Transakcji'},
-          'cost': {label: 'Kwota'}
-        }
+        fields: [
+          {key: 'name', label: 'Nazwa / członek'},
+          {key: 'budget', label: 'Budżet'},
+          {key: 'payment_type', label: 'Typ'},
+          {key: 'date', label: 'Data płatności'},
+          {key: 'transaction_date', label: 'Data transakcji'},
+          {key: 'transaction_title', label: 'Tytuł Transakcji'},
+          {key: 'cost', label: 'Kwota'},
+        ]
       }
     },
     methods: {

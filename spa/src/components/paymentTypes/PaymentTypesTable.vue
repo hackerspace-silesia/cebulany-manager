@@ -11,29 +11,21 @@
       :items="paymentTypes"
       :fields="fields"
     >
-      <template
-        slot="name"
-        slot-scope="row"
-      >
+      <template v-slot:cell(name)="row">
         <b-form-input
           v-model.lazy.trim="row.item.name"
           @change="update(row.item)"
         />
-      </template><template
-        slot="color"
-        slot-scope="row"
-      >
+      </template>
+      <template v-slot:cell(color)="row">
         <input
           type="color"
           :value="getColor(row.value)"
-          @input="row.item.color = $event.substring(1)"
+          @input="row.item.color = $event.target.value.substring(1)"
           @change="update(row.item)"
         >
       </template>
-      <template
-        slot="show_details_in_report"
-        slot-scope="row"
-      >
+      <template v-slot:cell(show_details_in_report)="row">
         <input
           v-model="row.item.show_details_in_report"
           type="checkbox"
@@ -41,10 +33,8 @@
           :false-value="false"
           @change="update(row.item)"
         >
-      </template><template
-        slot="show_count_in_report"
-        slot-scope="row"
-      >
+      </template>
+      <template v-slot:cell(show_count_in_report)="row">
         <input
           v-model="row.item.show_count_in_report"
           type="checkbox"
@@ -53,10 +43,7 @@
           @change="update(row.item)"
         >
       </template>
-      <template
-        slot="has_members"
-        slot-scope="row"
-      >
+      <template v-slot:cell(has_members)="row">
         <input
           v-model="row.item.has_members"
           type="checkbox"
@@ -64,9 +51,8 @@
           :false-value="false"
           @change="update(row.item)"
         >
-      </template><template
-        slot="action"
-        slot-scope="row"
+      </template>
+      <template v-slot:cell(action)="row"
       >
         <b-button @click="removePaymentType(row.item)">
           Skasuj
@@ -80,14 +66,13 @@
     props: ['paymentTypes'],
     data () {
       return {
-        fields: {
-          'name': {label: 'Nazwa'},
-          'color': {label: 'Kolor'},
-          'show_details_in_report': {label: 'Pokaż szczegóły w raporcie'},
-          'show_count_in_report': {label: 'Zliczaj w raporcie'},
-          'has_members': {label: 'Posiada członków'},
-          'action': {label: 'Akcje'}
-        }
+        fields: [
+          {key: 'name', label: 'Nazwa'},
+          {key: 'color', label: 'Kolor'},
+          {key: 'show_details_in_report', label: 'Pokaż szczegóły w raporcie'},
+          {key: 'show_count_in_report', label: 'Zliczaj w raporcie'},
+          {key: 'action', label: 'Akcje'},
+        ]
       }
     },
     methods: {

@@ -31,7 +31,7 @@
       <b-form-group>
         <b-button
           type="submit"
-          :disable="promiseState &amp;&amp; promiseState.key === 'loading'"
+          :disable="promiseState && promiseState.key === 'loading'"
         >
           {{ isNew? 'Dodaj' : 'Aktualizuj' }}
         </b-button>

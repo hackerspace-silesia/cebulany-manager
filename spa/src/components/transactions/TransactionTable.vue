@@ -21,47 +21,31 @@
       foot-clone="foot-clone"
       :items="transactions"
       :fields="fields"
-      @row-clicked.captured="rowClicked"
+      @row-clicked="rowClicked"
     >
-      <template
-        slot="name"
-        slot-scope="row"
-      >
+      <template v-slot:cell(name)="row">
         <span :title="row.value">{{ row.value | truncate(50) }}</span>
-      </template><template
-        slot="title"
-        slot-scope="row"
-      >
+      </template>
+      <template v-slot:cell(title)="row">
         <span :title="row.value">{{ row.value | truncate(50) }}</span>
-      </template><template
-        slot="cost"
-        slot-scope="row"
-      >
+      </template>
+      <template v-slot:cell(cost)="row">
         <money-value :value="row.value" />
-      </template><template
-        slot="left"
-        slot-scope="row"
-      >
+      </template>
+      <template v-slot:cell(left)="row">
         <money-value :value="row.value" />
-      </template><template
-        slot="types"
-        slot-scope="row"
-      >
+      </template>
+      <template v-slot:cell(types)="row">
         <span v-for="payment in row.item.payments"><span
           class="transaction-badge"
           :title="payment | paymentTitle"
           :style="payment | paymentStyle"
         >{{ payment | paymentName }}</span></span>
       </template>
-      <template
-        slot="FOOT_cost"
-        slot-scope="row"
-      >
+      <template v-slot:foot(cost)="row">
         <money-value :value="sum" />
-      </template><template
-        slot="FOOT_left"
-        slot-scope="row"
-      >
+      </template>
+      <template v-slot:foot(left)="row">
         <money-value :value="sumLeft" />
       </template>
     </b-table>
@@ -90,14 +74,14 @@
     props: ['transactions', 'sum', 'sumLeft', 'budgets', 'paymentTypes'],
     data () {
       return {
-        fields: {
-          'date': {label: 'Data', class: 'text-no-wrap'},
-          'name': {label: 'Nazwa'},
-          'title': {label: 'Tytuł'},
-          'cost': {label: 'Kwota', class: 'text-no-wrap text-right'},
-          'left': {label: 'Poz.', class: 'text-no-wrap text-right'},
-          'types': {label: '*'}
-        },
+        fields: [
+          {key: 'date', label: 'Data', class: 'text-no-wrap'},
+          {key: 'name', label: 'Nazwa'},
+          {key: 'title', label: 'Tytuł'},
+          {key: 'cost', label: 'Kwota', class: 'text-no-wrap text-right'},
+          {key: 'left', label: 'Poz.', class: 'text-no-wrap text-right'},
+          {key: 'types', label: '*'}
+        ],
         showModal: false,
         modalItem: null
       }

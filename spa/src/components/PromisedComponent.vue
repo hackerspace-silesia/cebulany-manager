@@ -1,12 +1,12 @@
 <template>
   <div>
-    <template v-if="state &amp;&amp; state.key == 'loading'">
+    <template v-if="state && state.key == 'loading'">
       <b-progress
         :value="1"
         :max="1"
         animated="animated"
       />
-    </template><template v-else-if="state &amp;&amp; state.key == 'error'">
+    </template><template v-else-if="state && state.key == 'error'">
       <b-progress
         :value="1"
         :max="1"
@@ -14,7 +14,8 @@
         striped="striped"
       /><div class="text-center">
         <slot name="error">
-          <strong>Ugh Error ;_;</strong><template v-if="state.code">
+          <strong>Ugh Error ;_;</strong>
+          <template v-if="state.code">
             &nbsp; HTTP: {{ state.code }}
           </template>
           <template

@@ -1,6 +1,6 @@
 <template>
   <tr>
-    <template v-if="state &amp;&amp; state.key == 'loading'">
+    <template v-if="state && state.key === 'loading'">
       <td colspan="1000">
         <b-progress
           :value="1"
@@ -9,7 +9,7 @@
         />
       </td>
     </template>
-    <template v-else-if="state &amp;&amp; state.key == 'error'">
+    <template v-else-if="state && state.key === 'error'">
       <td colspan="1000">
         <b-progress
           :value="1"

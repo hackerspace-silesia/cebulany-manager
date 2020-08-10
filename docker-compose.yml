@@ -6,6 +6,8 @@ services:
       dockerfile: ./Dockerfile.backend
     ports:
     - "5000:5000"
+    environment:
+      SQLALCHEMY_DATABASE_URI: postgresql://cebula:foo@db:5432/cebula
 
   frontend:
     build:
@@ -16,3 +18,11 @@ services:
     - "8080:8080"
     links:
     - "backend"
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: cebula
+      POSTGRES_DB: cebula
+      POSTGRES_PASSWORD: foo

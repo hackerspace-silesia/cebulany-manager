@@ -35,7 +35,7 @@
           >
             {{ payment.budget.name }}
           </td>
-          <td><span v-if="payment.member.name">{{ payment.member.name }}&nbsp;</span><span v-else>{{ payment.name }}</span></td>
+          <td><span v-if="payment.member && payment.member.name">{{ payment.member.name }}&nbsp;</span><span v-else>{{ payment.name }}</span></td>
           <td>{{ payment.date }}</td>
           <td class="text-right">
             {{ payment.cost }} zł
