@@ -16,6 +16,12 @@
           type="password"
         />
       </b-form-group>
+      <b-form-group label="Token (2FA)">
+        <b-form-input
+          v-model.trim="token"
+          type="password"
+        />
+      </b-form-group>
       <b-form-group>
         <b-button
           type="submit"
@@ -38,6 +44,7 @@
       return {
         login: '',
         password: '',
+        token: '',
         promiseState: null
       }
     },
@@ -50,7 +57,7 @@
     methods: {
       onSubmit (evt) {
         evt.preventDefault();
-        linkVm(this, loginService.getToken(this.login, this.password))
+        linkVm(this, loginService.getToken(this.login, this.password, this.token))
           .then(token => {
             loginService.setTokenIntoSession(token);
             this.$emit('onSuccess');

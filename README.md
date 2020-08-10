@@ -34,6 +34,12 @@ python create_mock.py > mock.csv
 ./uwsgi-me.sh
 ```
 
+# Managing users?
+
+```
+python -m cebulany.user_cli --help
+```
+
 # Develop
 
 ## Backend server
