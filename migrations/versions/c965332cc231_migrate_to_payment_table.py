@@ -21,6 +21,7 @@ depends_on = None
 
 
 def upgrade():
+    return # this migration is outdated
     payment = table('payment',
         column('id', Integer),
         column('name', String),
@@ -79,7 +80,7 @@ def upgrade():
     type_id = _first("select id from paymenttype where \"name\" == 'RACHUNKI'")
     budget_id = _first("select id from paymenttype where \"name\" == 'SKŁADKI'")
     rows = list(connection.execute('''
-        select 
+        select
           aa."name" as "name", aa."cost" as "cost", "transaction_id", "date"
         from bill as aa
         join "transaction" t on t.id == aa.transaction_id;
@@ -100,7 +101,7 @@ def upgrade():
     type_id = _first("select id from paymenttype where \"name\" == 'DAROWIZNY'")
     budget_id = _first("select id from budget where \"name\" == 'DAROWIZNY'")
     rows = list(connection.execute('''
-        select 
+        select
           aa."name" as "name", aa."cost" as "cost", "transaction_id", "date"
         from donation as aa
         join "transaction" t on t.id == aa.transaction_id;
@@ -121,7 +122,7 @@ def upgrade():
     type_id = _first("select id from paymenttype where \"name\" == 'INNE'")
     budget_id = _first("select id from budget where \"name\" == 'SKŁADKI'")
     rows = list(connection.execute('''
-        select 
+        select
           aa."name" as "name", aa."cost" as "cost", "transaction_id", "date"
         from other as aa
         join "transaction" t on t.id == aa.transaction_id;

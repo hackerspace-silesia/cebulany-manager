@@ -2,6 +2,7 @@
 mock.csv
 cebulany/test.db
 spa/node_modules
+docker-data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

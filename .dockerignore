@@ -1,0 +1,6 @@
+cebulany/*.db
+.env
+.git
+.gitignore
+dist
+docker-data

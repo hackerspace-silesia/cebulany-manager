@@ -1,5 +1,6 @@
 FROM tiangolo/uwsgi-nginx-flask:python3.7
 RUN apt update && apt install ca-certificates --yes
+RUN pip3 install psycopg2
 COPY setup.py /app
 COPY create_mock.py /app
 COPY alembic.ini /app
@@ -9,5 +10,4 @@ COPY /cebulany /app/cebulany
 WORKDIR /app
 RUN python setup.py install
 EXPOSE 5000
-RUN python create_mock.py > mock.csv
 CMD ./uwsgi-me.sh
