@@ -5,9 +5,10 @@ from itertools import groupby
 
 from cebulany.auth import token_required
 from cebulany.models import db, Member, Payment
-from cebulany.resources.model import ModelListResource, ModelResource
+from cebulany.resources.model import ModelListResource
 from cebulany.resources.types import month_type
 from cebulany import fields as cebulany_fields
+from cebulany.sql_utils import get_year_month_col
 
 parser = RequestParser()
 parser.add_argument('member_id', required=True, type=int)
@@ -50,7 +51,7 @@ class PaymentTableResource(ModelListResource):
     @marshal_with(payment_sum_fields)
     @token_required
     def get(self):
-        dt_col = sql_func.strftime('%Y-%m', Payment.date)
+        dt_col = get_year_month_col(Payment.date)
         args = query_parser.parse_args()
         query = db.session.query(
             Member.id,

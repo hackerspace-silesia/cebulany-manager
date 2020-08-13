@@ -8,6 +8,7 @@ from sqlalchemy import func as sql_func
 from cebulany.auth import token_required
 from cebulany.models import db, Transaction, Payment
 from cebulany.resources.model import ModelListResource
+from cebulany.sql_utils import get_year_col
 
 resource_fields = {
     'payments': fields.List(fields.Nested({
@@ -34,7 +35,7 @@ query_summary_parser.add_argument('year', type=int)
 
 
 def year_col(col, year: int):
-    return sql_func.strftime('%Y', col) == str(year)
+    return get_year_col(col) == str(year)
 
 
 def get_start_year_day(year: int) -> date:

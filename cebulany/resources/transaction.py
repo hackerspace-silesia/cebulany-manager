@@ -9,6 +9,7 @@ from sqlalchemy.orm import contains_eager
 from cebulany.auth import token_required
 from cebulany.models import Transaction, Payment
 from cebulany.resources.types import dt_type
+from cebulany.sql_utils import get_year_month_col
 
 transaction_parser = RequestParser()
 transaction_parser.add_argument('date_start', type=dt_type)
@@ -95,12 +96,12 @@ class TransactionResource(Resource):
             query = query.filter(model.date <= args['date_end'])
         elif args['month']:
             query = query.filter(
-                sql_func.strftime('%Y-%m', model.date) == args['month']
+                get_year_month_col(model.date) == args['month']
             )
         elif not args['member_id']:
             month = datetime.today().strftime('%Y-%m')
             query = query.filter(
-                sql_func.strftime('%Y-%m', model.date) == month
+                get_year_month_col(model.date) == month
             )
         if args['member_id']:
             query = query.filter(Payment.member_id == args['member_id'])

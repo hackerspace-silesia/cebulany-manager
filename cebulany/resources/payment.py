@@ -6,6 +6,7 @@ from cebulany.auth import token_required
 from cebulany.models import db, Transaction, Payment
 from cebulany.resources.model import ModelListResource, ModelResource
 from cebulany.resources.types import dt_type
+from cebulany.sql_utils import get_year_month_col, get_year_col
 
 resource_fields = {
     'id': fields.Integer(),
@@ -84,11 +85,11 @@ class PaymentListResource(ModelListResource):
         if args['month'] is not None:
             if '-' in args['month']:
                 query = query.filter(
-                    sql_func.strftime('%Y-%m', cls.date) == args['month']
+                    get_year_month_col(cls.date) == args['month']
                 )
             else:
                 query = query.filter(
-                    sql_func.strftime('%Y', cls.date) == args['month']
+                    get_year_col(cls.date) == args['month']
                 )
 
         if args['member_id'] is not None:

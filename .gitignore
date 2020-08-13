@@ -1,6 +1,7 @@
 *.idea
 mock.csv
-cebulany/test.db
+*.db
+cebulany/*.db
 spa/node_modules
 docker-data
 
