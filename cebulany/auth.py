@@ -26,7 +26,7 @@ def token_required(view):
         if user is None:
             abort(401)
 
-        if user.token_time < datetime.utcnow():
+        if user.token_time.replace(tzinfo=None) < datetime.utcnow():
             abort(401)
 
         user.update_token_time()
