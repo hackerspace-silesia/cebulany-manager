@@ -9,7 +9,7 @@ from os import environ
 
 from cebulany.models import Base
 
-DATABASE_URI = environ.get('DATABASE_URI', 'sqlite:///test.db')
+DATABASE_URI = environ.get('DATABASE_URI', 'sqlite:///cebulany/test.db')
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

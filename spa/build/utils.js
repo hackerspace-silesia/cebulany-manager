@@ -15,7 +15,6 @@ exports.cssLoaders = function (options) {
   var cssLoader = {
     loader: 'css-loader',
     options: {
-      //minimize: process.env.NODE_ENV === 'production',
       sourceMap: options.sourceMap
     }
   }
@@ -39,10 +38,10 @@ exports.cssLoaders = function (options) {
         {
           loader: MiniCssExtractPlugin.loader,
         },
-        "css-loader"
+        ...loaders,
       ]
     } else {
-      return ['vue-style-loader'].concat(loaders)
+      return ['vue-style-loader', 'style-loader'].concat(loaders)
     }
   }
 
