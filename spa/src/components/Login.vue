@@ -58,10 +58,10 @@
       onSubmit (evt) {
         evt.preventDefault();
         linkVm(this, loginService.getToken(this.login, this.password, this.token))
-          .then(token => {
-            loginService.setTokenIntoSession(token);
+          .then(({ token, token_time }) => {
+            loginService.setTokenIntoSession(token, token_time);
             this.$emit('onSuccess');
-          })
+          });
       }
     }
   }

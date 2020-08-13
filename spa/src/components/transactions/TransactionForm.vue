@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="col-6">
-      <b-form-radio
+      <b-form-radio-group
         v-model="monthOption"
         :options="monthOptions"
         @change="updateForm"
@@ -54,8 +54,8 @@
         text: '',
         monthOption: 'month',
         monthOptions: [
-          {'text': 'Miesiąc', value: 'month'},
-          {'text': 'Zakres Dat', value: 'date_range'}
+          {text: 'Miesiąc', value: 'month'},
+          {text: 'Zakres Dat', value: 'date_range'}
         ]
       }
     },
