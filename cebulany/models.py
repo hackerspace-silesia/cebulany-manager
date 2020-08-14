@@ -40,7 +40,7 @@ class Transaction(Base):
     title = db.Column(db.String(300))
     name = db.Column(db.String(300), index=True)
     main_line = db.Column(db.String(300))
-    cost = db.Column(db.Numeric(precision=2))
+    cost = db.Column(db.Numeric(10, 2), nullable=False)
     iban = db.Column(db.String(300))
     ref_id = db.Column(db.String(100), index=True)
     proposed_member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
@@ -85,7 +85,7 @@ class Payment(Base):
     budget_id = db.Column(db.Integer, db.ForeignKey('budget.id'), nullable=False)
     member_id = db.Column(db.Integer, db.ForeignKey('member.id'), nullable=True)
     date = db.Column(db.Date, nullable=False)
-    cost = db.Column(db.Numeric(precision=2), nullable=False)
+    cost = db.Column(db.Numeric(10, 2), nullable=False)
 
     member = relationship(Member, backref='payments')
     transaction = relationship(Transaction, backref='payments')

@@ -1,6 +1,10 @@
 FROM tiangolo/uwsgi-nginx-flask:python3.7
-RUN apt update && apt install ca-certificates --yes
+RUN apt update -y && apt install ca-certificates --yes
 RUN pip3 install psycopg2
+
+COPY requirements.txt /app
+RUN pip3 install -r requirements.txt
+
 COPY setup.py /app
 COPY create_mock.py /app
 COPY alembic.ini /app

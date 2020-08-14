@@ -1,13 +1,12 @@
-from sqlalchemy import func as sql_func, cast, Date, DateTime
+from sqlalchemy import func as sql_func, Date
 
 from cebulany.models import db
 
 
-def get_year_month_col(column):
+def get_year_month_col(column: Date):
     database_type = db.engine.dialect.name
     if database_type == 'postgresql':
-        dt_col = cast(column, DateTime)
-        return sql_func.to_char(dt_col, 'YYYY-MM')
+        return sql_func.to_char(column, 'YYYY-MM')
     if database_type == 'sqlite':
         return sql_func.strftime('%Y-%m', column)
 
@@ -17,8 +16,7 @@ def get_year_month_col(column):
 def get_year_col(column: Date):
     database_type = db.engine.dialect.name
     if database_type == 'postgresql':
-        dt_col = cast(column, DateTime)
-        return sql_func.to_char(dt_col, 'YYYY')
+        return sql_func.to_char(column, 'YYYY')
     if database_type == 'sqlite':
         return sql_func.strftime('%Y', column)
 

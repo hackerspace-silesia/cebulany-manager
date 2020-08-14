@@ -4,3 +4,5 @@ cebulany/*.db
 .gitignore
 dist
 docker-data
+spa/node_modules
+venv/
