@@ -1,3 +1,4 @@
+var process = require('process')
 var path = require('path')
 var utils = require('./utils')
 var webpack = require('webpack')
@@ -21,6 +22,7 @@ var webpackConfig = merge.merge(baseWebpackConfig, {
   devtool: config.build.productionSourceMap ? '#source-map' : false,
   output: {
     path: config.build.assetsRoot,
+    publicPath: (process.env.URL_PREFIX || '') + '/static/',
     filename: utils.assetsPath('js/[name].[chunkhash].js'),
     chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
   },

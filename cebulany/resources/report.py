@@ -4,11 +4,14 @@ from base64 import b64encode
 from datetime import date, timedelta
 from itertools import accumulate
 from decimal import Decimal
+from os import environ
 
 from flask import Blueprint, render_template
 from sqlalchemy import func as sql_func
 
 from cebulany.models import db, Transaction, Payment, Budget, PaymentType
+
+URL_PREFIX = '/' + environ.get('CEBULANY_APP_URL_PREFIX', '')
 
 
 report_page = Blueprint('report_page', 'report', template_folder='../templates')
@@ -143,7 +146,7 @@ class Money(Row):
 
     def get_value(self):
         return u'{:0.2f} zł'.format(self.value)
-    
+
     def get_classes(self):
         if self.value < 0:
             return 'negative'
@@ -222,7 +225,7 @@ def get_costs_plot_data(day):
         .filter(Transaction.date < day)
         .scalar()
     )
-        
+
     values = values_sorted_by_date(query_total)
     acc_values = [x + start_value for x in accumulate(values)]
 
@@ -249,7 +252,7 @@ def get_costs_plot_data(day):
     }
 
 
-@report_page.route('/report')
+@report_page.route(URL_PREFIX + '/report')
 def basic():
     day = date.today() - timedelta(days=365 * 2)
     day = day.replace(day=1)
