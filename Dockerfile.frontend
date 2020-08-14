@@ -1,9 +1,6 @@
 FROM node:lts-alpine
 
-ARG URL_PREFIX
-
 ENV NODE_ENV=development
-ENV URL_PREFIX=$URL_PREFIX
 
 # install simple http server for serving static content
 RUN npm install -g http-server
@@ -21,6 +18,9 @@ RUN yarn install
 COPY /spa .
 
 # build app for production with minification
+
+ARG URL_PREFIX
+ENV URL_PREFIX=$URL_PREFIX
 RUN yarn build
 
 EXPOSE 8080
