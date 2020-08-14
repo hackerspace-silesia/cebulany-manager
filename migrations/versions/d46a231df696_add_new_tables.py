@@ -49,7 +49,7 @@ def upgrade():
     sa.Column('budget_id', sa.Integer(), nullable=False),
     sa.Column('member_id', sa.Integer(), nullable=True),
     sa.Column('date', sa.Date(), nullable=False),
-    sa.Column('cost', sa.Numeric(precision=2), nullable=False),
+    sa.Column('cost', sa.Numeric(10, 2), nullable=False),
     sa.ForeignKeyConstraint(['budget_id'], ['budget.id'], ),
     sa.ForeignKeyConstraint(['member_id'], ['member.id'], ),
     sa.ForeignKeyConstraint(['payment_type_id'], ['paymenttype.id'], ),

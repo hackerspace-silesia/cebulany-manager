@@ -34,7 +34,7 @@ def upgrade():
     sa.Column('title', sa.String(length=300), nullable=True),
     sa.Column('name', sa.String(length=300), nullable=True),
     sa.Column('main_line', sa.String(length=300), nullable=True),
-    sa.Column('cost', sa.Numeric(precision=2), nullable=True),
+    sa.Column('cost', sa.Numeric(10, 2), nullable=True),
     sa.Column('iban', sa.String(length=300), nullable=True),
     sa.Column('ref_id', sa.String(length=100), nullable=True),
     sa.Column('proposed_member_id', sa.Integer(), nullable=True),
