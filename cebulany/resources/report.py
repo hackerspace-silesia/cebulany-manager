@@ -169,7 +169,7 @@ def get_costs_plot_data(day):
     data = query_total.all()
 
     def format_key(o):
-        return '{:4d}-{:02}'.format(o[1], o[2])
+        return '{:4.0f}-{:02}'.format(o[1], o[2])
 
     labels = [format_key(o) for o in data]
 
