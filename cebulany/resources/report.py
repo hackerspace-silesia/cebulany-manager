@@ -83,7 +83,7 @@ class ReportMonth(object):
     def get_payments_with_details(self, payment_type):
         query = (
             db.session
-            .query(Payment.name, sql_func.sum(Payment.cost))
+            .query(sql_func.upper(Payment.name), sql_func.sum(Payment.cost))
             .join(Payment.transaction)
             .filter(Payment.payment_type_id == payment_type.id)
             .group_by(sql_func.upper(Payment.name))
@@ -92,7 +92,7 @@ class ReportMonth(object):
         payment_type_name = payment_type.name.upper()
 
         payments = [
-            Money(u'{}: {}'.format(payment_type_name, name), cost)
+            Money(f'{payment_type_name}: {name}', cost)
             for name, cost in query.all()
         ]
 
