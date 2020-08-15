@@ -7,7 +7,7 @@ from decimal import Decimal
 from os import environ
 
 from flask import Blueprint, render_template
-from sqlalchemy import func as sql_func
+from sqlalchemy import func as sql_func, cast, Integer
 
 from cebulany.models import db, Transaction, Payment, Budget, PaymentType
 
@@ -15,8 +15,8 @@ URL_PREFIX = '/' + environ.get('CEBULANY_APP_URL_PREFIX', '')
 
 
 report_page = Blueprint('report_page', 'report', template_folder='../templates')
-month_field = sql_func.extract('month', Transaction.date)
-year_field = sql_func.extract('year', Transaction.date)
+month_field = cast(sql_func.extract('month', Transaction.date), Integer)
+year_field = cast(sql_func.extract('year', Transaction.date), Integer)
 
 
 def save_plot(fig):
@@ -169,7 +169,7 @@ def get_costs_plot_data(day):
     data = query_total.all()
 
     def format_key(o):
-        return '{:4.0f}-{:02}'.format(o[1], o[2])
+        return '{}-{:02}'.format(o[1], o[2])
 
     labels = [format_key(o) for o in data]
 
