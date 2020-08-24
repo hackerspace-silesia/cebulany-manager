@@ -48,7 +48,7 @@ app.register_blueprint(report_page)
 app.register_blueprint(upload_page)
 
 
-@app.route(URL_PREFIX + '/')
+@app.route(URL_PREFIX or '/')
 def index():
     return send_from_directory('../spa/dist', 'index.html')
 
