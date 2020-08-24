@@ -13,7 +13,7 @@ URL_PREFIX = '/' + environ.get('CEBULANY_APP_URL_PREFIX', '')
 upload_page = Blueprint('upload_page', 'upload')
 
 
-@upload_page.route(URL_PREFIX + '/transactions/upload', methods=['POST'])
+@upload_page.route(URL_PREFIX + '/api/transactions/upload', methods=['POST'])
 @token_required
 def upload_transactions():
     file = request.files.get('file')
