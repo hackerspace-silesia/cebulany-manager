@@ -23,7 +23,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 app.config['TOKEN_TIME'] = int(environ.get('CEBULANY_TOKEN_TIME', '600'))
 app.config['APP_NAME'] = environ.get('CEBULANY_APP_NAME', 'cebulany manager')
-URL_PREFIX = '/' + environ.get('CEBULANY_APP_URL_PREFIX', '')
+URL_PREFIX = environ.get('CEBULANY_APP_URL_PREFIX', '')
 API_PREFIX = URL_PREFIX + '/api'
 CORS(app)
 api = Api(app)
@@ -48,12 +48,12 @@ app.register_blueprint(report_page)
 app.register_blueprint(upload_page)
 
 
-@app.route(URL_PREFIX)
+@app.route(URL_PREFIX + '/')
 def index():
     return send_from_directory('../spa/dist', 'index.html')
 
 
-@app.route(URL_PREFIX + 'static/<mod>/<filename>')
+@app.route(URL_PREFIX + '/static/<mod>/<filename>')
 def pseudo_static(mod, filename):
     return send_from_directory('../spa/dist/static/%s' % mod, filename)
 

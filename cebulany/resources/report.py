@@ -11,7 +11,7 @@ from sqlalchemy import func as sql_func, cast, Integer
 
 from cebulany.models import db, Transaction, Payment, Budget, PaymentType
 
-URL_PREFIX = '/' + environ.get('CEBULANY_APP_URL_PREFIX', '')
+URL_PREFIX = environ.get('CEBULANY_APP_URL_PREFIX', '')
 
 
 report_page = Blueprint('report_page', 'report', template_folder='../templates')

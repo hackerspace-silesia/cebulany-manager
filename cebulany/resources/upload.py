@@ -7,7 +7,7 @@ from cebulany.auth import token_required
 from cebulany.export_data import fill_transactions
 from cebulany.csv import parse_lines as parse_file
 
-URL_PREFIX = '/' + environ.get('CEBULANY_APP_URL_PREFIX', '')
+URL_PREFIX = environ.get('CEBULANY_APP_URL_PREFIX', '')
 
 
 upload_page = Blueprint('upload_page', 'upload')
