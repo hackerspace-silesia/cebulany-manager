@@ -1,6 +1,6 @@
 from flask_restful import fields, marshal
 from flask_restful.reqparse import RequestParser
-from sqlalchemy import or_, func as sql_func
+from sqlalchemy import or_
 
 from cebulany.auth import token_required
 from cebulany.models import db, Transaction, Payment
@@ -124,12 +124,10 @@ class PaymentListResource(ModelListResource):
         )
         data_to_update = dict(
             proposed_type_name=name,
-            proposed_type_id=data['payment_type_id'],
-            proposed_budget_id=data['budget_id'],
-            proposed_member_id=data['member_id'],
+            proposed_type_id=data['payment_type_id'] or None,
+            proposed_budget_id=data['budget_id'] or None,
+            proposed_member_id=data['member_id'] or None,
         )
-        if data['member_id'] is not None:
-            data_to_update['proposed_member_id'] = data['member_id']
 
         (
             db.session
