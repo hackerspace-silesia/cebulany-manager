@@ -48,12 +48,12 @@ app.register_blueprint(report_page)
 app.register_blueprint(upload_page)
 
 
-@app.route(URL_PREFIX + '/')
+@app.route(URL_PREFIX)
 def index():
     return send_from_directory('../spa/dist', 'index.html')
 
 
-@app.route(URL_PREFIX + '/static/<mod>/<filename>')
+@app.route(URL_PREFIX + 'static/<mod>/<filename>')
 def pseudo_static(mod, filename):
     return send_from_directory('../spa/dist/static/%s' % mod, filename)
 
