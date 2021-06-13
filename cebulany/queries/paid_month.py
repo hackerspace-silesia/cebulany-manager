@@ -1,0 +1,49 @@
+from itertools import groupby
+
+from sqlalchemy import func as sql_func
+
+from cebulany.models import db, Member, Payment
+from cebulany.sql_utils import get_year_month_col
+
+
+class PaidMonthQuery:
+
+    @classmethod
+    def get_aggregated_payments(cls, payment_type_id):
+        query = cls._get_query(payment_type_id)
+        return cls._aggregate(query)
+
+    @staticmethod
+    def _get_query(payment_type_id):
+        dt_col = get_year_month_col(Payment.date)
+        return db.session.query(
+            Member.id,
+            sql_func.sum(Payment.cost),
+            sql_func.count(Payment.cost),
+            dt_col,
+        ).join(
+            Payment, isouter=True
+        ).order_by(
+            Member.is_active.desc(),
+            Member.join_date,
+            Member.name,
+            dt_col,
+        ).filter(
+            Payment.payment_type_id == payment_type_id,
+        ).group_by(
+            Member.id,
+            dt_col,
+        )
+
+    @staticmethod
+    def _aggregate(query):
+        return [
+            {
+                'member_id': member_id,
+                'months': {
+                    month: dict(sum=total, count=count)
+                    for _, total, count, month in data
+                }
+            }
+            for member_id, data in groupby(query.all(), lambda o: o[0])
+        ]

@@ -1,10 +1,9 @@
 from flask_restful import fields, marshal_with
 from flask_restful.reqparse import RequestParser
-from sqlalchemy import func as sql_func
-from itertools import groupby
 
 from cebulany.auth import token_required
-from cebulany.models import db, Member, Payment
+from cebulany.models import Payment
+from cebulany.queries.paid_month import PaidMonthQuery
 from cebulany.resources.model import ModelListResource
 from cebulany.resources.types import month_type
 from cebulany import fields as cebulany_fields
@@ -51,31 +50,7 @@ class PaymentTableResource(ModelListResource):
     @marshal_with(payment_sum_fields)
     @token_required
     def get(self):
-        dt_col = get_year_month_col(Payment.date)
         args = query_parser.parse_args()
-        query = db.session.query(
-            Member.id,
-            sql_func.sum(Payment.cost),
-            sql_func.count(Payment.cost),
-            dt_col,
-        ).join(Payment, isouter=True).order_by(
-            Member.is_active.desc(),
-            Member.join_date,
-            Member.name,
-            dt_col,
-        ).filter(
-            Payment.payment_type_id == args['payment_type_id'],
-        ).group_by(
-            Member.id, dt_col
+        return PaidMonthQuery.get_aggregated_payments(
+            payment_type_id=args['payment_type_id'],
         )
-
-        return [
-            {
-                'member_id': member_id,
-                'months': {
-                    month: dict(sum=sum, count=count)
-                    for _, sum, count, month in data
-                }
-            }
-            for member_id, data in groupby(query.all(), lambda o: o[0])
-        ]

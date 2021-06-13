@@ -22,6 +22,7 @@ DATABASE_URI = environ.get('DATABASE_URI', 'sqlite:///test.db')
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 app.config['TOKEN_TIME'] = int(environ.get('CEBULANY_TOKEN_TIME', '600'))
+app.config['TOTP_SUPPORT'] = environ.get('TOTP_SUPPORT', 'yes') == 'yes'
 app.config['APP_NAME'] = environ.get('CEBULANY_APP_NAME', 'cebulany manager')
 URL_PREFIX = environ.get('CEBULANY_APP_URL_PREFIX', '')
 API_PREFIX = URL_PREFIX + '/api'

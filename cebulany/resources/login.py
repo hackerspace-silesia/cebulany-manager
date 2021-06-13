@@ -29,8 +29,9 @@ class LoginResource(Resource):
         if not check_password_hash(user.password_hash, data['password']):
             abort(400, 'Wrong password or/and login')
 
-        if not user.verify_totp(data.token):
-            abort(400, 'Wrong token from 2FA')
+        if app.config['TOTP_SUPPORT']:
+            if not user.verify_totp(data.token):
+                abort(400, 'Wrong token from 2FA')
 
         user.generate_token()
         user.update_token_time()

@@ -9,7 +9,7 @@ export default {
     return axios.post('/payment_type/', data);
   },
   update (id, data) {
-    return axios.post(`/payment_type/${id}`, data);
+    return axios.put(`/payment_type/${id}`, data);
   },
   delete (id) {
     return axios.delete(`/payment_type/${id}`);

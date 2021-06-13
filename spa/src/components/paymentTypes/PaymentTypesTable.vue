@@ -25,6 +25,15 @@
           @change="update(row.item)"
         >
       </template>
+      <template v-slot:cell(has_members)="row">
+        <input
+          v-model="row.item.has_members"
+          type="checkbox"
+          :true-value="true"
+          :false-value="false"
+          @change="update(row.item)"
+        >
+      </template>
       <template v-slot:cell(show_details_in_report)="row">
         <input
           v-model="row.item.show_details_in_report"
@@ -69,6 +78,7 @@
         fields: [
           {key: 'name', label: 'Nazwa'},
           {key: 'color', label: 'Kolor'},
+          {key: 'has_members', label: 'Obsługa użytkowników'},
           {key: 'show_details_in_report', label: 'Pokaż szczegóły w raporcie'},
           {key: 'show_count_in_report', label: 'Zliczaj w raporcie'},
           {key: 'action', label: 'Akcje'},

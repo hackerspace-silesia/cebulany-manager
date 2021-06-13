@@ -1,5 +1,7 @@
 from flask_restful import fields
 from flask_restful.reqparse import RequestParser
+
+from cebulany.queries.member import MemberQuery
 from cebulany.resources.model import ModelResource, ModelListResource
 
 from cebulany.models import Member
@@ -30,18 +32,10 @@ class MemberListResource(ModelListResource):
 
     def get_list_query(self):
         parse_args = query_parser.parse_args()
-        query = Member.query.order_by(Member.name)
-        query_arg = parse_args['q']
-        limit_arg = parse_args['limit']
-        if query_arg:
-            args = query_arg.split()
-            query = query.filter(*[
-                Member.name.ilike('%%%s%%' % arg.replace('%',r'\%'))
-                for arg in args
-            ])
-        if limit_arg is not None:
-            query = query.limit(limit_arg)
-        return query
+        return MemberQuery.get_list_query(
+            name=parse_args['q'],
+            limit=parse_args['limit'],
+        )
 
 
 class MemberResource(ModelResource):

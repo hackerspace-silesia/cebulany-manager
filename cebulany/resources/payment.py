@@ -1,12 +1,11 @@
 from flask_restful import fields, marshal
 from flask_restful.reqparse import RequestParser
-from sqlalchemy import or_
 
 from cebulany.auth import token_required
 from cebulany.models import db, Transaction, Payment
+from cebulany.queries.payment import PaymentQuery
 from cebulany.resources.model import ModelListResource, ModelResource
 from cebulany.resources.types import dt_type
-from cebulany.sql_utils import get_year_month_col, get_year_col
 
 resource_fields = {
     'id': fields.Integer(),
@@ -61,41 +60,11 @@ class PaymentListResource(ModelListResource):
     ITEMS_PER_PAGE = 50
 
     def get_list_query(self):
-        cls = self.cls
-        query = (
-            cls.query
-            .join(cls.transaction)
-            .join(cls.member, isouter=True)
-            .join(cls.payment_type)
-            .join(cls.budget)
-            .order_by(Transaction.date.desc())
-        )
-
         args = query_parser.parse_args()
-        if args['name']:
-            arg = args['name'].replace('%', r'\%')
-            query = query.filter(or_(
-                Transaction.name.ilike('%%%s%%' % arg),
-                cls.name.ilike('%%%s%%' % arg),
-            ))
-        if args['payment_type_id'] is not None:
-            query = query.filter(cls.payment_type_id == args['payment_type_id'])
-        if args['budget_id'] is not None:
-            query = query.filter(cls.budget_id == args['budget_id'])
-        if args['month'] is not None:
-            if '-' in args['month']:
-                query = query.filter(
-                    get_year_month_col(cls.date) == args['month']
-                )
-            else:
-                query = query.filter(
-                    get_year_col(cls.date) == args['month']
-                )
+        page = args.pop('page')
+        query = PaymentQuery.get_query_list(**args)
 
-        if args['member_id'] is not None:
-            query = query.filter(cls.member_id == args['member_id'])
-
-        return query, args['page']
+        return query, page
 
     @token_required
     def get(self):

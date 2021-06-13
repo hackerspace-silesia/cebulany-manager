@@ -1,7 +1,7 @@
 from datetime import datetime
 from functools import wraps
 
-from flask import request, current_app as app, abort
+from flask import request, abort
 
 from cebulany.models import db, User
 
