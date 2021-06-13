@@ -4,7 +4,7 @@ from cebulany.models import Member
 class MemberQuery:
 
     @classmethod
-    def get_list_query(cls, name, limit):
+    def get_list_query(cls, name=None, limit=None):
         query = Member.query.order_by(Member.name)
         query = cls._filter_by_name(query, name)
         query = cls._limit(query, limit)

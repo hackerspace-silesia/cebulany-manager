@@ -36,6 +36,9 @@
               >
                 Dodaj
               </b-button>
+              <b-button @click="excel">
+                Excel
+              </b-button>
               <b-popover
                 target="new-member-form"
                 triggers="focus click"
@@ -140,7 +143,9 @@
       },
       getPaidMonths () {
         let promise = PaymentService.getTable({
-          payment_type_id: this.paymentTypeId
+          payment_type_id: this.paymentTypeId,
+          start_year: this.yearStart,
+          end_year: this.yearEnd,
         });
         linkVm(this, promise)
           .then(resp => { this.paidmonths = resp.data; });
@@ -154,6 +159,12 @@
         this.updateMember(obj);
         this.getPaidMonths();
         this.showNewMemberForm = false;
+      },
+      excel (obj) {
+        let promise = PaymentService.getExcelTable(
+          this.yearStart, this.yearEnd, this.paymentTypeId,
+        );
+        linkVm(this, promise);
       }
     }
   }

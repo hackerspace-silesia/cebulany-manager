@@ -7,7 +7,6 @@ from cebulany.queries.paid_month import PaidMonthQuery
 from cebulany.resources.model import ModelListResource
 from cebulany.resources.types import month_type
 from cebulany import fields as cebulany_fields
-from cebulany.sql_utils import get_year_month_col
 
 parser = RequestParser()
 parser.add_argument('member_id', required=True, type=int)
@@ -17,8 +16,8 @@ parser.add_argument('date', type=month_type)
 
 query_parser = RequestParser()
 query_parser.add_argument('payment_type_id', required=True, type=int)
-query_parser.add_argument('month', type=month_type)
-
+query_parser.add_argument('start_year', required=True, type=int)
+query_parser.add_argument('end_year', required=True, type=int)
 
 transaction_fields = {
     'date': fields.DateTime(dt_format='iso8601'),
@@ -51,6 +50,4 @@ class PaymentTableResource(ModelListResource):
     @token_required
     def get(self):
         args = query_parser.parse_args()
-        return PaidMonthQuery.get_aggregated_payments(
-            payment_type_id=args['payment_type_id'],
-        )
+        return PaidMonthQuery.get_aggregated_payments(**args)
