@@ -72,12 +72,12 @@ class PaymentSummaryQuery:
     @staticmethod
     def _get_balance(day: date):
         return (
-                   db.session
-                       .query(sql_func.sum(Payment.cost))
-                       .join(Payment.transaction)
-                       .filter(Transaction.date <= day)
-                       .scalar()
-               ) or Decimal('0.00')
+           db.session
+           .query(sql_func.sum(Payment.cost))
+           .join(Payment.transaction)
+           .filter(Transaction.date <= day)
+           .scalar()
+        ) or Decimal('0.00')
 
     @classmethod
     def get_balances(cls, year: int):

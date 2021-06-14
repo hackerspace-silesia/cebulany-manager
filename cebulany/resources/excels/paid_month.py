@@ -2,18 +2,17 @@ from datetime import datetime
 
 from openpyxl import Workbook
 from openpyxl.cell import WriteOnlyCell
-from openpyxl.styles import NamedStyle, Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
 
 from cebulany.auth import token_required
 from cebulany.queries.member import MemberQuery
 from cebulany.queries.paid_month import PaidMonthQuery
-from cebulany.resources.excels.utils import send_excel
+from cebulany.resources.excels.utils import send_excel, setup_styles
 from cebulany.resources.excels.blueprint import excel_page, URL_PREFIX
 
 
 @excel_page.route(URL_PREFIX + '/table/<int:start_year>-<int:end_year>/<int:payment_type_id>')
-#@token_required
+@token_required
 def excel_paid_month(start_year: int, end_year: int, payment_type_id: int):
     members = MemberQuery.get_list_query()
     all_paid_months = {
@@ -107,32 +106,6 @@ def gen_cell(sheet, month_info, month, join_date, is_active, today):
     if not is_active:
         cell.style = 'inactive'
     return cell
-
-
-def setup_styles(workbook):
-    font_args = dict(name='Calibri', size=10)
-    header = NamedStyle(name="header")
-    header.font = Font(bold=True, size=12)
-    header.alignment = Alignment(horizontal='center')
-    workbook.add_named_style(header)
-
-    left_header = NamedStyle(name="left_header")
-    left_header.font = Font(bold=True, **font_args)
-    workbook.add_named_style(left_header)
-
-    inactive = NamedStyle(name="inactive")
-    inactive.fill = PatternFill(start_color='D6D6D6', fill_type='solid')
-    inactive.font = Font(bold=True, **font_args)
-    workbook.add_named_style(inactive)
-
-    bad = NamedStyle(name="bad")
-    bad.fill = PatternFill(start_color='f1b0b7', fill_type='solid')
-    bad.font = Font(bold=True, **font_args)
-    workbook.add_named_style(bad)
-
-    ok = NamedStyle(name="ok")
-    ok.font = Font(**font_args)
-    workbook.add_named_style(ok)
 
 
 def gen_months(start_year, end_year):

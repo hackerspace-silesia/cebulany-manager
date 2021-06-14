@@ -10,10 +10,14 @@
           type="number"
         />
       </b-form-group>
+      <b-button @click="excel">
+        Excel
+      </b-button>
     </b-col>
   </b-form-row>
 </template>
 <script>
+import PaymentService from '@/services/payment'
   export default {
     data () {
       const date = new Date();
@@ -37,6 +41,9 @@
       setQuery () {
         const query = Object.assign({}, this.query);
         this.$emit('input', query);
+      },
+      excel () {
+        PaymentService.getExcelSummary(this.query.year)
       }
     }
   }
