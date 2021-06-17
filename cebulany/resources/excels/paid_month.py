@@ -1,20 +1,19 @@
 from datetime import datetime
 
 from openpyxl import Workbook
-from openpyxl.cell import WriteOnlyCell
 from openpyxl.utils import get_column_letter
 
 from cebulany.auth import token_required
 from cebulany.queries.member import MemberQuery
 from cebulany.queries.paid_month import PaidMonthQuery
-from cebulany.resources.excels.utils import send_excel, setup_styles
+from cebulany.resources.excels.utils import send_excel, setup_styles, add_cell
 from cebulany.resources.excels.blueprint import excel_page, URL_PREFIX
 
 
 @excel_page.route(URL_PREFIX + '/table/<int:start_year>-<int:end_year>/<int:payment_type_id>')
 @token_required
 def excel_paid_month(start_year: int, end_year: int, payment_type_id: int):
-    members = MemberQuery.get_list_query()
+    members = MemberQuery.get_list_query(order="table")
     all_paid_months = {
         paid_month['member_id']: paid_month['months']
         for paid_month in PaidMonthQuery.get_aggregated_payments(
@@ -46,18 +45,16 @@ def gen_workbook(year_span, members, all_paid_months):
 
 
 def add_header(sheet, year_span):
-    first_row = ['']
-    second_row = ['']
+    first_row = [add_cell(sheet)]
+    second_row = [add_cell(sheet)]
     years = list(range(year_span[0], year_span[1] + 1))
 
     for year in years:
-        cell = WriteOnlyCell(sheet, value=str(year))
-        cell.style = 'header'
-        first_row += [cell] + [''] * 11
+        cell = add_cell(sheet, str(year), 'header')
+        first_row += [cell] + [add_cell(sheet)] * 11
 
         for month in range(1, 12 + 1):
-            cell = WriteOnlyCell(sheet, value=f'{month:02d}')
-            cell.style = 'header'
+            cell = add_cell(sheet, f'{month:02d}', 'header')
             second_row.append(cell)
 
     sheet.append(first_row)
@@ -82,8 +79,7 @@ def add_content(sheet, year_span, members, all_paid_months):
         today = datetime.utcnow().strftime('%Y-%m')
         join_date = member.join_date.strftime('%Y-%m')
         is_active = member.is_active
-        header = WriteOnlyCell(sheet, value=member.name)
-        header.style = 'left_header'
+        header = add_cell(sheet, member.name, 'left_header')
         row = [header]
         for month in months:
             month_info = paid_months.get(month)
@@ -93,16 +89,11 @@ def add_content(sheet, year_span, members, all_paid_months):
 
 
 def gen_cell(sheet, month_info, month, join_date, is_active, today):
-    cell = WriteOnlyCell(sheet)
+    cell = add_cell(sheet)
     if month_info is not None:
-        cell.value = str(month_info['sum'])
-        cell.style = 'ok'
-    else:
-        cell.value = '-'
-        if join_date <= month and today >= month:
+        cell.value = month_info['sum']
+    elif join_date <= month and today >= month:
             cell.style = 'bad'
-        else:
-            cell.style = 'ok'
     if not is_active:
         cell.style = 'inactive'
     return cell
