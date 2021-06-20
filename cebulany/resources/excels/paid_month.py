@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from openpyxl import Workbook
-from openpyxl.utils import get_column_letter
 
 from cebulany.auth import token_required
 from cebulany.queries.member import MemberQuery
@@ -59,7 +58,8 @@ def add_header(sheet, year_span):
 
     sheet.append(first_row)
     sheet.append(second_row)
-    sheet.column_dimensions[get_column_letter(1)].auto_size = True
+    sheet.column_dimensions['A'].width = 20.0
+    sheet.freeze_panes = 'B3'
 
     for i in range(len(years)):
         i *= 12

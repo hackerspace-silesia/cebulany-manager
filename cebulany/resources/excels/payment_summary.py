@@ -1,5 +1,4 @@
 from openpyxl import Workbook
-from openpyxl.cell import WriteOnlyCell
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 
@@ -55,7 +54,9 @@ def add_budget_header(sheet, budgets):
     first_row = [add_cell(sheet, 'Budżet →')]
     second_row = [add_cell(sheet, 'Typ ↓')]
 
-    for budget in budgets:
+    for col, budget in enumerate(budgets):
+        sheet.column_dimensions[get_column_letter(col * 2 + 2)].width = 15.0
+        sheet.column_dimensions[get_column_letter(col * 2 + 3)].width = 15.0
         cell = add_cell(sheet, budget.name, 'header')
         cell.fill = PatternFill(start_color=budget.color, fill_type='solid')
         first_row += [cell, add_cell(sheet)]
@@ -68,7 +69,8 @@ def add_budget_header(sheet, budgets):
 
     sheet.append(first_row)
     sheet.append(second_row)
-    sheet.column_dimensions[get_column_letter(1)].auto_size = True
+    sheet.column_dimensions['A'].width = 30.0
+    sheet.freeze_panes = 'B3'
 
     for i in range(len(budgets)):
         i *= 2
