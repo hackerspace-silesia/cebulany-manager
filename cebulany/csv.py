@@ -44,7 +44,7 @@ def to_date(raw):
     raw = raw.strip()
     for date_format in DATE_FORMATS:
         try:
-            dt = datetime.strptime(raw, DATE_FORMAT)
+            dt = datetime.strptime(raw, date_format)
         except ValueError:
             continue
         else:
