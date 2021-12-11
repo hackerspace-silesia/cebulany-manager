@@ -34,7 +34,22 @@ TRANSACTION_TYPES = {
     ),
 }
 
-DATE_FORMAT = '%d-%m-%Y'
+DATE_FORMATS = (
+    '%d-%m-%Y',
+    '%Y-%m-%d',
+)
+
+
+def to_date(raw):
+    raw = raw.strip()
+    for date_format in DATE_FORMATS:
+        try:
+            dt = datetime.strptime(raw, DATE_FORMAT)
+        except ValueError:
+            continue
+        else:
+            return dt.date()
+    raise ValueError(f"unknown date format: {raw}")
 
 
 def parse_lines(lines):
@@ -57,7 +72,7 @@ def parse_line(line, line_num=None):
             name=name,
         )
     data.update(
-        date=datetime.strptime(date.strip(), DATE_FORMAT).date(),
+        date=to_date(date),
         cost=Decimal(cost),
         line_num=line_num,
         iban=iban,
@@ -90,7 +105,7 @@ def parse_main(main, line_num=None):
 def open_and_parse(arg):
     with codecs_open(arg, encoding='utf-8') as f:
         return parse_lines(f.readlines())
-    
+
 
 if __name__ == "__main__":
     data = list(itertools.chain.from_iterable(
