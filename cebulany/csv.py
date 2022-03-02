@@ -62,10 +62,10 @@ def parse_lines(lines):
 def parse_line(line, line_num=None):
     date, cost, name, main, iban, ref_id, op_code = line.split(u';', 6)
     main = main.strip()
+    name = name.strip()
     if not name:
         data = parse_main(main, line_num)
     else:
-        name = name.strip()
         data = dict(
             main_line=u'{} {}'.format(name, main),
             title=main,
@@ -76,7 +76,7 @@ def parse_line(line, line_num=None):
         cost=Decimal(cost),
         line_num=line_num,
         iban=iban,
-        ref_id=ref_id,
+        ref_id=ref_id if ref_id.startswith('CEN') else f'{ref_id}::{date}::{op_code}',
     )
     return data
 
@@ -97,7 +97,7 @@ def parse_main(main, line_num=None):
 
     return dict(
         title=data['title'],
-        name=data.get('name', ''),
+        name=data.get('name') or main,
         main_line=main,
     )
 
