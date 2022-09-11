@@ -31,6 +31,9 @@
         <b-nav-item href="#/summary">
           Podsumowanie
         </b-nav-item>
+        <b-nav-item href="#/users">
+          Użytkownicy
+        </b-nav-item>
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">

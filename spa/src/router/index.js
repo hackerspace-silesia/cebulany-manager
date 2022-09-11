@@ -6,6 +6,7 @@ import Budgets from '@/components/budgets/Budgets';
 import PaymentTypes from '@/components/paymentTypes/PaymentTypes';
 import Payments from '@/components/payments/Payments';
 import SummaryPayments from '@/components/summary/SummaryPayments';
+import Users from '@/components/users/Users';
 
 Vue.use(Router);
 
@@ -40,6 +41,11 @@ export default new Router({
       path: '/summary',
       name: 'Summary',
       component: SummaryPayments
-    }
+    },
+    {
+      path: '/users',
+      name: 'Users',
+      component: Users
+    },
   ]
 })

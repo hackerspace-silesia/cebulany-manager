@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from cebulany.models import db
+from cebulany.resources.user import UserResource, UserListResource, ChangePasswordResource
 from cebulany.resources.transaction import TransactionResource
 from cebulany.resources.member import MemberResource, MemberListResource
 from cebulany.resources.paid_month import PaymentTableResource
@@ -17,6 +18,7 @@ from cebulany.resources.payment import PaymentListResource, PaymentResource
 from cebulany.resources.payment_summary import PaymentSummaryResource
 
 from os import environ
+
 
 DATABASE_URI = environ.get('DATABASE_URI', 'sqlite:///test.db')
 
@@ -45,6 +47,9 @@ api.add_resource(PaymentTypeListResource, API_PREFIX + '/payment_type/')
 api.add_resource(PaymentTypeResource, API_PREFIX + '/payment_type/<int:id>')
 
 api.add_resource(LoginResource, API_PREFIX + '/login')
+api.add_resource(UserListResource, API_PREFIX + '/user/')
+api.add_resource(UserResource, API_PREFIX + '/user/<int:id>')
+api.add_resource(ChangePasswordResource, API_PREFIX + '/user/<int:id>/password')
 
 app.register_blueprint(report_page)
 app.register_blueprint(upload_page)

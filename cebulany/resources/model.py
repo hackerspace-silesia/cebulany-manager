@@ -1,4 +1,4 @@
-from flask_restful import Resource, fields, marshal, abort
+from flask_restful import Resource, marshal, abort
 from flask_restful.reqparse import RequestParser
 
 from cebulany.auth import token_required

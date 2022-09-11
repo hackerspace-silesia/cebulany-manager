@@ -79,7 +79,7 @@ if __name__ == "__main__":
                     )
             elif args.cmd == 'add':
                 user = add_user(args.username)
-                print('OK. 2FA url: ', user.get_totp_uri())
+                print('OK. 2FA url: ', user.totp_uri)
             elif args.cmd == 'del':
                 del_user(args.username)
                 print('OK.')

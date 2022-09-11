@@ -121,7 +121,8 @@ class User(Base):
         seconds = current_app.config['TOKEN_TIME']
         self.token_time = datetime.utcnow() + timedelta(seconds=seconds)
 
-    def get_totp_uri(self):
+    @property
+    def totp_uri(self):
         app_name = quote(current_app.config['APP_NAME'])
         username = quote(self.username)
         return (
