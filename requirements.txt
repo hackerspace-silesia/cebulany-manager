@@ -1,8 +1,8 @@
-Flask==2.0.1
+Flask~=2.2.0
 Flask-Cors==3.0.8
-Flask-RESTful==0.3.9
-Flask-SQLAlchemy==2.5.1
+Flask-RESTful==0.3.10
+Flask-SQLAlchemy==3.0.3
 uwsgi==2.0.19.1
-alembic==1.4.2
+alembic==1.11.1
 onetimepass==1.0.1
 openpyxl==3.0.7
