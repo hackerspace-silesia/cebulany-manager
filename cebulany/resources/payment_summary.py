@@ -27,7 +27,7 @@ resource_fields = {
 }
 
 query_summary_parser = RequestParser()
-query_summary_parser.add_argument('year', type=int)
+query_summary_parser.add_argument('year', type=int, location='args')
 
 
 class PaymentSummaryResource(ModelListResource):

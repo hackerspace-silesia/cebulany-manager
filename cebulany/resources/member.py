@@ -13,8 +13,8 @@ member_parser.add_argument('join_date', required=True, type=dt_type)
 member_parser.add_argument('is_active', required=True, type=bool)
 
 query_parser = RequestParser()
-query_parser.add_argument('q')
-query_parser.add_argument('limit', type=int)
+query_parser.add_argument('q', location='args')
+query_parser.add_argument('limit', type=int, location='args')
 
 
 member_fields = {

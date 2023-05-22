@@ -12,16 +12,16 @@ from cebulany.resources.types import dt_type
 from cebulany.sql_utils import get_year_month_col
 
 transaction_parser = RequestParser()
-transaction_parser.add_argument('date_start', type=dt_type)
-transaction_parser.add_argument('date_end', type=dt_type)
-transaction_parser.add_argument('month')
-transaction_parser.add_argument('text')
-transaction_parser.add_argument('negative')
-transaction_parser.add_argument('positive')
-transaction_parser.add_argument('cost_le', type=Decimal)
-transaction_parser.add_argument('cost_ge', type=Decimal)
-transaction_parser.add_argument('ordering')
-transaction_parser.add_argument('member_id', type=int)
+transaction_parser.add_argument('date_start', type=dt_type, location='args')
+transaction_parser.add_argument('date_end', type=dt_type, location='args')
+transaction_parser.add_argument('month', location='args')
+transaction_parser.add_argument('text', location='args')
+transaction_parser.add_argument('negative', location='args')
+transaction_parser.add_argument('positive', location='args')
+transaction_parser.add_argument('cost_le', type=Decimal, location='args')
+transaction_parser.add_argument('cost_ge', type=Decimal, location='args')
+transaction_parser.add_argument('ordering', location='args')
+transaction_parser.add_argument('member_id', type=int, location='args')
 
 
 member_fields = fields.Nested({

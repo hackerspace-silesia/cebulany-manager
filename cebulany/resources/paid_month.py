@@ -15,9 +15,9 @@ parser.add_argument('cost', required=True)
 parser.add_argument('date', type=month_type)
 
 query_parser = RequestParser()
-query_parser.add_argument('payment_type_id', required=True, type=int)
-query_parser.add_argument('start_year', required=True, type=int)
-query_parser.add_argument('end_year', required=True, type=int)
+query_parser.add_argument('payment_type_id', required=True, type=int, location='args')
+query_parser.add_argument('start_year', required=True, type=int, location='args')
+query_parser.add_argument('end_year', required=True, type=int, location='args')
 
 transaction_fields = {
     'date': fields.DateTime(dt_format='iso8601'),

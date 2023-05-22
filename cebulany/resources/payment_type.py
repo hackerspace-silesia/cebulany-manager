@@ -23,7 +23,7 @@ parser.add_argument('show_count_in_report', required=False, type=bool)
 
 
 query_parser = RequestParser()
-query_parser.add_argument('has_members', type=boolean)
+query_parser.add_argument('has_members', type=boolean, location='args')
 
 
 class PaymentTypeListResource(ModelListResource):

@@ -45,12 +45,12 @@ parser.add_argument('date', required=False, type=dt_type)
 
 
 query_parser = RequestParser()
-query_parser.add_argument('name')
-query_parser.add_argument('payment_type_id', type=int)
-query_parser.add_argument('budget_id', type=int)
-query_parser.add_argument('member_id', type=int)
-query_parser.add_argument('month')
-query_parser.add_argument('page', type=int, default=1)
+query_parser.add_argument('name', location='args')
+query_parser.add_argument('payment_type_id', type=int, location='args')
+query_parser.add_argument('budget_id', type=int, location='args')
+query_parser.add_argument('member_id', type=int, location='args')
+query_parser.add_argument('month', location='args')
+query_parser.add_argument('page', type=int, default=1, location='args')
 
 
 class PaymentListResource(ModelListResource):
