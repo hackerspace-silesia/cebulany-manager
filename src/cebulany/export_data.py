@@ -20,6 +20,7 @@ def fill_transactions(data):
 if __name__ == "__main__":
     from sys import argv
     from itertools import chain
-    gen = (open_and_parse(arg) for arg in argv[1:])
-    data = list(chain.from_iterable(gen))
-    fill_transactions(data)
+    for arg in argv[1:]:
+        with open(arg) as file:
+            gen = parse(file)
+            fill_transactions(gen)

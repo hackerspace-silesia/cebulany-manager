@@ -44,7 +44,7 @@ class Transaction(Base):
     ref_id = db.Column(db.String(100), index=True)
 
     suggestion = relationship('Suggestion', foreign_keys=[iban], 
-                              primaryjoin='transaction.iban == suggestion.iban')
+                              primaryjoin='Transaction.iban == Suggestion.iban')
 
 
 class Suggestion(db.Model):

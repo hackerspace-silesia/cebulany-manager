@@ -5,7 +5,7 @@ from flask import request, abort
 
 from cebulany.auth import token_required
 from cebulany.export_data import fill_transactions
-from cebulany.csv import parse_lines as parse_file
+from cebulany.pdf import parse
 
 URL_PREFIX = environ.get('CEBULANY_APP_URL_PREFIX', '')
 
@@ -23,7 +23,8 @@ def upload_transactions():
     if file.filename == '':
         abort(400, 'No selected file')
 
-    lines = parse_file(line.decode('utf-8') for line in file.stream)
+    
+    lines = parse(file.stream)
     fill_transactions(lines)
 
     return 'OK', 200

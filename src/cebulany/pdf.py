@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 from decimal import Decimal
-from sys import argv
 from datetime import datetime
 import re
+from typing import IO
 
-import pandas as pd
-from py_pdf_parser.loaders import load_file
+from py_pdf_parser.loaders import load
 from py_pdf_parser.exceptions import NoElementFoundError
 
 
 RE_MONEY = re.compile(r"(?P<unit>-?[\s\d]+)[,.](?P<fract>\d\d)\s*(?P<currency>[A-Z]+)")
-RE_CODE = re.compile(r"(CEN|PSD)\d{8,}", re.IGNORECASE)
+RE_CODE = re.compile(r"(CEN|PSD)\d{8,}|5620-4VMTF1-001", re.IGNORECASE)
+LA_PARAMS = dict(
+    line_margin=1.5,
+)
 
 
-def parse(filename):
-    document = load_file(filename, la_params=dict(
-        line_margin=1.5,
-    ))
+def parse(filename: IO):
+    document = load(filename, la_params=LA_PARAMS)
     for page in document.pages:
         yield from _parse_page(page)
 
@@ -49,7 +49,7 @@ def _parse_page(page):
         date = _parse_date(date)
 
         code_match = RE_CODE.search(desc)
-        assert code_match is not None
+        assert code_match is not None, desc
 
         yield {
             "line_num": index,

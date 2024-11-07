@@ -29,6 +29,11 @@ member_fields = fields.Nested({
     'name': fields.String,
 })
 
+member_fields_optional = fields.Nested({
+    'id': fields.Integer,
+    'name': fields.String,
+}, allow_null=True)
+
 payment_type_fields = fields.Nested({
     'id': fields.Integer,
     'color': fields.String,
@@ -56,8 +61,8 @@ suggestion_fields = fields.Nested({
     'type_name': fields.String,
     'type_id': fields.Integer,
     'budget_id': fields.Integer,
-    'member': member_fields,
-})
+    'member': member_fields_optional,
+}, allow_null=True)
 
 
 resource_fields = {

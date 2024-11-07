@@ -74,23 +74,22 @@
     components: {TypeSelect},
     props: ['item', 'budgets', 'paymentTypes'],
     data () {
-      var member = null;
-      if (this.item.proposed_member && this.item.proposed_member.name) {
-        member = this.item.proposed_member;
-      }
-
-      let budgetId = this.item.proposed_budget_id || '0';
-      let paymentTypeId = this.item.proposed_type_id || '0';
+      let suggestion = this.item.suggestion !== null ? this.item.suggestion : {
+        budget_id: 0,
+        type_id: 0,
+        type_name: '',
+        member: null,
+      };
 
       return {
         promiseState: null,
-        budgetId: budgetId,
-        budget: this.budgets[budgetId],
-        paymentTypeId: paymentTypeId,
-        paymentType: this.paymentTypes[paymentTypeId],
+        budgetId: suggestion.budget_id,
+        budget: this.budgets[suggestion.budget_id],
+        paymentTypeId: suggestion.type_id,
+        paymentType: this.paymentTypes[suggestion.type_id],
         cost: this.item.left || 0,
-        name: this.item.proposed_type_name || '',
-        member: member,
+        name: suggestion.type_name,
+        member: suggestion.member,
         memberOptions: [],
         date: this.item.date || (new Date()).toISOString().slice(0, 10)
       }

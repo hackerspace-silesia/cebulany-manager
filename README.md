@@ -5,9 +5,9 @@
 ```
 
 # make virtualenv
-virtualenv venv -ppython3.7
-source venv/bin/activate
-python setup.py install
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -e .
 cd spa/
 yarn install
 yarn run build
@@ -45,9 +45,9 @@ python -m cebulany.user_cli --help
 ## Backend server
 
 ```
-source venv/bin/activate
+source .venv/bin/activate
 cd cebulany/
-FLASK_DEBUG=1 FLASK_APP=app.py flask run
+FLASK_DEBUG=1 FLASK_APP=cebulany.app flask run
 ```
 
 ## Frontend server
