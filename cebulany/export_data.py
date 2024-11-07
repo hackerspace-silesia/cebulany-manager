@@ -1,4 +1,4 @@
-from cebulany.csv import open_and_parse
+from cebulany.pdf import parse
 from cebulany.models import Transaction
 
 
@@ -11,17 +11,6 @@ def fill_transactions(data):
                 .filter_by(ref_id=record['ref_id'])
             )
             if transaction_query.first() is None:
-                last_transaction = (
-                    db.session.query(Transaction)
-                    .filter_by(iban=record['iban'])
-                    .order_by(Transaction.date.desc())
-                    .first()
-                )
-                if last_transaction is not None:
-                    record['proposed_member_id'] = last_transaction.proposed_member_id or None
-                    record['proposed_budget_id'] = last_transaction.proposed_budget_id or None
-                    record['proposed_type_id'] = last_transaction.proposed_type_id or None
-                    record['proposed_type_name'] = last_transaction.proposed_type_name
                 db.session.add(Transaction(**record))
             else:
                 transaction_query.update(record)

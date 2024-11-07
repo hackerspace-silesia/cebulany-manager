@@ -39,18 +39,26 @@ class Transaction(Base):
     date = db.Column(db.Date, index=True, nullable=False)
     title = db.Column(db.String(300))
     name = db.Column(db.String(300), index=True)
-    main_line = db.Column(db.String(300))
     cost = db.Column(db.Numeric(10, 2), nullable=False)
-    iban = db.Column(db.String(300))
+    iban = db.Column(db.String(40), index=True)
     ref_id = db.Column(db.String(100), index=True)
-    proposed_member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
-    proposed_type_name = db.Column(db.String(300))
-    proposed_type_id = db.Column(db.Integer, db.ForeignKey('paymenttype.id'))
-    proposed_budget_id = db.Column(db.Integer, db.ForeignKey('budget.id'))
 
-    proposed_member = relationship('Member')
-    proposed_payment_type = relationship('PaymentType')
-    proposed_budget = relationship('Budget')
+    suggestion = relationship('Suggestion', foreign_keys=[iban], 
+                              primaryjoin='transaction.iban == suggestion.iban')
+
+
+class Suggestion(db.Model):
+    __tablename__ = "suggestion"
+    iban = db.Column(db.String(40), primary_key=True, nullable=False)
+
+    member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
+    type_name = db.Column(db.String(300))
+    type_id = db.Column(db.Integer, db.ForeignKey('paymenttype.id'))
+    budget_id = db.Column(db.Integer, db.ForeignKey('budget.id'))
+
+    member = relationship('Member')
+    payment_type = relationship('PaymentType')
+    budget = relationship('Budget')
 
 
 class Member(Base):
@@ -99,10 +107,10 @@ class User(Base):
     password_hash = db.Column(db.String(128))
     otp_secret = db.Column(db.String(16))
     token = db.Column(db.String(32))
-    token_time = db.Column(db.DateTime, default=datetime.utcnow)
+    token_time = db.Column(db.DateTime, default=datetime.now)
 
     def __init__(self, **kwargs):
-        super(User, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if self.otp_secret is None:
             self.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
 
