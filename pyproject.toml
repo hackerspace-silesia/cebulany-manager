@@ -1,0 +1,14 @@
+[project]
+name = "cebulany_manager"
+version = "0.1.0"
+requires-python = ">=3.12"
+authors = [
+  {name = "Firemark"},
+]
+maintainers = [
+  {name = "Firemark"},
+]
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
