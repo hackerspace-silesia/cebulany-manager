@@ -9,25 +9,25 @@ from cebulany.resources.excels.utils import send_excel, setup_styles, add_cell
 from cebulany.resources.excels.blueprint import excel_page, URL_PREFIX
 
 
+def get_data(start_year, end_year, payment_type_id):
+    return dict(
+        year_span=(start_year, end_year),
+        members=MemberQuery.get_list_query(order="table"),
+        all_paid_months={
+            paid_month['member_id']: paid_month['months']
+            for paid_month in PaidMonthQuery.get_aggregated_payments(
+                payment_type_id=payment_type_id,
+                start_year=start_year,
+                end_year=end_year,
+            )
+        }
+    )
+
+
 @excel_page.route(URL_PREFIX + '/table/<int:start_year>-<int:end_year>/<int:payment_type_id>')
 @token_required
 def excel_paid_month(start_year: int, end_year: int, payment_type_id: int):
-    members = MemberQuery.get_list_query(order="table")
-    all_paid_months = {
-        paid_month['member_id']: paid_month['months']
-        for paid_month in PaidMonthQuery.get_aggregated_payments(
-            payment_type_id=payment_type_id,
-            start_year=start_year,
-            end_year=end_year,
-        )
-    }
-
-    workbook = gen_workbook(
-        year_span=(start_year, end_year),
-        members=members,
-        all_paid_months=all_paid_months,
-    )
-
+    workbook = gen_workbook(**get_data(start_year, end_year, payment_type_id))
     download_name = f'members-{start_year}-{end_year}.xlsx'
     return send_excel(workbook, download_name)
 
@@ -37,10 +37,14 @@ def gen_workbook(year_span, members, all_paid_months):
     setup_styles(workbook)
     sheet = workbook.active
     sheet.title = 'Members'
-    add_header(sheet, year_span)
-    add_content(sheet, year_span, members, all_paid_months)
+    fill_worksheet(sheet, year_span, members, all_paid_months)
 
     return workbook
+
+
+def fill_worksheet(sheet, year_span, members, all_paid_months):
+    add_header(sheet, year_span)
+    add_content(sheet, year_span, members, all_paid_months)
 
 
 def add_header(sheet, year_span):

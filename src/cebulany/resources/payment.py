@@ -102,10 +102,10 @@ class PaymentListResource(ModelListResource):
         if suggestion is None:
             suggestion = Suggestion(iban=iban)
 
-        suggestion.type_name = data["name"]
-        suggestion.type_id = data["payment_type_id"]
-        suggestion.budget_id = data["budget_id"]
-        suggestion.member_id = data["member_id"]
+        suggestion.type_name = data["name"] or ""
+        suggestion.type_id = data["payment_type_id"] or None
+        suggestion.budget_id = data["budget_id"] or None
+        suggestion.member_id = data["member_id"] or None
 
         db.session.add(suggestion)
         db.session.commit()

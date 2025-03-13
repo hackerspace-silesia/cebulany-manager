@@ -17,7 +17,6 @@ class PaidMonthQuery:
     def _get_query(payment_type_id, start_year, end_year):
         dt_col = get_year_month_col(Payment.date)
         year_col = get_year_col(Payment.date)
-        print(start_year, end_year, year_col)
         return db.session.query(
             Member.id,
             sql_func.sum(Payment.cost),

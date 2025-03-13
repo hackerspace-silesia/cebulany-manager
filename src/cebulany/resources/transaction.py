@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from flask_restful import Resource, fields, marshal_with
 from flask_restful.reqparse import RequestParser
-from sqlalchemy import or_, func as sql_func
+from sqlalchemy import or_, and_
 from sqlalchemy.orm import contains_eager
 
 from cebulany.auth import token_required
@@ -123,9 +123,12 @@ class TransactionResource(Resource):
         if args['cost_ge']:
             query = query.filter(model.cost >= args['cost_ge'])
         if args['text']:
-            query = query.filter(or_(
-                model.main_line.like('%%%s%%' % word.replace('%', r'\%'))
-                for word in args['text'].upper().split()
+            query = query.filter(and_(
+                or_(
+                    model.name.ilike('%%%s%%' % word.replace('%', r'\%')),
+                    model.title.ilike('%%%s%%' % word.replace('%', r'\%')),
+                )
+                for word in args['text'].split()
             ))
         if args['ordering']:
             query = query.order_by(*args['ordering'].split(','))
