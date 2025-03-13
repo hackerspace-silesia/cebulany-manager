@@ -19,7 +19,6 @@ from cebulany.resources.payment_summary import PaymentSummaryResource
 
 from os import environ
 
-
 DATABASE_URI = environ.get('DATABASE_URI', 'sqlite:///test.db')
 
 app = Flask(__name__)
@@ -60,12 +59,12 @@ app.register_blueprint(excel_page)
 @app.route(URL_PREFIX + '/index.html')
 @app.route(URL_PREFIX + '/')
 def index():
-    return send_from_directory('../spa/dist', 'index.html')
+    return send_from_directory('/app/spa/dist', 'index.html')
 
 
 @app.route(URL_PREFIX + '/static/<mod>/<filename>')
 def pseudo_static(mod, filename):
-    return send_from_directory('../spa/dist/static/%s' % mod, filename)
+    return send_from_directory('/app/spa/dist/static/%s' % mod, filename)
 
 
 if app.debug:
