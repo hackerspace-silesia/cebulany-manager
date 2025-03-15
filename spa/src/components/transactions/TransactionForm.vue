@@ -8,25 +8,26 @@
       />
       <b-form inline="inline">
         <template v-if="monthOption == 'month'">
-          <b-form-input
+          <date-picker
             v-model="month"
-            size="sm"
             type="month"
+            value-type="format"
+            token="YYYY-MM"
+            :clearable="false"
             @change="updateForm"
           />
           &nbsp;
-          <b-button @click="excel">Excel</b-button>
+          <b-button size="sm" @click="excel">Excel</b-button>
         </template>
         <template v-else-if="monthOption == 'date_range'">
-          <label>od&nbsp;</label><b-form-input
-            v-model="startDate"
-            size="sm"
+          <date-picker
+            v-model="dateRange"
             type="date"
-            @change="updateForm"
-          /><label>&nbsp;do&nbsp;</label><b-form-input
-            v-model="endDate"
-            size="sm"
-            type="date"
+            value-type="format"
+            token="YYYY-MM-DD"
+            range-separator=" → "
+            :clearable="false"
+            range
             @change="updateForm"
           />
         </template>
@@ -52,8 +53,7 @@
       let today = (new Date()).toISOString();
       return {
         month: today.slice(0, 7),
-        startDate: today.slice(0, 7) + '-01',
-        endDate: today.slice(0, 10),
+        dateRange: [today.slice(0, 7) + '-01', today.slice(0, 10)],
         text: '',
         monthOption: 'month',
         monthOptions: [
@@ -74,8 +74,9 @@
         if (this.monthOption === 'month') {
           data.month = this.month;
         } else if (this.monthOption === 'date_range') {
-          data.date_start = this.startDate;
-          data.date_end = this.endDate;
+          const [start, end] = this.dateRange
+          data.date_start = start;
+          data.date_end = end;
         }
         this.$emit('change', data);
       },

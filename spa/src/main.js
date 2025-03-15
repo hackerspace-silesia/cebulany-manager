@@ -8,7 +8,9 @@ import dataState from './state';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'vue-select/dist/vue-select.css';
+import 'vue2-datepicker/index.css';
 
+import DatePicker from 'vue2-datepicker';
 import MoneyValue from './components/MoneyValue';
 import PromisedComponent from './components/PromisedComponent';
 import PromisedRowComponent from './components/PromisedRowComponent';
@@ -29,6 +31,7 @@ Vue.component('money-value', MoneyValue);
 Vue.component('PromisedComponent', PromisedComponent);
 Vue.component('PromisedRowComponent', PromisedRowComponent);
 Vue.component('v-select', vSelect);
+Vue.component('date-picker', DatePicker);
 
 /* eslint-disable no-new */
 new Vue({

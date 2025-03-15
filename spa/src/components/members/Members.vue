@@ -4,16 +4,15 @@
       <b-col>
         <PromisedComponent :state="promiseInnerState">
           <b-form inline="inline">
-            <b-form-group label="Od">
-              <b-form-input
-                v-model="yearStart"
-                type="number"
-              />
-            </b-form-group>
-            <b-form-group label="Do">
-              <b-form-input
-                v-model="yearEnd"
-                type="number"
+            <b-form-group label="Zakres">
+              <date-picker
+                v-model="yearRange"
+                type="year"
+                value-type="format"
+                token="YYYY"
+                range-separator=" → "
+                :clearable="false"
+                range
               />
             </b-form-group>
             <b-form-group label="Typ">
@@ -100,8 +99,7 @@
         paymentTypeId: null,
         memberFilter: '',
         showNewMemberForm: false,
-        yearEnd: now.getFullYear(),
-        yearStart: now.getFullYear() - 1
+        yearRange: [`${now.getFullYear()-1}`, `${now.getFullYear()}`],
       }
     },
     computed: {
@@ -110,13 +108,12 @@
           return;
         }
         let years = [];
-        let yearEnd = parseInt(this.yearEnd);
-        let yearStart = parseInt(this.yearStart);
-        let range = yearEnd - yearStart;
-        for (let i = 0; i <= range; i++) {
-          years.push(i + yearStart);
+        let yearStart = parseInt(this.yearRange[0]);
+        let yearEnd = parseInt(this.yearRange[1]);
+        for (let year = yearStart; year <= yearEnd; year++) {
+          years.push(year);
         }
-        this.getPaidMonths(yearStart, yearEnd);
+        this.getPaidMonths();
         return years;
       }
     },
@@ -144,8 +141,8 @@
       getPaidMonths () {
         let promise = PaymentService.getTable({
           payment_type_id: this.paymentTypeId,
-          start_year: this.yearStart,
-          end_year: this.yearEnd,
+          start_year: this.yearRange[0],
+          end_year: this.yearRange[1],
         });
         linkVm(this, promise)
           .then(resp => { this.paidmonths = resp.data; });
@@ -162,7 +159,7 @@
       },
       excel (obj) {
         let promise = PaymentService.getExcelTable(
-          this.yearStart, this.yearEnd, this.paymentTypeId,
+          this.yearRange[0], this.yearRange[1], this.paymentTypeId,
         );
         linkVm(this, promise);
       }

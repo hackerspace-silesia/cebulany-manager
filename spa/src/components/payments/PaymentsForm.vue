@@ -35,22 +35,25 @@
               v-model="withMonth"
               size="sm"
             >
-              <option :value="true">
-                Miesiąc
-              </option>
-              <option :value="false">
-                Rok
-              </option>
+              <option :value="true"> Miesiąc </option>
+              <option :value="false"> Rok </option>
             </b-select>
-            <b-form-input
+            <date-picker
               v-if="withMonth"
               v-model="month"
               type="month"
+              value-type="format"
+              token="YYYY-MM"
+              :clearable="false"
+              @change="updateForm"
             />
-            <b-form-input
+            <date-picker
               v-if="!withMonth"
               v-model="year"
-              type="number"
+              type="year"
+              value-type="format"
+              token="YYYY"
+              :clearable="false"
             />
           </b-form-group>
         </b-col>
@@ -81,7 +84,7 @@
           month: `${year}-${month}`
         },
         month: `${year}-${month}`,
-        year: year,
+        year: year.toString(),
         withMonth: true,
         promiseState: null,
         paymentTypes: [],
