@@ -1,5 +1,6 @@
 import Transaction from '@/models/transaction';
 import axios from './base';
+import {downloadFile} from './excel';
 
 export default {
   get (params) {
@@ -13,6 +14,12 @@ export default {
         response.data.sumLeft = sumLeft;
         return response;
       });
+  },
+  getExcelTable (month) {
+    return axios.get(
+      `/excel/transactions/${month}`,
+      { responseType: 'blob' }
+    ).then(downloadFile);
   },
   upload (file) {
     let data = new FormData();

@@ -14,7 +14,10 @@
             type="month"
             @change="updateForm"
           />
-        </template><template v-else-if="monthOption == 'date_range'">
+          &nbsp;
+          <b-button @click="excel">Excel</b-button>
+        </template>
+        <template v-else-if="monthOption == 'date_range'">
           <label>od&nbsp;</label><b-form-input
             v-model="startDate"
             size="sm"
@@ -59,6 +62,9 @@
         ]
       }
     },
+    created () {
+      this.updateForm();
+    },
     methods: {
       updateForm () {
         let data = {};
@@ -72,6 +78,11 @@
           data.date_end = this.endDate;
         }
         this.$emit('change', data);
+      },
+      excel () {
+        if (this.monthOption === 'month') {
+          this.$emit('excel', this.month);
+        }
       }
     }
   }

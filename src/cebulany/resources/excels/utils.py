@@ -49,6 +49,13 @@ def setup_styles(workbook):
     bad.number_format = number_format
     workbook.add_named_style(bad)
 
+    nice = NamedStyle(name="nice")
+    nice.fill = PatternFill(start_color='7fb88e', fill_type='solid')
+    nice.font = Font(bold=True, **font_args)
+    nice.border = border
+    nice.number_format = number_format
+    workbook.add_named_style(nice)
+
     ok = NamedStyle(name="ok")
     ok.font = Font(**font_args)
     ok.border = border

@@ -2,7 +2,10 @@
   <b-row>
     <b-col>
       <h1>Przelewy</h1>
-      <TransactionForm @change="fetchTransactions" />
+      <TransactionForm
+        @change="setFormParams"
+        @excel="excel"
+      />
       <TransactionLegend
         :budgets="budgets"
         :payment-types="paymentTypes"
@@ -44,6 +47,7 @@ export default {
   },
   data () {
     return {
+      formParams: null,
       transactions: [],
       paymentTypes: {},
       budgets: {},
@@ -62,7 +66,6 @@ export default {
         .then(([budgetResponse, paymentTypeResponse]) => {
           this.budgets = this.transformArrayToMap(budgetResponse.data);
           this.paymentTypes = this.transformArrayToMap(paymentTypeResponse.data);
-          this.fetchTransactions();
         })
     },
     transformArrayToMap (array) {
@@ -72,8 +75,12 @@ export default {
       });
       return obj;
     },
-    fetchTransactions (params) {
-      linkVm(this, TransactionService.get(params))
+    setFormParams(params) {
+      this.formParams = params;
+      this.fetchTransactions();
+    },
+    fetchTransactions () {
+      linkVm(this, TransactionService.get(this.formParams))
         .then((response) => {
           this.transactions = response.data.transactions;
           this.sum = response.data.sum;
@@ -82,6 +89,9 @@ export default {
     },
     uploadTransactions () {
       this.fetchTransactions();
+    },
+    excel (month) {
+      linkVm(this, TransactionService.getExcelTable(month));
     }
   }
 }
