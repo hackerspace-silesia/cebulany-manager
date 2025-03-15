@@ -1,18 +1,55 @@
-version: '3'
 services:
+  frontend:
+    image: cebulany-manager-frontend
+    container_name: "frontend"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=8080"
+    volumes:
+      - ./spa/src:/app/src
+      - ./spa/config:/app/config
+      - ./spa/static:/app/static
+      - ./spa/index.html:/app/index.html
+
   backend:
-    image: cebulany-manager
-    ports:
-    - "5000:5000"
+    image: cebulany-manager-backend
+    container_name: "backend"
     environment:
+      FLASK_APP: cebulany.app
       DATABASE_URI: postgresql://cebula:foo@db:5432/cebula
+      TOTP_SUPPORT: 0
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.services.backend.loadbalancer.server.port=5000"
+    volumes:
+      - ./docker-data/data:/data
+      - ./src:/app/src
+      - ./migrations:/app/migrations
 
   db:
     image: postgres
-    restart: always
     environment:
       POSTGRES_USER: cebula
       POSTGRES_DB: cebula
       POSTGRES_PASSWORD: foo
     volumes:
       - ./docker-data/postgres:/var/lib/postgresql/data
+
+  traefik:
+    image: "traefik:v3.3"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:5000"
+    ports:
+      - "5000:5000"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"

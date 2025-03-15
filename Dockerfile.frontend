@@ -25,4 +25,5 @@ ENV URL_PREFIX=$URL_PREFIX
 RUN yarn build
 
 EXPOSE 8080
-CMD [ "http-server", "dist" ]
+#CMD [ "http-server", "dist" ]
+CMD [ "yarn", "run", "dev"]

@@ -5,13 +5,15 @@ RUN pip3 install psycopg2
 COPY requirements.txt /app
 RUN pip3 install -r requirements.txt
 
+COPY src /app/src
 COPY pyproject.toml /app
-COPY create_mock.py /app
 COPY alembic.ini /app
 COPY uwsgi-me.sh /app
+COPY MANIFEST.in /app
 COPY /migrations /app/migrations
-COPY src /app/src
 WORKDIR /app
-RUN pip3 install .
+RUN pip3 install -e .
 EXPOSE 5000
-CMD ./uwsgi-me.sh
+COPY uwsgi.ini .
+ENV FLASK_APP=cebulany.app
+CMD flask run --host=0.0.0.0 --debug
