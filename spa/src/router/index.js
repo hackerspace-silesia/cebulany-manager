@@ -18,6 +18,16 @@ export default new Router({
       component: Transactions
     },
     {
+      path: '/transactions/:month',
+      name: 'Transactions-Month',
+      component: Transactions
+    },
+    {
+      path: '/transactions/:start/:end',
+      name: 'Transactions-Range',
+      component: Transactions
+    },
+    {
       path: '/members',
       name: 'Members',
       component: Members

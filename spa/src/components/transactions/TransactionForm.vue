@@ -51,11 +51,24 @@
   export default {
     data () {
       let today = (new Date()).toISOString();
+      let monthOption = 'month';
+      let month = today.slice(0, 7);
+      let dateRange = [today.slice(0, 7) + '-01', today.slice(0, 10)];
+      const params = this.$route.params;
+      if (params.start && params.end) {
+        if (params.end === "-") {
+          monthOption = 'month';
+          month = params.start;
+        } else {
+          monthOption = 'date_range';
+          dateRange = [params.start, params.end];
+        }
+      }
       return {
-        month: today.slice(0, 7),
-        dateRange: [today.slice(0, 7) + '-01', today.slice(0, 10)],
-        text: '',
-        monthOption: 'month',
+        month,
+        dateRange,
+        monthOption,
+        text: this.$route.query.text || '',
         monthOptions: [
           {text: 'Miesiąc', value: 'month'},
           {text: 'Zakres Dat', value: 'date_range'}
@@ -68,13 +81,25 @@
     methods: {
       updateForm () {
         let data = {};
+        let query = {};
         if (this.text) {
           data.text = this.text;
+          query.text = this.text;
         }
         if (this.monthOption === 'month') {
+          this.$router.replace({
+            name: 'Transactions-Range',
+            params: { start: this.month, end: "-" },
+            query,
+          });
           data.month = this.month;
         } else if (this.monthOption === 'date_range') {
           const [start, end] = this.dateRange
+          this.$router.replace({
+            name: 'Transactions-Range',
+            params: { start, end },
+            query,
+          });
           data.date_start = start;
           data.date_end = end;
         }
