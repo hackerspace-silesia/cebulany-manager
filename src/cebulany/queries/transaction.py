@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import or_, and_
 from sqlalchemy.orm import contains_eager
 
-from cebulany.models import Transaction
+from cebulany.models import Transaction, Payment
 from cebulany.sql_utils import get_year_month_col
 
 
@@ -16,6 +16,7 @@ class TransactionQuery:
         month: str | None = None,
         text_like: str | None = None,
         ordering: str | None = None,
+        member_id: int | None = None,
     ):
         model = Transaction
         query = (
@@ -29,8 +30,11 @@ class TransactionQuery:
             query = query.filter(model.date <= date_end)
         elif month:
             query = query.filter(get_year_month_col(model.date) == month)
-        else:
+        elif not member_id:
             raise Exception("!! :(")
+
+        if member_id:
+            query = query.filter(Payment.member_id == member_id)
 
         if text_like:
             query = query.filter(

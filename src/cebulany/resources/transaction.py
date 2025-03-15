@@ -103,6 +103,7 @@ class TransactionResource(Resource):
             month=args["month"],
             text_like=args["text"],
             ordering=args["ordering"],
+            member_id=args["member_id"],
         )
         return {
             "transactions": transactions,
