@@ -35,7 +35,11 @@
           >
             {{ payment.budget.name }}
           </td>
-          <td><span v-if="payment.member && payment.member.name">{{ payment.member.name }}&nbsp;</span><span v-else>{{ payment.name }}</span></td>
+          <td>
+            <span v-if="payment.member && payment.member.name">
+              {{ payment.member.name }}&nbsp;
+            </span>
+            <span v-else>{{ payment.name }}</span></td>
           <td>{{ payment.date }}</td>
           <td class="text-right">
             {{ payment.cost }} zł
@@ -81,7 +85,7 @@
         linkVm(this, PaymentService.delete(pk)).then(response => {
           let item = this.item;
           let oldObj = item.payments.find(obj => obj.id === pk);
-          item.left += Number(oldObj.cost);
+          item.left = item.left + Number(oldObj.cost);
           item.payments = item.payments.filter(obj => obj.id !== pk);
         });
       }

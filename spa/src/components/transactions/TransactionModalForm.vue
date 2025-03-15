@@ -100,6 +100,12 @@
       },
       paymentTypeId (value) {
         this.paymentType = this.paymentTypes[value];
+      },
+      item: {
+        handler(value) {
+          this.cost = value.left || 0;
+        },
+        deep: true,
       }
     },
     methods: {

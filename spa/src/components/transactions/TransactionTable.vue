@@ -3,7 +3,7 @@
     <b-modal
       v-model="showModal"
       title="Transakcja"
-      size="lg"
+      size="xl"
       ok-only="ok-only"
     >
       <TransactionModal
