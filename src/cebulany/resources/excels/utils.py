@@ -2,7 +2,7 @@ from tempfile import NamedTemporaryFile
 
 from openpyxl import Workbook
 from openpyxl.cell import Cell
-from openpyxl.styles import NamedStyle, Font, PatternFill, Alignment, Border, Side
+from openpyxl.styles import NamedStyle, Font, PatternFill, Border, Side, Alignment
 from flask import send_file
 
 
@@ -18,20 +18,21 @@ def send_excel(workbook: Workbook, download_name):
         )
 
 
-def setup_styles(workbook):
+def setup_styles(workbook, font_name='Calibri', font_size=10):
     thin = Side(border_style="thin", color="000000")
     border = Border(top=thin, left=thin, right=thin, bottom=thin)
-    font_args = dict(name='Calibri', size=10)
+    font_args = dict(name=font_name, size=font_size)
     number_format = '0.00 zł'
 
     header = NamedStyle(name="header")
-    header.font = Font(bold=True, name='Calibri', size=12)
-    header.alignment = Alignment(horizontal='center')
+    header.font = Font(bold=True, name=font_name, size=font_size + 2)
+    header.alignment = Alignment(horizontal='center', vertical='center')
     header.border = border
     workbook.add_named_style(header)
 
     left_header = NamedStyle(name="left_header")
     left_header.font = Font(bold=True, **font_args)
+    left_header.alignment.vertical = 'center'
     left_header.border = border
     workbook.add_named_style(left_header)
 
@@ -40,6 +41,7 @@ def setup_styles(workbook):
     inactive.font = Font(bold=True, **font_args)
     inactive.border = border
     inactive.number_format = number_format
+    inactive.alignment.vertical = 'center'
     workbook.add_named_style(inactive)
 
     bad = NamedStyle(name="bad")
@@ -47,6 +49,7 @@ def setup_styles(workbook):
     bad.font = Font(bold=True, **font_args)
     bad.border = border
     bad.number_format = number_format
+    bad.alignment.vertical = 'center'
     workbook.add_named_style(bad)
 
     nice = NamedStyle(name="nice")
@@ -54,13 +57,23 @@ def setup_styles(workbook):
     nice.font = Font(bold=True, **font_args)
     nice.border = border
     nice.number_format = number_format
+    nice.alignment.vertical = 'center'
     workbook.add_named_style(nice)
 
     ok = NamedStyle(name="ok")
     ok.font = Font(**font_args)
     ok.border = border
     ok.number_format = number_format
+    ok.alignment.vertical = 'center'
     workbook.add_named_style(ok)
+
+    wrap_text = NamedStyle(name="wrap_text")
+    wrap_text.font = Font(**font_args)
+    wrap_text.border = border
+    wrap_text.number_format = number_format
+    wrap_text.alignment.wrap_text = True
+    wrap_text.alignment.vertical = 'center'
+    workbook.add_named_style(wrap_text)
 
 
 def add_cell(sheet, value='', style='ok') -> Cell:
