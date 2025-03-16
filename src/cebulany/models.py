@@ -42,6 +42,7 @@ class Transaction(Base):
     cost = db.Column(db.Numeric(10, 2), nullable=False)
     iban = db.Column(db.String(40), index=True)
     ref_id = db.Column(db.String(100), index=True)
+    additional_info = db.Column(db.String(300), server_default="", nullable=False)
 
     suggestion = relationship('Suggestion', foreign_keys=[iban], 
                               primaryjoin='Transaction.iban == Suggestion.iban')
@@ -68,6 +69,12 @@ class Member(Base):
     join_date = db.Column(db.Date, nullable=False)
 
 
+class AccountancyType(Base):
+    __abstract__ = False
+    name = db.Column(db.String(300), index=True, nullable=False)
+    color = db.Column(db.String(6), nullable=False)
+
+
 class PaymentType(Base):
     __abstract__ = False
     name = db.Column(db.String(300), index=True, nullable=False)
@@ -76,6 +83,9 @@ class PaymentType(Base):
     show_details_in_report = db.Column(db.Boolean, default=False, nullable=False)
     show_count_in_report = db.Column(db.Boolean, default=False, nullable=False)
 
+    accountancy_type_id = db.Column(db.Integer, db.ForeignKey('accountancytype.id'), nullable=True)
+    payment_type = relationship(AccountancyType, backref='payment_types')
+
 
 class Budget(Base):
     __abstract__ = False
@@ -83,22 +93,32 @@ class Budget(Base):
     color = db.Column(db.String(6), nullable=False)
     show_details_in_report = db.Column(db.Boolean, default=False, nullable=False)
     show_count_in_report = db.Column(db.Boolean, default=False, nullable=False)
+    description = db.Column(db.String(300), server_default="", nullable=False)
+
+
+class InnerBudget(Base):
+    __abstract__ = False
+    name = db.Column(db.String(300), index=True, nullable=False)
+    color = db.Column(db.String(6), nullable=False)
 
 
 class Payment(Base):
     __abstract__ = False
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
     name = db.Column(db.String(300), index=True, nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    cost = db.Column(db.Numeric(10, 2), nullable=False)
+
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
     payment_type_id = db.Column(db.Integer, db.ForeignKey('paymenttype.id'), nullable=False)
     budget_id = db.Column(db.Integer, db.ForeignKey('budget.id'), nullable=False)
     member_id = db.Column(db.Integer, db.ForeignKey('member.id'), nullable=True)
-    date = db.Column(db.Date, nullable=False)
-    cost = db.Column(db.Numeric(10, 2), nullable=False)
+    inner_budget_id = db.Column(db.Integer, db.ForeignKey('innerbudget.id'), nullable=True)
 
     member = relationship(Member, backref='payments')
     transaction = relationship(Transaction, backref='payments')
     payment_type = relationship(PaymentType, backref='payments')
     budget = relationship(Budget, backref='payments')
+    inner_budget = relationship(InnerBudget, backref='payments')
 
 
 class User(Base):
