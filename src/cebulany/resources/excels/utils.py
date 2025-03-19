@@ -45,16 +45,14 @@ def setup_styles(workbook, font_name='Calibri', font_size=10):
     workbook.add_named_style(inactive)
 
     bad = NamedStyle(name="bad")
-    bad.fill = PatternFill(start_color='f1b0b7', fill_type='solid')
-    bad.font = Font(bold=True, **font_args)
+    bad.font = Font(bold=True, color = 'C32148', **font_args)
     bad.border = border
     bad.number_format = number_format
     bad.alignment.vertical = 'center'
     workbook.add_named_style(bad)
 
     nice = NamedStyle(name="nice")
-    nice.fill = PatternFill(start_color='7fb88e', fill_type='solid')
-    nice.font = Font(bold=True, **font_args)
+    nice.font = Font(bold=True, color='4D8C57', **font_args)
     nice.border = border
     nice.number_format = number_format
     nice.alignment.vertical = 'center'
@@ -73,6 +71,13 @@ def setup_styles(workbook, font_name='Calibri', font_size=10):
     wrap_text.number_format = number_format
     wrap_text.alignment.wrap_text = True
     wrap_text.alignment.vertical = 'center'
+    workbook.add_named_style(wrap_text)
+
+    wrap_text = NamedStyle(name="wrap_text_center")
+    wrap_text.font = Font(**font_args)
+    wrap_text.border = border
+    wrap_text.number_format = number_format
+    wrap_text.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
     workbook.add_named_style(wrap_text)
 
 

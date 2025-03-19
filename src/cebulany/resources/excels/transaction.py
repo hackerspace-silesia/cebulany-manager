@@ -1,4 +1,8 @@
+from collections import defaultdict
+from decimal import Decimal
 from functools import partial
+from itertools import chain
+from typing import Iterable
 
 from openpyxl import Workbook
 from openpyxl.cell.text import InlineFont
@@ -63,21 +67,19 @@ def fill_worksheet(sheet, dt: str, transactions: list[Transaction]):
 
     for index, transaction in enumerate(transactions, start=1):
         ps = transaction.payments
-        one_payment = len(ps) == 1
-        payment_type = CellRichText([format_payment_type(p, not one_payment) for p in ps])
-        payment_type.style = "wrap_text"
-        budget = CellRichText([format_budget(p, not one_payment) for p in ps])
-        budget.style = "wrap_text"
+        payment_type = _to_rich_text(_format_payment_type(p) for p in ps)
+        budget = _to_rich_text(_format_budget(p) for p in ps)
+        info = f"{transaction.additional_info} {transaction.name}".strip()
 
         sheet.append(
             [
                 add(f"{index:03d}", "left_header"),
                 add(transaction.date.strftime("%Y-%m-%d"), "left_header"),
-                add(f"{transaction.additional_info} {transaction.name}", "wrap_text"),
+                add(info, "wrap_text"),
                 add(transaction.title, "wrap_text"),
                 add(transaction.cost, "bad" if transaction.cost < 0 else "nice"),
-                add(payment_type, "wrap_text"),
-                add(budget, "wrap_text"),
+                add(payment_type, "wrap_text_center"),
+                add(budget, "wrap_text_center"),
             ]
         )
 
@@ -85,7 +87,7 @@ def fill_worksheet(sheet, dt: str, transactions: list[Transaction]):
         sheet.row_dimensions[index].height = 40.0
 
 
-def format_payment_type(payment: Payment, with_cost=False):
+def _format_payment_type(payment: Payment):
     pt = payment.payment_type
     at = pt.accountancy_type
     if at:
@@ -95,27 +97,45 @@ def format_payment_type(payment: Payment, with_cost=False):
         desc = pt.name
         color = pt.color
 
-    if with_cost:
-        desc = f"{desc}({payment.cost} zł)"
-
-    return _color_text(desc + "; ", color)
+    return (desc, color, abs(payment.cost))
 
 
-def format_budget(payment: Payment, with_cost=False):
+def _format_budget(payment: Payment):
     if payment.cost >= 0:
         desc = payment.budget.description_on_positive
     else:
         desc = payment.budget.description_on_negative
 
-    if not desc:
-        return desc
-
-    if with_cost:
-        desc = f"{desc}({payment.cost} zł)"
-
-    return _color_text(desc + "; ", payment.budget.color)
+    return (desc, payment.budget.color, abs(payment.cost))
 
 
-def _color_text(s, color):
-    font = InlineFont(sz=8, b=True, rFont='Calibri', color=color)
+def _to_rich_text(labels: Iterable[tuple[str, str, Decimal]]) -> CellRichText:
+    accumulator: defaultdict[str, Decimal] = defaultdict(Decimal)
+    colors: dict[str, str] = {}
+    for label, color, cost in labels:
+        accumulator[label] += cost
+        colors[label] = color
+
+    match len(accumulator):
+        case 0:
+            return CellRichText(["-"])
+        case 1:
+            label = next(iter(accumulator))
+            color = colors[label]
+            return CellRichText([_color_text(label, color)])
+        case _:
+            elements = list(chain.from_iterable(
+                [
+                    _color_text(label, colors[label]),
+                    _color_text(f" ({cost} zł)", colors[label], bold=True),
+                    "\n"
+                ]
+                for label, cost in accumulator.items()
+            ))
+            elements.pop()  # Remove last '\n'
+            return CellRichText(elements)
+
+
+def _color_text(s: str, color: str, bold: bool=False):
+    font = InlineFont(sz=8, b=bold, rFont='Calibri', color=color)
     return TextBlock(font, s)
