@@ -7,6 +7,8 @@ import PaymentTypes from '@/components/paymentTypes/PaymentTypes';
 import Payments from '@/components/payments/Payments';
 import SummaryPayments from '@/components/summary/SummaryPayments';
 import Users from '@/components/users/Users';
+import AccountacyTypes from '@/components/accountancyTypes/AccountacyTypes';
+import InnerBudgets from '@/components/innerBudgets/InnerBudgets';
 
 Vue.use(Router);
 
@@ -38,9 +40,19 @@ export default new Router({
       component: Budgets
     },
     {
+      path: '/inner-budgets',
+      name: 'InnerBudgets',
+      component: InnerBudgets,
+    },
+    {
       path: '/payment-types',
       name: 'PaymentTypes',
       component: PaymentTypes
+    },
+    {
+      path: '/accountancy-types',
+      name: 'AccountancyTypes',
+      component: AccountacyTypes,
     },
     {
       path: '/summary',

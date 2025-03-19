@@ -4,5 +4,5 @@ Flask-RESTful==0.3.10
 Flask-SQLAlchemy==3.0.3
 alembic==1.11.1
 onetimepass==1.0.1
-openpyxl==3.0.7
+openpyxl==3.1.5
 py_pdf_parser~=0.13

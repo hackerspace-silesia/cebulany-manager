@@ -1,9 +1,9 @@
 <template>
   <b-row>
     <b-col>
-      <h1>Budżety</h1>
+      <h1>Budżety wewnętrzne</h1>
       <PromisedComponent :state="promiseState">
-        <BudgetTable
+        <InnerBudgetTable
           :budgets="budgets"
           @row-update="update"
           @row-remove="remove"
@@ -14,14 +14,14 @@
 </template>
 
 <script>
-import BudgetTable from './BudgetTable'
+import InnerBudgetTable from './InnerBudgetTable'
 import linkVm from '@/helpers/linkVm'
 
-import BudgetService from '@/services/budget'
+import InnerBudgetService from '@/services/innerBudget'
 
 export default {
   components: {
-    BudgetTable
+    InnerBudgetTable
   },
   data () {
     return {
@@ -30,26 +30,26 @@ export default {
     }
   },
   created () {
-    this.fetchBudgets();
+    this.fetchInnerBudgets();
   },
   methods: {
-    fetchBudgets () {
-      linkVm(this, BudgetService.getAll())
+    fetchInnerBudgets () {
+      linkVm(this, InnerBudgetService.getAll())
         .then((response) => {
           this.budgets = response.data;
         })
     },
     update (data) {
       if (!data.id) {
-        BudgetService.post(data).then(obj => {
+        InnerBudgetService.post(data).then(obj => {
           this.budgets.push(obj.data);
         });
       } else {
-        BudgetService.update(data.id, data);
+        InnerBudgetService.update(data.id, data);
       }
     },
     remove (data) {
-      BudgetService.delete(data.id).then(() => {
+      InnerBudgetService.delete(data.id).then(() => {
         this.budgets = this.budgets.filter(obj => obj.id !== data.id);
       });
     }

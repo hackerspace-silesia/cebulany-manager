@@ -7,6 +7,7 @@
         <tr>
           <th>Typ</th>
           <th>Budżet</th>
+          <th>Budżet wew.</th>
           <th>Nazwa</th>
           <th>Data</th>
           <th>Kwota</th>
@@ -17,6 +18,7 @@
         <TransactionModalForm
           :item="item"
           :budgets="budgets"
+          :inner-budgets="innerBudgets"
           :payment-types="paymentTypes"
         />
         <TransactionModalRow
@@ -36,7 +38,7 @@
 
   export default {
     components: {TransactionModalTable, TransactionModalForm, TransactionModalRow},
-    props: ['item', 'budgets', 'paymentTypes'],
+    props: ['item', 'budgets', 'innerBudgets', 'paymentTypes'],
     data () {
       return {
         promiseState: null

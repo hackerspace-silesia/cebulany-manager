@@ -12,6 +12,7 @@ resource_fields = {
     'has_members': fields.Boolean(),
     'show_details_in_report': fields.Boolean(),
     'show_count_in_report': fields.Boolean(),
+    'accountancy_type_id': fields.Integer(),
 }
 
 parser = RequestParser()
@@ -20,6 +21,7 @@ parser.add_argument('color', required=True, type=str)
 parser.add_argument('has_members', required=False, type=bool)
 parser.add_argument('show_details_in_report', required=False, type=bool)
 parser.add_argument('show_count_in_report', required=False, type=bool)
+parser.add_argument('accountancy_type_id', required=False, type=int)
 
 
 query_parser = RequestParser()
@@ -33,7 +35,7 @@ class PaymentTypeListResource(ModelListResource):
 
     def get_list_query(self):
         cls = self.cls
-        query = super(PaymentTypeListResource, self).get_list_query()
+        query = super().get_list_query()
 
         args = query_parser.parse_args()
         has_members = args['has_members']

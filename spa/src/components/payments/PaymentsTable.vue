@@ -14,6 +14,9 @@
       <template v-slot:cell(budget)="row">
         <strong :style="getBgColorStyle(row.value.color)">{{ row.value.name }}</strong>
       </template>
+      <template v-slot:cell(inner_budget)="row">
+        <strong :style="getBgColorStyle(row.value.color)">{{ row.value.name }}</strong>
+      </template>
       <template v-slot:cell(payment_type)="row">
         <strong :style="getBgColorStyle(row.value.color)">{{ row.value.name }}</strong>
       </template>
@@ -37,6 +40,7 @@
         fields: [
           {key: 'name', label: 'Nazwa / członek'},
           {key: 'budget', label: 'Budżet'},
+          {key: 'inner_budget', label: 'Budżet wew.'},
           {key: 'payment_type', label: 'Typ'},
           {key: 'date', label: 'Data płatności'},
           {key: 'transaction_date', label: 'Data transakcji'},

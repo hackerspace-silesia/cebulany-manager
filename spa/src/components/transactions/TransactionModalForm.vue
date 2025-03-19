@@ -13,6 +13,13 @@
       />
     </td>
     <td>
+      <TypeSelect
+        v-model="innerBudgetId"
+        :types="innerBudgets"
+        has-null-option="hasNullOption"
+      />
+    </td>
+    <td>
       <template v-if="paymentType && paymentType.has_members">
         <v-select
           size="sm"
@@ -72,10 +79,11 @@
 
   export default {
     components: {TypeSelect},
-    props: ['item', 'budgets', 'paymentTypes'],
+    props: ['item', 'budgets', 'innerBudgets', 'paymentTypes'],
     data () {
       let suggestion = this.item.suggestion !== null ? this.item.suggestion : {
         budget_id: 0,
+        inner_budget_id: 0,
         type_id: 0,
         type_name: '',
         member: null,
@@ -84,9 +92,11 @@
       return {
         promiseState: null,
         budgetId: suggestion.budget_id,
-        budget: this.budgets[suggestion.budget_id],
+        budget: this.budgets[suggestion.budget_id] || null,
+        innerBudgetId: suggestion.inner_budget_id,
+        innerBudget: this.innerBudgets[suggestion.inner_budget_id] || null,
         paymentTypeId: suggestion.type_id,
-        paymentType: this.paymentTypes[suggestion.type_id],
+        paymentType: this.paymentTypes[suggestion.type_id] || null,
         cost: this.item.left || 0,
         name: suggestion.type_name,
         member: suggestion.member,
@@ -136,6 +146,7 @@
           transaction_id: this.item.id,
           member_id: memberId,
           budget_id: this.budgetId,
+          inner_budget_id: this.innerBudgetId,
           payment_type_id: this.paymentTypeId,
           name: name,
           date: this.date,

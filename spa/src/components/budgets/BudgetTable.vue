@@ -1,6 +1,6 @@
 <template>
   <div class="budgets">
-    <b-button @click="addBudget">
+    <b-button @click="add">
       Dodaj nowy rekord
     </b-button>
     <b-table
@@ -14,6 +14,18 @@
       <template v-slot:cell(name)="row">
         <b-form-input
           v-model.lazy.trim="row.item.name"
+          @change="update(row.item)"
+        />
+      </template>
+      <template v-slot:cell(description_on_positive)="row">
+        <b-form-input
+          v-model.lazy.trim="row.item.description_on_positive"
+          @change="update(row.item)"
+        />
+      </template>
+      <template v-slot:cell(description_on_negative)="row">
+        <b-form-input
+          v-model.lazy.trim="row.item.description_on_negative"
           @change="update(row.item)"
         />
       </template>
@@ -44,7 +56,7 @@
         >
       </template>
       <template v-slot:cell(action)="row" >
-        <b-button @click="removeBudget(row.item)">
+        <b-button @click="remove(row.item)">
           Skasuj
         </b-button>
       </template>
@@ -58,6 +70,8 @@
       return {
         fields: [
           {key: 'name', label: 'Nazwa'},
+          {key: 'description_on_positive', label: 'Opis (Zysk)'},
+          {key: 'description_on_negative', label: 'Opis (Koszt)'},
           {key: 'color', label: 'Kolor'},
           {key: 'show_details_in_report', label: 'Pokaż szczegóły w raporcie'},
           {key: 'show_count_in_report', label: 'Zliczaj w raporcie'},
@@ -72,17 +86,19 @@
       update (row) {
         this.$emit('row-update', row);
       },
-      addBudget () {
+      add () {
         const len = this.budgets.length;
         const obj = {
           name: `BUDGET-${len}`,
           color: '000000',
+          description_on_negative: '',
+          description_on_positive: '',
           show_details_in_report: false,
           show_count_in_report: false
         };
         this.$emit('row-update', obj);
       },
-      removeBudget (row) {
+      remove (row) {
         this.$emit('row-remove', row);
       }
     }

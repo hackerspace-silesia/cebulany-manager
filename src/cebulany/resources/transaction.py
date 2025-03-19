@@ -32,16 +32,24 @@ member_fields_optional = fields.Nested(
 payment_type_fields = fields.Nested(
     {
         "id": fields.Integer,
-        "color": fields.String,
-        "name": fields.String,
+        "color": fields.String(default="999999"),
+        "name": fields.String(default="-"),
     }
 )
 
 budget_fields = fields.Nested(
     {
         "id": fields.Integer,
-        "color": fields.String,
-        "name": fields.String,
+        "color": fields.String(default="999999"),
+        "name": fields.String(default="-"),
+    }
+)
+
+inner_budget_fields = fields.Nested(
+    {
+        "id": fields.Integer,
+        "color": fields.String(default="999999"),
+        "name": fields.String(default="-"),
     }
 )
 
@@ -52,6 +60,7 @@ payment_fields = fields.Nested(
         "member": member_fields,
         "payment_type": payment_type_fields,
         "budget": budget_fields,
+        "inner_budget": inner_budget_fields,
         "date": fields.DateTime(dt_format="iso8601"),
         "cost": fields.Price(decimals=2),
     }
@@ -63,6 +72,7 @@ suggestion_fields = fields.Nested(
         "type_name": fields.String,
         "type_id": fields.Integer,
         "budget_id": fields.Integer,
+        "inner_budget_id": fields.Integer(default=None),
         "member": member_fields_optional,
     },
     allow_null=True,
@@ -80,6 +90,7 @@ resource_fields = {
                 "cost": fields.Price(decimals=2),
                 "iban": fields.String(),
                 "payments": fields.List(payment_fields),
+                "additional_info": fields.String(),
                 "suggestion": suggestion_fields,
             }
         )

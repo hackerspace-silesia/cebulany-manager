@@ -56,10 +56,12 @@ class Suggestion(db.Model):
     type_name = db.Column(db.String(300))
     type_id = db.Column(db.Integer, db.ForeignKey('paymenttype.id'))
     budget_id = db.Column(db.Integer, db.ForeignKey('budget.id'))
+    inner_budget_id = db.Column(db.Integer, db.ForeignKey('innerbudget.id'), nullable=True)
 
     member = relationship('Member')
     payment_type = relationship('PaymentType')
     budget = relationship('Budget')
+    inner_budget = relationship('InnerBudget')
 
 
 class Member(Base):
@@ -84,7 +86,7 @@ class PaymentType(Base):
     show_count_in_report = db.Column(db.Boolean, default=False, nullable=False)
 
     accountancy_type_id = db.Column(db.Integer, db.ForeignKey('accountancytype.id'), nullable=True)
-    payment_type = relationship(AccountancyType, backref='payment_types')
+    accountancy_type = relationship(AccountancyType, backref='payment_types')
 
 
 class Budget(Base):
@@ -93,7 +95,8 @@ class Budget(Base):
     color = db.Column(db.String(6), nullable=False)
     show_details_in_report = db.Column(db.Boolean, default=False, nullable=False)
     show_count_in_report = db.Column(db.Boolean, default=False, nullable=False)
-    description = db.Column(db.String(300), server_default="", nullable=False)
+    description_on_negative = db.Column(db.String(300), server_default="", nullable=False)
+    description_on_positive = db.Column(db.String(300), server_default="", nullable=False)
 
 
 class InnerBudget(Base):

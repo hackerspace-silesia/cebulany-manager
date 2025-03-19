@@ -3,6 +3,7 @@
     size="sm"
     :value="value"
     @input="$emit('input', $event)"
+    @change="$emit('change', $event)"
   >
     <option
       v-if="hasNullOption"

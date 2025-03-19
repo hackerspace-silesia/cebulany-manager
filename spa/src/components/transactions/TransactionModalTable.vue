@@ -28,6 +28,12 @@
         <money-value :value="item.left" />
       </td>
     </tr>
+    <tr>
+      <th>Dodatkowa informacja</th>
+      <td colspan="3">
+        <b-form-input size="sm" v-model.lazy.trim="item.additional_info" />
+      </td>
+    </tr>
   </table>
 </template>
 <script>

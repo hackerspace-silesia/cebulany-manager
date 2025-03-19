@@ -23,16 +23,23 @@ resource_fields = {
     "payment_type_id": fields.Integer(),
     "payment_type": fields.Nested(
         {
-            "name": fields.String,
-            "color": fields.String,
+            "color": fields.String(default="999999"),
+            "name": fields.String(default="-"),
         }
     ),
     "budget_id": fields.Integer(),
     "budget": fields.Nested(
         {
-            "name": fields.String,
-            "color": fields.String,
+            "color": fields.String(default="999999"),
+            "name": fields.String(default="-"),
         }
+    ),
+    "inner_budget_id": fields.Integer(),
+    "inner_budget": fields.Nested(
+        {
+            "color": fields.String(default="999999"),
+            "name": fields.String(default="-"),
+        },
     ),
     "transaction": fields.Nested(
         {
@@ -49,6 +56,7 @@ parser.add_argument("cost", required=True, type=str)
 parser.add_argument("transaction_id", required=True, type=int)
 parser.add_argument("payment_type_id", required=True, type=int)
 parser.add_argument("budget_id", required=True, type=int)
+parser.add_argument("inner_budget_id", required=False, type=int)
 parser.add_argument("member_id", required=False, type=int)
 parser.add_argument("date", required=False, type=dt_type)
 
@@ -57,6 +65,7 @@ query_parser = RequestParser()
 query_parser.add_argument("name", location="args")
 query_parser.add_argument("payment_type_id", type=int, location="args")
 query_parser.add_argument("budget_id", type=int, location="args")
+query_parser.add_argument("inner_budget_id", type=int, location="args")
 query_parser.add_argument("member_id", type=int, location="args")
 query_parser.add_argument("month", location="args")
 query_parser.add_argument("page", type=int, default=1, location="args")
@@ -105,6 +114,7 @@ class PaymentListResource(ModelListResource):
         suggestion.type_name = data["name"] or ""
         suggestion.type_id = data["payment_type_id"] or None
         suggestion.budget_id = data["budget_id"] or None
+        suggestion.inner_budget_id = data["inner_budget_id"] or None
         suggestion.member_id = data["member_id"] or None
 
         db.session.add(suggestion)

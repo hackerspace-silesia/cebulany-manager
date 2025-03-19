@@ -15,6 +15,7 @@
           :transactions="transactions"
           :budgets="budgets"
           :payment-types="paymentTypes"
+          :inner-budgets="innerBudgets"
           :sum="sum"
         />
       </PromisedComponent>
@@ -36,6 +37,7 @@ import linkVm from '@/helpers/linkVm'
 
 import TransactionService from '@/services/transactions'
 import BudgetService from '@/services/budget'
+import InnerBudgetService from '@/services/innerBudget'
 import PaymentTypeService from '@/services/paymentType'
 
 export default {
@@ -51,6 +53,7 @@ export default {
       transactions: [],
       paymentTypes: {},
       budgets: {},
+      innerBudgets: {},
       sum: 0,
       sumLeft: 0,
       promiseState: null
@@ -61,10 +64,11 @@ export default {
   },
   methods: {
     fetchInit () {
-      let promises = [BudgetService.getAll(), PaymentTypeService.getAll()];
+      let promises = [BudgetService.getAll(), InnerBudgetService.getAll(), PaymentTypeService.getAll()];
       linkVm(this, Promise.all(promises))
-        .then(([budgetResponse, paymentTypeResponse]) => {
+        .then(([budgetResponse, innerBudgetResponse, paymentTypeResponse]) => {
           this.budgets = this.transformArrayToMap(budgetResponse.data);
+          this.innerBudgets = this.transformArrayToMap(innerBudgetResponse.data);
           this.paymentTypes = this.transformArrayToMap(paymentTypeResponse.data);
         })
     },

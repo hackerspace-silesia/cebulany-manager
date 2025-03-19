@@ -5,6 +5,7 @@
       <PromisedComponent :state="promiseState">
         <PaymentTypesTable
           :payment-types="paymentTypes"
+          :accountancy-types="accountancyTypes"
           @row-update="update"
           @row-remove="remove"
         />
@@ -18,6 +19,7 @@ import PaymentTypesTable from './PaymentTypesTable'
 import linkVm from '@/helpers/linkVm'
 
 import PaymentTypeService from '@/services/paymentType'
+import AccoutancyTypeService from '@/services/accountancyType'
 
 export default {
   components: {
@@ -26,6 +28,7 @@ export default {
   data () {
     return {
       paymentTypes: [],
+      accountancyTypes: [],
       promiseState: null
     }
   },
@@ -34,10 +37,14 @@ export default {
   },
   methods: {
     fetchPaymentTypes () {
-      linkVm(this, PaymentTypeService.getAll())
-        .then((response) => {
-          this.paymentTypes = response.data;
-        })
+      let promise = AccoutancyTypeService.getAll().then((response) => {
+        this.accountancyTypes = response.data;
+        return PaymentTypeService.getAll();
+      }).then((response) => {
+        this.paymentTypes = response.data;
+      });
+
+      linkVm(this, promise);
     },
     update (data) {
       if (!data.id) {
@@ -56,23 +63,3 @@ export default {
   }
 }
 </script>
-
-<style>
-  .payment-type-badge {
-    display: inline-block;
-    text-align: center;
-    width: 16px;
-    margin: 0 1px;
-    border-radius: 4px;
-    color: white;
-    font-size: 7pt;
-    font-weight: bold;
-    border: solid black;
-    border-width: 3px;
-  }
-  .payment-type-badge-big {
-    width: 18px;
-    font-size: 9pt;
-    border-radius: 8px;
-  }
-</style>

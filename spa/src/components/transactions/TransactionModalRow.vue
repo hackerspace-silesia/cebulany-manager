@@ -12,6 +12,12 @@
     >
       {{ payment.budget.name }}
     </td>
+    <td
+      class="white"
+      :style="payment.inner_budget | colorCell"
+    >
+      {{ payment.inner_budget.name }}
+    </td>
     <td>
       <span v-if="payment.member && payment.member.name">
         {{ payment.member.name }}&nbsp;

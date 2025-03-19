@@ -12,8 +12,12 @@ from cebulany.resources.upload import upload_page
 from cebulany.resources.excels import excel_page
 from cebulany.resources.login import LoginResource
 from cebulany.resources.budget import BudgetListResource, BudgetResource
+from cebulany.resources.inner_budget import InnerBudgetListResource
+from cebulany.resources.inner_budget import InnerBudgetResource
 from cebulany.resources.payment_type import PaymentTypeListResource
 from cebulany.resources.payment_type import PaymentTypeResource
+from cebulany.resources.accountancy_type import AccountancyTypeListResource
+from cebulany.resources.accountancy_type import AccountancyTypeResource
 from cebulany.resources.payment import PaymentListResource, PaymentResource
 from cebulany.resources.payment_summary import PaymentSummaryResource
 
@@ -42,8 +46,12 @@ api.add_resource(PaymentListResource, API_PREFIX + '/payment/')
 api.add_resource(PaymentResource, API_PREFIX + '/payment/<int:id>')
 api.add_resource(BudgetListResource, API_PREFIX + '/budget/')
 api.add_resource(BudgetResource, API_PREFIX + '/budget/<int:id>')
+api.add_resource(InnerBudgetListResource, API_PREFIX + '/inner_budget/')
+api.add_resource(InnerBudgetResource, API_PREFIX + '/inner_budget/<int:id>')
 api.add_resource(PaymentTypeListResource, API_PREFIX + '/payment_type/')
 api.add_resource(PaymentTypeResource, API_PREFIX + '/payment_type/<int:id>')
+api.add_resource(AccountancyTypeListResource, API_PREFIX + '/accountancy_type/')
+api.add_resource(AccountancyTypeResource, API_PREFIX + '/accountancy_type/<int:id>')
 
 api.add_resource(LoginResource, API_PREFIX + '/login')
 api.add_resource(UserListResource, API_PREFIX + '/user/')

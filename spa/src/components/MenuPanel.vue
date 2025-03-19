@@ -25,8 +25,14 @@
         <b-nav-item href="#/budgets">
           Budżety
         </b-nav-item>
+        <b-nav-item href="#/inner-budgets">
+          Budżety wewnętrzne
+        </b-nav-item>
         <b-nav-item href="#/payment-types">
           Typy płatności
+        </b-nav-item>
+        <b-nav-item href="#/accountancy-types">
+          Księgowe typy
         </b-nav-item>
         <b-nav-item href="#/summary">
           Podsumowanie

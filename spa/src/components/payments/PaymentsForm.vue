@@ -16,6 +16,18 @@
         </b-col>
         <b-col>
           <b-form-group
+            label="Budżet wewnętrzny"
+            label-size="sm"
+          >
+            <type-select
+              v-model="query.inner_budget_id"
+              :types="innerBudgets"
+              has-null-option="hasNullOption"
+            />
+          </b-form-group>
+        </b-col>
+        <b-col>
+          <b-form-group
             label="Typ"
             label-size="sm"
           >
@@ -45,7 +57,6 @@
               value-type="format"
               token="YYYY-MM"
               :clearable="false"
-              @change="updateForm"
             />
             <date-picker
               v-if="!withMonth"
@@ -67,6 +78,7 @@
 
   import PaymentTypeService from '@/services/paymentType'
   import BudgetService from '@/services/budget'
+  import InnerBudgetService from '@/services/innerBudget'
 
   export default {
     components: {
@@ -81,6 +93,7 @@
         query: {
           payment_type_id: null,
           budget_id: null,
+          inner_budget_id: null,
           month: `${year}-${month}`
         },
         month: `${year}-${month}`,
@@ -88,7 +101,8 @@
         withMonth: true,
         promiseState: null,
         paymentTypes: [],
-        budgets: []
+        budgets: [],
+        innerBudgets: [],
       };
     },
     watch: {
@@ -114,10 +128,11 @@
     },
     methods: {
       fetchInit () {
-        let promises = [BudgetService.getAll(), PaymentTypeService.getAll()];
+        let promises = [BudgetService.getAll(), PaymentTypeService.getAll(), InnerBudgetService.getAll()];
         linkVm(this, Promise.all(promises))
-          .then(([budgetResponse, paymentTypeResponse]) => {
+          .then(([budgetResponse, paymentTypeResponse, innerBudgetResponse]) => {
             this.budgets = this.transformArrayToMap(budgetResponse.data);
+            this.innerBudgets = this.transformArrayToMap(innerBudgetResponse.data);
             this.paymentTypes = this.transformArrayToMap(paymentTypeResponse.data);
           })
       },

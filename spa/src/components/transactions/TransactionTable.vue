@@ -10,6 +10,7 @@
         v-if="showModal"
         :item="modalItem"
         :budgets="budgets"
+        :inner-budgets="innerBudgets"
         :payment-types="paymentTypes"
         :sum-left="sumLeft"
       />
@@ -71,7 +72,7 @@
         return name ? name.charAt(0).toUpperCase() : '?';
       }
     },
-    props: ['transactions', 'sum', 'sumLeft', 'budgets', 'paymentTypes'],
+    props: ['transactions', 'sum', 'sumLeft', 'budgets', 'innerBudgets', 'paymentTypes'],
     data () {
       return {
         fields: [
