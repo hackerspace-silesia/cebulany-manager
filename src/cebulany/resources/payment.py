@@ -50,6 +50,11 @@ resource_fields = {
     ),
 }
 
+group_resource_fields = {
+    "id": fields.Integer(),
+    "cost": fields.Price(decimals=2),
+}
+
 parser = RequestParser()
 parser.add_argument("name", required=True)
 parser.add_argument("cost", required=True, type=str)
@@ -80,22 +85,36 @@ class PaymentListResource(ModelListResource):
     def get_list_query(self):
         args = query_parser.parse_args()
         page = args.pop("page")
-        query = PaymentQuery.get_query_list(**args)
+        query = (
+            PaymentQuery.get_query_list(**args)
+            .limit(self.ITEMS_PER_PAGE)
+            .offset(self.ITEMS_PER_PAGE * (page - 1))
+        )
+        sum_query = PaymentQuery.get_query_agg(**args)
+        groups = {
+            "payment_type": PaymentQuery.get_query_group_by_type(**args),
+            "budget": PaymentQuery.get_query_group_by_budget(**args),
+            "inner_budget": PaymentQuery.get_query_group_by_inner_budget(**args),
+        }
 
-        return query, page
+        return query, sum_query, groups
 
     @token_required
     def get(self):
-        query, page = self.get_list_query()
+        query, sum_query, groups = self.get_list_query()
+        count, total = db.session.execute(sum_query).one()
         return {
-            "data": marshal(
-                query.limit(self.ITEMS_PER_PAGE)
-                .offset(self.ITEMS_PER_PAGE * (page - 1))
-                .all(),
-                self.resource_fields,
-            ),
+            "data": [
+                marshal(obj, self.resource_fields)
+                for obj in db.session.execute(query).scalars()
+            ],
+            "groups": {
+                name: [marshal(obj, group_resource_fields) for obj in db.session.execute(query)]
+                for name, query in groups.items()
+            },
             "items_per_page": self.ITEMS_PER_PAGE,
-            "count": query.count(),
+            "count": count or 0,
+            "total": str(total or "-"),
         }
 
     @token_required

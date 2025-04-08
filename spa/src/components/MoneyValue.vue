@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="value &lt; 0"
-    class="text-danger"
-  >
+  <div v-if="value < 0" class="text-danger">
     {{ value }} zł
   </div>
   <div v-else>

@@ -28,16 +28,37 @@
         <money-value :value="item.left" />
       </td>
     </tr>
-    <tr>
+    <PromisedRowComponent :state="promiseState">
       <th>Dodatkowa informacja</th>
       <td colspan="3">
-        <b-form-input size="sm" v-model.lazy.trim="item.additional_info" />
+        <b-form-input 
+          size="sm"
+          v-model.lazy.trim="item.additional_info"
+          @change="update"
+        />
       </td>
-    </tr>
+    </PromisedRowComponent>
   </table>
 </template>
 <script>
+  import TransactionService from '@/services/transactions'
+  import linkVm from '@/helpers/linkVm'
+
   export default {
-    props: ['item']
+    props: ['item'],
+    data() {
+      return {
+        promiseState: null,
+      };
+    },
+    methods: {
+      update() {
+        const {id, additional_info: AddtionalInfo} = this.item;
+        const promise = TransactionService.updateAdditionalInfo(id, {
+          additional_info: AddtionalInfo,
+        });
+        linkVm(this.promiseState, promise);
+      }
+    }
   }
 </script>

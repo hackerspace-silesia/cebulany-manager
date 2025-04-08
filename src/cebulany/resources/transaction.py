@@ -3,6 +3,8 @@ from flask_restful.reqparse import RequestParser
 
 from cebulany.queries.transaction import TransactionQuery
 from cebulany.auth import token_required
+from cebulany.models import Transaction
+from cebulany.resources.model import ModelResource, ModelResourceWithoutDelete
 from cebulany.resources.types import dt_type
 
 transaction_parser = RequestParser()
@@ -12,6 +14,9 @@ transaction_parser.add_argument("month", location="args")
 transaction_parser.add_argument("text", location="args")
 transaction_parser.add_argument("ordering", location="args")
 transaction_parser.add_argument("member_id", type=int, location="args")
+
+additional_parser = RequestParser()
+additional_parser.add_argument("additional_info", required=False, type=str)
 
 
 member_fields = fields.Nested(
@@ -99,6 +104,12 @@ resource_fields = {
 }
 
 
+additional_info_fields = {
+    "id": fields.Integer,
+    "additional_info": fields.String,
+}
+
+
 class TransactionResource(Resource):
 
     @marshal_with(resource_fields)
@@ -120,3 +131,9 @@ class TransactionResource(Resource):
             "transactions": transactions,
             "sum": sum(transaction.cost for transaction in transactions),
         }
+
+
+class AdditionalInfoTransactionResource(ModelResourceWithoutDelete):
+    cls = Transaction
+    parser = additional_parser
+    resource_fields = additional_info_fields

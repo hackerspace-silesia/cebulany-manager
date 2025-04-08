@@ -15,6 +15,9 @@ export default {
         return response;
       });
   },
+  updateAdditionalInfo(id, data) {
+    return axios.put(`/transactions/${id}/info`, data);
+  },
   getExcelTable (month) {
     return axios.get(
       `/excel/transactions/${month}`,

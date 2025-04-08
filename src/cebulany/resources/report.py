@@ -2,7 +2,7 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
-from itertools import accumulate, cycle
+from itertools import accumulate
 from decimal import Decimal
 from os import environ
 from typing import TypedDict
@@ -288,7 +288,7 @@ def get_costs_plot_data(day):
 
 
 def get_data():
-    day = date.today() - timedelta(days=365 * 2)
+    day = date.today() - timedelta(days=365 * 1)
     day = day.replace(day=1)
     query_dates = db.session.query(
         year_field,
@@ -376,17 +376,15 @@ def cycle_color(colors: list):
             
             yield pt
 
+positive_colors = ['63B76C', '7ED4E6', '7070CC', '4D8C57', 'F7A38E', 'E6BC5C', 'AF1F65']
+negative_colors = ['F653A6', 'F2BA49', 'FD0E35', 'A9B2C3', '87421F', '8B8680', 'E6BE8A', 'D982B5']
+
 
 def worksheet_months(ws, months: list[ReportMonth]):
     named_colors = {}
-    c = cycle([
-        'red', 'blue', 'green',
-        'orange', 'magenta', 'cyan',
-        'yellow', 'gray', 'violet',
-    ])
     cycle_colors = {
-        'positive': cycle_color(['63B76C', '7ED4E6', '7070CC', '4D8C57', 'F7A38E', 'E6BC5C', 'AF1F65']),
-        'negative': cycle_color(['F653A6', 'F2BA49', 'FD0E35', 'A9B2C3', '87421F', '8B8680', 'E6BE8A', 'D982B5']),
+        'positive': cycle_color(positive_colors + negative_colors),
+        'negative': cycle_color(negative_colors + positive_colors),
         'others': cycle_color(['FF0000']),
     }
 
@@ -402,6 +400,8 @@ def worksheet_months(ws, months: list[ReportMonth]):
         header_cell.style = "f:header"
         header_cell = ws.cell(row=it_row, column=2, value="Wartosć")
         header_cell.style = "f:header"
+        header_cell = ws.cell(row=it_row, column=3, value="ABS")
+        header_cell.style = "f:header"
         it_row += 1
 
         color_rows = defaultdict(list)
@@ -413,6 +413,8 @@ def worksheet_months(ws, months: list[ReportMonth]):
             cell.style = "f:header"
             cell = ws.cell(row=it_row, column=2, value=row.value)
             cell.style = "f:value"
+            cell = ws.cell(row=it_row, column=3, value=abs(row.value))
+            cell.style = "f:value"
             it_row += 1
 
             if key not in named_colors:
@@ -422,7 +424,7 @@ def worksheet_months(ws, months: list[ReportMonth]):
         def add_graph(title, it, group_name, letter):
             end = it + len(report.row_groups[group_name]) - 1
             categories = Reference(ws, min_col=1, min_row=it, max_row=end)
-            data = Reference(ws, min_col=2, min_row=it, max_row=end)
+            data = Reference(ws, min_col=3, min_row=it, max_row=end)
             chart = PieChart()
             chart.title = title
             chart.add_data(data)
@@ -451,8 +453,8 @@ def worksheet_months(ws, months: list[ReportMonth]):
 
         it_row += 1  # Span.
 
-        add_graph(f"{title} - Przychód", it_positive, "positive", "D")
-        add_graph(f"{title} - Koszt", it_negative, "negative", "M")
+        add_graph(f"{title} - Przychód", it_positive, "positive", "E")
+        add_graph(f"{title} - Koszt", it_negative, "negative", "N")
 
     ws.column_dimensions["A"].width = 50
     ws.column_dimensions["B"].width = 20

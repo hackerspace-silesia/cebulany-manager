@@ -27,7 +27,7 @@
         <span>{{ row.item.transaction.title }}</span>
       </template>
       <template v-slot:cell(cost)="row">
-        <span class="float-right">{{ row.value }} PLN</span>
+        <money-value class="float-right" :value="row.value" />
       </template>
     </b-table>
   </div>

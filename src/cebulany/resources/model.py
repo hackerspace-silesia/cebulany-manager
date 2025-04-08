@@ -30,7 +30,7 @@ class ModelListResource(Resource):
         return marshal(obj, self.resource_fields), 201
 
 
-class ModelResource(Resource):
+class ModelResourceWithoutDelete(Resource):
     cls = None
     parser = parser
     resource_fields = resource_fields
@@ -54,6 +54,9 @@ class ModelResource(Resource):
         db.session.commit()
 
         return marshal(obj, self.resource_fields)
+
+
+class ModelResource(ModelResourceWithoutDelete):
 
     @token_required
     def delete(self, id):
