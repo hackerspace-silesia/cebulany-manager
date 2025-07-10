@@ -4,10 +4,10 @@ function now() {
 
 export default {
   state: {
-    deadline: now() + parseInt(sessionStorage.tokenTime || 0),
+    deadline: now() + parseInt(localStorage.tokenTime || 0),
   },
   now: now,
   updateDeadline() {
-    this.state.deadline = now() + parseInt(sessionStorage.tokenTime || 0);
+    this.state.deadline = now() + parseInt(localStorage.tokenTime || 0);
   },
 }

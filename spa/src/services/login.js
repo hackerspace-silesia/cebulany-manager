@@ -8,7 +8,7 @@ export default {
       .then(response => response.data);
   },
   loginFromSession () {
-    const token = sessionStorage.token;
+    const token = localStorage.token;
     if (!token) {
       return false;
     }
@@ -16,13 +16,13 @@ export default {
     return true;
   },
   setTokenIntoSession (token, tokenTime) {
-    sessionStorage.token = token;
-    sessionStorage.tokenTime = tokenTime;
+    localStorage.token = token;
+    localStorage.tokenTime = tokenTime;
     this.setHeader(token);
   },
   logout () {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('tokenTime');
+    localStorage.removeItem('token');
+    localStorage.removeItem('tokenTime');
   },
   setHeader (token) {
     axios.defaults.headers['Authorization'] = `Socek ${token}`;
