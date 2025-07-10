@@ -97,7 +97,7 @@
         const obj = {
           name: `TYPE-${len}`,
           color: '000000',
-          accountancy_type_id: 0,
+          accountancy_type_id: 1,
           show_details_in_report: false,
           show_count_in_report: false,
           has_members: false

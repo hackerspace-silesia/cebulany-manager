@@ -17,6 +17,7 @@
           :payment-types="paymentTypes"
           :inner-budgets="innerBudgets"
           :sum="sum"
+          :sum-left="sumLeft"
         />
       </PromisedComponent>
       <TransactionLegend
@@ -88,7 +89,12 @@ export default {
         .then((response) => {
           this.transactions = response.data.transactions;
           this.sum = response.data.sum;
-          this.sumLeft = response.data.sumLeft;
+          const sumFromPayments = this.transactions.reduce(
+            (st, t) => {
+              if(!t.payments) return st;
+              return st + t.payments.reduce((sp, p) => sp + parseFloat(p.cost), 0.0);
+            }, 0.0);
+          this.sumLeft = (parseFloat(this.sum) - sumFromPayments).toFixed(2);
         })
     },
     uploadTransactions () {

@@ -14,17 +14,26 @@
         >
           {{ budget.name }}
         </th>
+        <th colspan="2" class="text-center">SUMA</th>
       </tr>
       <tr>
         <th class="text-center">
           Typ ↓
-        </th><template v-for="budget in budgets">
+        </th>
+        <template v-for="budget in budgets">
           <th class="text-center neg-cell">
             koszt
-          </th><th class="text-center pos-cell">
+          </th>
+          <th class="text-center pos-cell">
             przychód
           </th>
         </template>
+        <th class="text-center neg-cell">
+          koszt
+        </th>
+        <th class="text-center pos-cell">
+          przychód
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -37,15 +46,45 @@
           :style="getBgColorStyle(paymentType.color)"
         >
           {{ paymentType.name }}
-        </th><template v-for="budget in budgets">
+        </th>
+        <template v-for="budget in budgets">
           <td class="text-right neg-cell">
             {{ getPaymentCost(budget.id, paymentType.id, false) }}
-          </td><td class="text-right pos-cell">
+          </td>
+          <td class="text-right pos-cell">
             {{ getPaymentCost(budget.id, paymentType.id, true) }}
           </td>
         </template>
+        <td class="text-right neg-cell">
+          {{ getPaymentRowCost(paymentType.id, false).toFixed(2) }}
+        </td>
+        <td class="text-right pos-cell">
+          {{ getPaymentRowCost(paymentType.id, true).toFixed(2) }}
+        </td>
       </tr>
     </tbody>
+    <tfoot>
+      <tr>
+        <th class="text-center">SUMA</th>
+        <template v-for="budget in budgets">
+          <td class="text-right neg-cell">
+            {{ getPaymentColCost(budget.id, false).toFixed(2) }}
+          </td>
+          <td class="text-right pos-cell">
+            {{ getPaymentColCost(budget.id, true).toFixed(2) }}
+          </td>
+        </template>
+        <td class="text-right neg-cell">{{ totalNeg.toFixed(2) }}</td>
+        <td class="text-right pos-cell">{{ totalPos.toFixed(2) }}</td>
+      </tr>
+      <tr>
+        <th class="text-center">SUMA</th>
+        <td v-for="budget in budgets" colspan="2" class="text-right total-cell">
+          {{ (getPaymentColCost(budget.id, false) + getPaymentColCost(budget.id, true)).toFixed(2) }}
+        </td>
+        <td class="text-right total-cell" colspan="2">{{ (totalPos + totalNeg).toFixed(2) }}</td>
+      </tr>
+    </tfoot>
   </table>
 </template>
 <script>
@@ -59,7 +98,19 @@
           data[key] = payment.cost;
         });
         return data;
-      }
+      },
+      totalNeg () {
+        const total = this.payments
+          .filter(p => !p.is_positive)
+          .reduce((c, payment) => c + parseFloat(payment.cost || "0"), 0);
+        return total;
+      },
+      totalPos () {
+        const total = this.payments
+          .filter(p => p.is_positive)
+          .reduce((c, payment) => c + parseFloat(payment.cost || "0"), 0);
+        return total;
+      },
     },
     methods: {
       getColor (color) {
@@ -68,7 +119,7 @@
       getBgColorStyle (color) {
         return {
           backgroundColor: this.getColor(color),
-          color: 'white'
+          color: 'white',
         };
       },
       makeKey (budgetId, paymentTypeId, isPositive) {
@@ -77,7 +128,21 @@
       getPaymentCost (budgetId, paymentTypeId, isPositive) {
         const key = this.makeKey(budgetId, paymentTypeId, isPositive);
         return this.paymentsMap[key];
-      }
+      },
+      getPaymentColCost (budgetId, isPositive) {
+        return this.paymentTypes.reduce((c, payment) => {
+          const key = this.makeKey(budgetId, payment.id, isPositive);
+          const value = this.paymentsMap[key] || "0";
+          return c + parseFloat(value);
+        }, 0);
+      },
+      getPaymentRowCost (paymentTypeId, isPositive) {
+        return this.budgets.reduce((c, budget) => {
+          const key = this.makeKey(budget.id, paymentTypeId, isPositive);
+          const value = this.paymentsMap[key] || "0";
+          return c + parseFloat(value);
+        }, 0);
+      },
     }
   }
 </script>
@@ -87,7 +152,7 @@
     border: 1px solid black;
   }
 
-  .pos-cell, .neg-cell {
+  .pos-cell, .neg-cell, .total-cell {
     font-family: monospace;
     font-weight: bold;
     vertical-align: middle;
