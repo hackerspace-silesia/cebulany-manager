@@ -114,7 +114,7 @@ class PaymentListResource(ModelListResource):
             },
             "items_per_page": self.ITEMS_PER_PAGE,
             "count": count or 0,
-            "total": str(total or "-"),
+            "total": str(total if total is not None else "-"),
         }
 
     @token_required

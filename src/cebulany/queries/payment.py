@@ -89,6 +89,8 @@ class PaymentQuery:
     def _filter_by_inner_budget_id(query, budget_id):
         if budget_id is None:
             return query
+        if budget_id == -1:
+            return query.filter(Payment.inner_budget_id == None)
         return query.filter(Payment.inner_budget_id == budget_id)
 
     @staticmethod

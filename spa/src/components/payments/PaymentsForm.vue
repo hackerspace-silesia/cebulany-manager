@@ -134,6 +134,7 @@
             this.budgets = this.transformArrayToMap(budgetResponse.data);
             this.innerBudgets = this.transformArrayToMap(innerBudgetResponse.data);
             this.paymentTypes = this.transformArrayToMap(paymentTypeResponse.data);
+            this.innerBudgets["-1"] = {id: -1, name: "-- BRAK --", color: "888888"};
           })
       },
       transformArrayToMap (array) {
