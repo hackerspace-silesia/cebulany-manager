@@ -1,6 +1,7 @@
-from sqlalchemy import or_
+from sqlalchemy import or_, union_all
+from sqlalchemy.orm import aliased
 
-from cebulany.models import Transaction, Payment, db
+from cebulany.models import Transaction, Payment, InnerTransfer, InnerBudget, db
 from cebulany.sql_utils import get_year_month_col, get_year_col
 
 
@@ -8,10 +9,33 @@ class PaymentQuery:
 
     @classmethod
     def get_query_agg(cls, **kw):
-        return cls._get_query_list(
-            db.func.count(),
-            db.func.sum(Payment.cost),
+        payment_query = cls._get_query_list(
+            db.func.count().label('count'),
+            db.func.sum(Payment.cost).label('cost'),
             **kw,
+        )
+
+        borrowed_transfer_query = cls._subsub(InnerTransfer.from_id, db.select(
+            db.func.count().label('count'),
+            db.func.sum(-InnerTransfer.cost).label('cost'),
+        ), kw)
+
+        lent_transfer_query = cls._subsub(InnerTransfer.to_id, db.select(
+            db.func.count().label('count'),
+            db.func.sum(InnerTransfer.cost).label('cost'),
+        ), kw)
+
+        union_query = union_all(
+            payment_query, 
+            borrowed_transfer_query, 
+            lent_transfer_query
+        ).subquery("total")
+
+        return (
+            db.select(
+                db.func.sum(union_query.c.count).label('count'), 
+                db.func.sum(union_query.c.cost).label('cost'),
+            )
         )
 
     @classmethod
@@ -24,23 +48,140 @@ class PaymentQuery:
 
     @classmethod
     def get_query_group_by_budget(cls, **kw):
-        return cls._get_query_list(
+        payment_query = cls._get_query_list(
             Payment.budget_id.label('id'),
-            db.func.sum(Payment.cost).label('cost'),
+            (Payment.cost).label('cost'),
             **kw,
-        ).group_by(Payment.budget_id)
+        )
+
+        borrowed_transfer_query = cls._subsub(InnerTransfer.from_id, db.select(
+            InnerTransfer.budget_id.label('id'),
+            (-InnerTransfer.cost).label('cost'),
+        ), kw)
+
+        lent_transfer_query = cls._subsub(InnerTransfer.to_id, db.select(
+            InnerTransfer.budget_id.label('id'),
+            (InnerTransfer.cost).label('cost'),
+        ), kw)
+
+        union_query = union_all(
+            payment_query, 
+            borrowed_transfer_query, 
+            lent_transfer_query
+        ).subquery("total")
+
+        query = (
+            db.select(
+                union_query.c.id.label('id'), 
+                db.func.sum(union_query.c.cost).label('cost'),
+            )
+            .group_by(union_query.c.id)
+        )
+        
+        return query
 
     @classmethod
     def get_query_group_by_inner_budget(cls, **kw):
-        return cls._get_query_list(
+        payment_query = cls._get_query_list(
             Payment.inner_budget_id.label('id'),
-            db.func.sum(Payment.cost).label('cost'),
+            (Payment.cost).label('cost'),
             **kw,
-        ).group_by(Payment.inner_budget_id)
+        )
+
+        borrowed_transfer_query = cls._subsub(InnerTransfer.from_id, db.select(
+            InnerTransfer.from_id.label('id'),
+            (-InnerTransfer.cost).label('cost'),
+        ), kw)
+
+        lent_transfer_query = cls._subsub(InnerTransfer.to_id, db.select(
+            InnerTransfer.to_id.label('id'),
+            (InnerTransfer.cost).label('cost'),
+        ), kw)
+
+        union_query = union_all(
+            payment_query, 
+            borrowed_transfer_query, 
+            lent_transfer_query
+        ).subquery("total")
+
+        query = (
+            db.select(
+                union_query.c.id.label('id'), 
+                db.func.sum(union_query.c.cost).label('cost'),
+            )
+            .group_by(union_query.c.id)
+        )
+        
+        return query
+
+    @staticmethod
+    def _subsub(inner_budget_col, query, kw):
+        budget_id = kw.get("budget_id")
+        if budget_id == -1:
+            query = query.filter(InnerTransfer.budget_id == None)
+        elif budget_id is not None:
+            query = query.filter(InnerTransfer.budget_id == budget_id)
+
+        inner_budget_id = kw.get("inner_budget_id")
+        if inner_budget_id == -1:
+            query = query.filter(inner_budget_col == None)
+        elif inner_budget_id is not None:
+            query = query.filter(inner_budget_col == inner_budget_id)
+
+        month = kw.get("month")
+        if month is not None:
+            if '-' in month:
+                query = query.filter(
+                    get_year_month_col(InnerTransfer.date) == month
+                )
+            else:
+                query = query.filter(
+                    get_year_col(InnerTransfer.date) == month
+                )
+        return query
 
     @classmethod
     def get_query_list(cls, **kw):
         return cls._get_query_list(Payment, **kw).order_by(Transaction.date.desc())
+
+    @classmethod
+    def get_inner_transfers(cls, **kw):
+        query = (
+            db.select(InnerTransfer)
+            .join(InnerTransfer.budget)
+            .join(aliased(InnerBudget), InnerTransfer.to_inner_budget, isouter=True)
+            .join(aliased(InnerBudget), InnerTransfer.from_inner_budget, isouter=True)
+        )
+        budget_id = kw.get("budget_id")
+        if budget_id == -1:
+            query = query.filter(InnerTransfer.budget_id == None)
+        elif budget_id is not None:
+            query = query.filter(InnerTransfer.budget_id == budget_id)
+
+        inner_budget_id = kw.get("inner_budget_id")
+        if inner_budget_id == -1:
+            query = query.filter(or_(
+                InnerTransfer.from_id == None,
+                InnerTransfer.to_id == None,
+            ))
+        elif inner_budget_id is not None:
+            query = query.filter(or_(
+                InnerTransfer.from_id == inner_budget_id,
+                InnerTransfer.to_id == inner_budget_id,
+            ))
+
+        month = kw.get("month")
+        if month is not None:
+            if '-' in month:
+                query = query.filter(
+                    get_year_month_col(InnerTransfer.date) == month
+                )
+            else:
+                query = query.filter(
+                    get_year_col(InnerTransfer.date) == month
+                )
+        return query
+
 
     @classmethod
     def _get_query_list(cls, *fields, name=None, payment_type_id=None, budget_id=None, inner_budget_id=None, month=None, member_id=None):

@@ -105,6 +105,20 @@ class InnerBudget(Base):
     color = db.Column(db.String(6), nullable=False)
 
 
+class InnerTransfer(Base):
+    __abstract__ = False
+    date = db.Column(db.Date, nullable=False)
+    cost = db.Column(db.Numeric(10, 2), nullable=False)
+
+    budget_id = db.Column(db.Integer, db.ForeignKey('budget.id'), nullable=False)
+    from_id = db.Column(db.Integer, db.ForeignKey('innerbudget.id'), nullable=True)
+    to_id = db.Column(db.Integer, db.ForeignKey('innerbudget.id'), nullable=True)
+
+    budget = relationship(Budget, backref='inner_transforms')
+    from_inner_budget = relationship(InnerBudget, backref='borrowed_inner_transforms', foreign_keys=[from_id])
+    to_inner_budget = relationship(InnerBudget, backref='lent_inner_transforms', foreign_keys=[to_id])
+
+
 class Payment(Base):
     __abstract__ = False
     name = db.Column(db.String(300), index=True, nullable=False)

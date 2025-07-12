@@ -23,6 +23,10 @@
             <PaymentsGroupTable title="Budżet Wew." :group="groups.innerBudget" />
           </b-col>
         </b-row>
+        <InnerTransformsTable 
+          v-if="innerTransfers && innerTransfers.length > 0"
+          :inner-transfers="innerTransfers" 
+        />
         <PaymentsTable :payments="payments" />
       </PromisedComponent>
       <PaymentsNavigation
@@ -45,17 +49,20 @@ import PaymentService from '@/services/payment'
 import PaymentTypeService from '@/services/paymentType';
 import BudgetService from '@/services/budget';
 import InnerBudgetService from '@/services/innerBudget';
+import InnerTransformsTable from './InnerTransformsTable.vue'
 
 export default {
   components: {
     PaymentsTable,
     PaymentsGroupTable,
     PaymentsNavigation,
+    InnerTransformsTable,
     PaymentsForm
   },
   data () {
     return {
       payments: [],
+      innerTransfers: [],
       query: {},
       groups: {
         paymentType: {data: [], ids: {}},
@@ -105,13 +112,14 @@ export default {
 
       return PaymentService.getAll(query)
         .then((response) => {
-          const {data, count, total, groups, items_per_page: itemsPerPage} = response.data;
+          const {data, count, total, groups, inner_transfers: innerTransfers, items_per_page: itemsPerPage} = response.data;
           this.payments = data;
           this.count = count;
           this.total = total;
           this.groups.paymentType.data = groups.payment_type;
           this.groups.budget.data = groups.budget;
           this.groups.innerBudget.data = groups.inner_budget;
+          this.innerTransfers = innerTransfers;
           this.itemsPerPage = itemsPerPage;
         });
     }

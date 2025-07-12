@@ -7,6 +7,12 @@ from cebulany.queries.payment import PaymentQuery
 from cebulany.resources.model import ModelListResource, ModelResource
 from cebulany.resources.types import dt_type
 
+
+type_field = {
+    "color": fields.String(default="999999"),
+    "name": fields.String(default="-"),
+}
+
 resource_fields = {
     "id": fields.Integer(),
     "transaction_id": fields.Integer(),
@@ -21,26 +27,11 @@ resource_fields = {
         allow_null=True,
     ),
     "payment_type_id": fields.Integer(),
-    "payment_type": fields.Nested(
-        {
-            "color": fields.String(default="999999"),
-            "name": fields.String(default="-"),
-        }
-    ),
+    "payment_type": fields.Nested(type_field),
     "budget_id": fields.Integer(),
-    "budget": fields.Nested(
-        {
-            "color": fields.String(default="999999"),
-            "name": fields.String(default="-"),
-        }
-    ),
+    "budget": fields.Nested(type_field),
     "inner_budget_id": fields.Integer(),
-    "inner_budget": fields.Nested(
-        {
-            "color": fields.String(default="999999"),
-            "name": fields.String(default="-"),
-        },
-    ),
+    "inner_budget": fields.Nested(type_field),
     "transaction": fields.Nested(
         {
             "date": fields.DateTime(dt_format="iso8601"),
@@ -52,6 +43,14 @@ resource_fields = {
 
 group_resource_fields = {
     "id": fields.Integer(),
+    "cost": fields.Price(decimals=2),
+}
+
+inner_transfers_fields = {
+    "date": fields.DateTime(dt_format="iso8601"),
+    "budget": fields.Nested(type_field),
+    "from_inner_budget": fields.Nested(type_field),
+    "to_inner_budget": fields.Nested(type_field),
     "cost": fields.Price(decimals=2),
 }
 
@@ -96,12 +95,13 @@ class PaymentListResource(ModelListResource):
             "budget": PaymentQuery.get_query_group_by_budget(**args),
             "inner_budget": PaymentQuery.get_query_group_by_inner_budget(**args),
         }
+        inner_transfers = PaymentQuery.get_inner_transfers(**args)
 
-        return query, sum_query, groups
+        return query, sum_query, groups, inner_transfers
 
     @token_required
     def get(self):
-        query, sum_query, groups = self.get_list_query()
+        query, sum_query, groups, inner_transfers = self.get_list_query()
         count, total = db.session.execute(sum_query).one()
         return {
             "data": [
@@ -112,8 +112,9 @@ class PaymentListResource(ModelListResource):
                 name: [marshal(obj, group_resource_fields) for obj in db.session.execute(query)]
                 for name, query in groups.items()
             },
+            "inner_transfers": [marshal(obj, inner_transfers_fields) for obj in db.session.execute(inner_transfers).scalars()],
             "items_per_page": self.ITEMS_PER_PAGE,
-            "count": count or 0,
+            "count": int(count or 0),
             "total": str(total if total is not None else "-"),
         }
 
