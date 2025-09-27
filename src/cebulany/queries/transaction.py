@@ -40,6 +40,7 @@ class TransactionQuery:
             query = query.filter(
                 and_(
                     or_(
+                        model.additional_info.ilike("%%%s%%" % word.replace("%", r"\%")),
                         model.name.ilike("%%%s%%" % word.replace("%", r"\%")),
                         model.title.ilike("%%%s%%" % word.replace("%", r"\%")),
                     )

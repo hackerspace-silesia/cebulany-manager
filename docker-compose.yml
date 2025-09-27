@@ -31,7 +31,7 @@ services:
       - ./migrations:/app/migrations
 
   db:
-    image: postgres
+    image: postgres:15
     environment:
       POSTGRES_USER: cebula
       POSTGRES_DB: cebula
