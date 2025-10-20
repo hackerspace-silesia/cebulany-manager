@@ -50,6 +50,6 @@ class TransactionQuery:
         if ordering:
             query = query.order_by(ordering)
         else:
-            query = query.order_by(model.date)
+            query = query.order_by(model.date, -model.line_num)
 
         return query.all()
