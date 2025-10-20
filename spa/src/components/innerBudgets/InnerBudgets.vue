@@ -26,7 +26,7 @@ export default {
   data () {
     return {
       budgets: [],
-      promiseState: null
+      promiseState: null,
     }
   },
   created () {

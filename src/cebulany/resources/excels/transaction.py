@@ -2,7 +2,7 @@ from collections import defaultdict
 from decimal import Decimal
 from functools import partial
 from itertools import chain
-from typing import Iterable
+from typing import Iterable, NamedTuple
 
 from openpyxl import Workbook
 from openpyxl.cell.text import InlineFont
@@ -87,6 +87,12 @@ def fill_worksheet(sheet, dt: str, transactions: list[Transaction]):
         sheet.row_dimensions[index].height = 40.0
 
 
+class RichCostLabel(NamedTuple):
+    desc: str
+    color: str
+    cost: Decimal
+
+
 def _format_payment_type(payment: Payment):
     pt = payment.payment_type
     at = pt.accountancy_type
@@ -97,19 +103,27 @@ def _format_payment_type(payment: Payment):
         desc = pt.name
         color = pt.color
 
-    return (desc, color, abs(payment.cost))
+    return RichCostLabel(desc, color, abs(payment.cost))
 
 
 def _format_budget(payment: Payment):
     if payment.cost >= 0:
-        desc = payment.budget.description_on_positive
+        desc_attr = "description_on_positive"
     else:
-        desc = payment.budget.description_on_negative
+        desc_attr = "description_on_negative"
 
-    return (desc, payment.budget.color, abs(payment.cost))
+    desc = getattr(payment.budget, desc_attr)
+    color = payment.budget.color
+    
+    if payment.inner_budget:
+        if additional_desc := getattr(payment.inner_budget, desc_attr):
+            desc += f" {additional_desc}"
+            color = payment.inner_budget.color
+
+    return RichCostLabel(desc, color, abs(payment.cost))
 
 
-def _to_rich_text(labels: Iterable[tuple[str, str, Decimal]]) -> CellRichText:
+def _to_rich_text(labels: Iterable[RichCostLabel]) -> CellRichText:
     accumulator: defaultdict[str, Decimal] = defaultdict(Decimal)
     colors: dict[str, str] = {}
     for label, color, cost in labels:
@@ -127,7 +141,7 @@ def _to_rich_text(labels: Iterable[tuple[str, str, Decimal]]) -> CellRichText:
             elements = list(chain.from_iterable(
                 [
                     _color_text(label, colors[label]),
-                    _color_text(f" ({cost} zł)", colors[label], bold=True),
+                    _color_text(f" ({str(cost).replace('.', ',')} zł)", colors[label], bold=True),
                     "\n"
                 ]
                 for label, cost in accumulator.items()

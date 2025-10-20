@@ -17,6 +17,18 @@
           @change="update(row.item)"
         />
       </template>
+      <template v-slot:cell(description_on_positive)="row">
+        <b-form-input
+          v-model.lazy.trim="row.item.description_on_positive"
+          @change="update(row.item)"
+        />
+      </template>
+      <template v-slot:cell(description_on_negative)="row">
+        <b-form-input
+          v-model.lazy.trim="row.item.description_on_negative"
+          @change="update(row.item)"
+        />
+      </template>
       <template v-slot:cell(color)="row">
         <input
           type="color"
@@ -40,6 +52,8 @@
       return {
         fields: [
           {key: 'name', label: 'Nazwa'},
+          {key: 'description_on_positive', label: 'Opis (Zysk)'},
+          {key: 'description_on_negative', label: 'Opis (Koszt)'},
           {key: 'color', label: 'Kolor'},
           {key: 'action', label: 'Akcje'},
         ]

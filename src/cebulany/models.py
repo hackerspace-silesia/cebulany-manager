@@ -103,6 +103,8 @@ class InnerBudget(Base):
     __abstract__ = False
     name = db.Column(db.String(300), index=True, nullable=False)
     color = db.Column(db.String(6), nullable=False)
+    description_on_negative = db.Column(db.String(300), server_default="", nullable=False)
+    description_on_positive = db.Column(db.String(300), server_default="", nullable=False)
 
 
 class InnerTransfer(Base):

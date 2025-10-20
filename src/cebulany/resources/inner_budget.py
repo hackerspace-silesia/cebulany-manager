@@ -8,11 +8,15 @@ resource_fields = {
     'id': fields.Integer(),
     'name': fields.String(),
     'color': fields.String(),
+    'description_on_negative': fields.String(),
+    'description_on_positive': fields.String(),
 }
 
 parser = RequestParser()
 parser.add_argument('name', required=True)
 parser.add_argument('color', required=True, type=str)
+parser.add_argument('description_on_negative', required=False, type=str)
+parser.add_argument('description_on_positive', required=False, type=str)
 
 
 class InnerBudgetListResource(ModelListResource):
