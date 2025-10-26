@@ -23,7 +23,7 @@
             <PaymentsGroupTable title="Budżet Wew." :group="groups.innerBudget" />
           </b-col>
         </b-row>
-        <InnerTransformsTable 
+        <InnerTransfersTable 
           v-if="innerTransfers && innerTransfers.length > 0"
           :inner-transfers="innerTransfers" 
         />
@@ -42,6 +42,7 @@
 import PaymentsTable from './PaymentsTable'
 import PaymentsGroupTable from './PaymentsGroupTable'
 import PaymentsNavigation from './PaymentsNavigation'
+import InnerTransfersTable from './InnerTransfersTable'
 import PaymentsForm from './PaymentsForm'
 import linkVm from '@/helpers/linkVm'
 
@@ -49,14 +50,13 @@ import PaymentService from '@/services/payment'
 import PaymentTypeService from '@/services/paymentType';
 import BudgetService from '@/services/budget';
 import InnerBudgetService from '@/services/innerBudget';
-import InnerTransformsTable from './InnerTransformsTable.vue'
 
 export default {
   components: {
     PaymentsTable,
     PaymentsGroupTable,
     PaymentsNavigation,
-    InnerTransformsTable,
+    InnerTransfersTable,
     PaymentsForm
   },
   data () {

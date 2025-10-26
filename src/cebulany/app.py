@@ -20,6 +20,8 @@ from cebulany.resources.accountancy_type import AccountancyTypeListResource
 from cebulany.resources.accountancy_type import AccountancyTypeResource
 from cebulany.resources.payment import PaymentListResource, PaymentResource
 from cebulany.resources.payment_summary import PaymentSummaryResource
+from cebulany.resources.inner_transfer import InnerTransferListResource
+from cebulany.resources.inner_transfer import InnerTransferResource
 
 from os import environ
 
@@ -53,6 +55,8 @@ api.add_resource(PaymentTypeListResource, API_PREFIX + '/payment_type/')
 api.add_resource(PaymentTypeResource, API_PREFIX + '/payment_type/<int:id>')
 api.add_resource(AccountancyTypeListResource, API_PREFIX + '/accountancy_type/')
 api.add_resource(AccountancyTypeResource, API_PREFIX + '/accountancy_type/<int:id>')
+api.add_resource(InnerTransferListResource, API_PREFIX + '/inner_transfer/')
+api.add_resource(InnerTransferResource, API_PREFIX + '/inner_transfer/<int:id>')
 
 api.add_resource(LoginResource, API_PREFIX + '/login')
 api.add_resource(UserListResource, API_PREFIX + '/user/')

@@ -28,6 +28,9 @@
         <b-nav-item href="#/inner-budgets">
           Budżety wewnętrzne
         </b-nav-item>
+        <b-nav-item href="#/inner-transfers">
+          Transfery
+        </b-nav-item>
         <b-nav-item href="#/payment-types">
           Typy płatności
         </b-nav-item>
