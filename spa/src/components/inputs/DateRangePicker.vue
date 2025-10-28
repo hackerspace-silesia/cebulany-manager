@@ -1,12 +1,12 @@
 <template>
     <b-form-group label="Zakres" label-size="sm">
-        <b-select v-model="range" size="sm" >
+        <b-select v-model="option" size="sm" @change="updateOption">
             <option value="month">Miesiąc</option>
             <option value="year">Rok</option>
-            <!-- <option value="range">Zakres</option> -->
+            <option value="range">Zakres</option>
         </b-select>
         <date-picker
-            v-if="range == 'month'"
+            v-if="option == 'month'"
             v-model="month"
             type="month"
             value-type="format"
@@ -15,7 +15,7 @@
             @change="updateMonth"
         />
         <date-picker
-            v-if="range == 'year'"
+            v-if="option == 'year'"
             v-model="year"
             type="year"
             value-type="format"
@@ -23,78 +23,77 @@
             :clearable="false"
             @change="updateYear"
         />
+        <date-picker
+            v-if="option == 'range'"
+            v-model="range"
+            type="date"
+            value-type="format"
+            token="YYYY-MM-DD"
+            range-separator=" → "
+            :clearable="false"
+            :range="true"
+            @change="updateRange"
+        />
     </b-form-group>
 </template>
 <script>
-import { toIsoDate } from '@/helpers/isoDate';
+import { toIsoMonth } from '@/helpers/isoDate';
+import DateRange from '@/models/dateRange';
 
 export default {
     props: {
-      value: { required: true },
+      value: { required: true, type: DateRange },
     },
     data() {
         const date = new Date();
         const year = date.getFullYear();
-        let month = date.getMonth();
-        month = month < 10 ? `0${month}` : '' + month;
+        const month = toIsoMonth(date);
         return {
-            range: "month",
-            month: `${year}-${month}`,
+            option: "month",
+            month: month,
             year: year.toString(),
+            range: DateRange.getRangeFromMonth(month),
         }
     },
-    mounted() {
-        if (this.value.month !== undefined) {
-            this.range = "month";
-            this.month = this.value.month;
-        }
-        if (this.value.year !== undefined) {
-            this.range = "year";
-            this.year = this.value.year;
-        }
-        this.update();
+    created() {
+        this.updateValue(this.value);
     },
     watch: {
-        range() { this.update(); }
+        value(value) {
+            this.updateValue(value);
+        },
     },
     methods: {
-        update() {
-            switch(this.range) {
+        updateOption(option) {
+            switch(option) {
                 case "month": this.updateMonth(); break;
                 case "year": this.updateYear(); break;
+                case "range": this.updateRange(); break;
             }
         },
-        getRangeFromMonth(month) {
-            let [_year, _month] = month.split("-");
-            _year = parseInt(_year);
-            _month = parseInt(_month) - 1;
-
-            const start = new Date(_year, _month, 1);
-            const end = new Date(_year, _month + 1, 0);
-            return [start, end];
-        },
-        getRangeFromYear(year) {
-            const _year = parseInt(year);
-
-            const start = new Date(_year, 0, 1);
-            const end = new Date(_year + 1, 0, 0);
-            return [start, end];
+        updateValue(value) {
+            if (value.month !== undefined) {
+                this.option = "month";
+                this.month = value.month;
+                this.range = [value.start, value.end];
+            } else if (value.year !== undefined) {
+                this.option = "year";
+                this.year = value.year;
+                this.range = [value.start, value.end];
+            } else {
+                this.option = "range";
+                this.range = [value.start, value.end];
+            }
         },
         updateMonth() {
-            const [start, end] = this.getRangeFromMonth(this.month);
-            this.$emit('input', {
-                month: this.month,
-                start: toIsoDate(start),
-                end: toIsoDate(end),
-            });
+            this.$emit('input', new DateRange({ month: this.month }));
         },
         updateYear() {
-            const [start, end] = this.getRangeFromYear(this.year);
-            this.$emit('input', {
-                year: this.year,
-                start: toIsoDate(start),
-                end: toIsoDate(end),
-            });
+            this.$emit('input', new DateRange({ year: this.year }));
+        },
+        updateRange() {
+            const [start, end] = this.range;
+            this.$emit('input', new DateRange({ start, end }));
         }
     },
 }

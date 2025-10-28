@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import DateRange from '@/models/dateRange';
 
 import InnerTransfersTable from './InnerTransfersTable'
 import DateRangePicker from '@/components/inputs/DateRangePicker';
@@ -41,10 +42,7 @@ export default {
       budgets: [],
       innerBudgets: [],
       promiseState: null,
-      dateRange: {
-        start: this.$route.query.start,
-        end: this.$route.query.end,
-      },
+      dateRange: DateRange.fromQuery(this.$route.query),
     };
   },
   mounted () {
@@ -53,26 +51,33 @@ export default {
       InnerBudgetsService.getAll(),
     ];
 
+    const dateRange = this.dateRange;
+
     linkVm(this, Promise.all(promises))
       .then(([budgetResp, innerBudgetResp]) => {
         this.budgets = budgetResp.data;
         this.innerBudgets = innerBudgetResp.data;
+        this.fetchInnerTransfers(dateRange);
       });
   },
   watch: {
     dateRange(val) {
-      this.$router.replace({
+      this.$router.push({
         name: 'InnerTransfers',
-        query: val,
-      })
+        query: val.toQuery(),
+      }).catch(()=>{});
+
       this.fetchInnerTransfers(val);
-    }
+    },
+    $route() {
+      this.dateRange = DateRange.fromQuery(this.$route.query);
+    },
   },
   methods: {
-    fetchInnerTransfers (date_range) {
+    fetchInnerTransfers (dateRange) {
       const query = {
-        start_date: date_range.start,
-        end_date: date_range.end,
+        start_date: dateRange.start,
+        end_date: dateRange.end,
       };
       linkVm(this, InnerTransfersService.getAll(query))
         .then((response) => {
