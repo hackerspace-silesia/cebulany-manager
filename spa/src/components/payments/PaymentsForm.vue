@@ -61,14 +61,8 @@
       DateRangePicker,
     },
     data () {
-      const dateRange = DateRange.fromQuery(this.$route.query);
       return {
-        query: {
-          payment_type_id: null,
-          budget_id: null,
-          inner_budget_id: null,
-          dateRange,
-        },
+        query: this.makeNewQuery(),
         paymentTypes: [],
         budgets: [],
         innerBudgets: [],
@@ -81,15 +75,24 @@
           this.setQuery();
         }
       },
-    },
-    computed: {
-
+      $route() {
+        this.query = this.makeNewQuery();
+      },
     },
     created () {
       this.setQuery();
       this.fetchInit();
     },
     methods: {
+      makeNewQuery() {
+        const dateRange = DateRange.fromQuery(this.$route.query);
+        return {
+          payment_type_id: this.$route.query.payment_type_id || null,
+          budget_id: this.$route.query.budget_id || null,
+          inner_budget_id: this.$route.query.inner_budget_id || null,
+          dateRange,
+        };
+      },
       fetchInit () {
         let promises = [BudgetService.getAll(), PaymentTypeService.getAll(), InnerBudgetService.getAll()];
         linkVm(this, Promise.all(promises))

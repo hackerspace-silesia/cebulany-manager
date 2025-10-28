@@ -62,7 +62,7 @@ export default {
   },
   watch: {
     dateRange(val) {
-      this.$router.push({
+      this.$router.replace({
         name: 'InnerTransfers',
         query: val.toQuery(),
       }).catch(()=>{});

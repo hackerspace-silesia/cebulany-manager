@@ -115,6 +115,14 @@ export default {
         end_date: dateRange.end,
         ...prevQuery,
       };
+      this.$router.replace({
+        name: 'Payments',
+        query: {
+          page: this.page,
+          ...dateRange.toQuery(),
+          ...prevQuery,
+        },
+      }).catch(()=>{});
 
       return PaymentService.getAll(query)
         .then((response) => {
