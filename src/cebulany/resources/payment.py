@@ -71,7 +71,8 @@ query_parser.add_argument("payment_type_id", type=int, location="args")
 query_parser.add_argument("budget_id", type=int, location="args")
 query_parser.add_argument("inner_budget_id", type=int, location="args")
 query_parser.add_argument("member_id", type=int, location="args")
-query_parser.add_argument("month", location="args")
+query_parser.add_argument("start_date", required=True, type=dt_type, location="args")
+query_parser.add_argument("end_date", required=True, type=dt_type, location="args")
 query_parser.add_argument("page", type=int, default=1, location="args")
 
 

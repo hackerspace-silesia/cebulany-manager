@@ -128,16 +128,10 @@ class PaymentQuery:
         elif inner_budget_id is not None:
             query = query.filter(inner_budget_col == inner_budget_id)
 
-        month = kw.get("month")
-        if month is not None:
-            if '-' in month:
-                query = query.filter(
-                    get_year_month_col(InnerTransfer.date) == month
-                )
-            else:
-                query = query.filter(
-                    get_year_col(InnerTransfer.date) == month
-                )
+        if start := kw.get("start_date"):
+            query = query.filter(InnerTransfer.date >= start)
+        if end := kw.get("end_date"):
+            query = query.filter(InnerTransfer.date <= end)
         return query
 
     @classmethod
@@ -170,21 +164,16 @@ class PaymentQuery:
                 InnerTransfer.to_id == inner_budget_id,
             ))
 
-        month = kw.get("month")
-        if month is not None:
-            if '-' in month:
-                query = query.filter(
-                    get_year_month_col(InnerTransfer.date) == month
-                )
-            else:
-                query = query.filter(
-                    get_year_col(InnerTransfer.date) == month
-                )
+        if start := kw.get("start_date"):
+            query = query.filter(InnerTransfer.date >= start)
+        if end := kw.get("end_date"):
+            query = query.filter(InnerTransfer.date <= end)
+        
         return query
 
 
     @classmethod
-    def _get_query_list(cls, *fields, name=None, payment_type_id=None, budget_id=None, inner_budget_id=None, month=None, member_id=None):
+    def _get_query_list(cls, *fields, name=None, payment_type_id=None, budget_id=None, inner_budget_id=None, start_date=None, end_date=None, member_id=None):
         query = (
             db.select(*fields)
             .join(Payment.transaction)
@@ -198,7 +187,7 @@ class PaymentQuery:
         query = cls._filter_by_payment_type(query, payment_type_id)
         query = cls._filter_by_budget_id(query, budget_id)
         query = cls._filter_by_inner_budget_id(query, inner_budget_id)
-        query = cls._filter_by_month(query, month)
+        query = cls._filter_by_date(query, start_date, end_date)
         query = cls._filter_by_member_id(query, member_id)
 
         return query
@@ -235,16 +224,12 @@ class PaymentQuery:
         return query.filter(Payment.inner_budget_id == budget_id)
 
     @staticmethod
-    def _filter_by_month(query, month):
-        if month is None:
-            return query
-        if '-' in month:
-            return query.filter(
-                get_year_month_col(Transaction.date) == month
-            )
-        return query.filter(
-            get_year_col(Transaction.date) == month
-        )
+    def _filter_by_date(query, start, end):
+        if start:
+            query = query.filter(Transaction.date >= start)
+        if end:
+            query = query.filter(Transaction.date <= end)
+        return query
 
     @staticmethod
     def _filter_by_member_id(query, member_id):

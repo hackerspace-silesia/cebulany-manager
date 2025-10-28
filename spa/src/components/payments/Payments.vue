@@ -108,7 +108,13 @@ export default {
       return objs;
     },
     fetchPaymentsPromise() {
-      const query = {page: this.page, ...this.query};
+      const {dateRange, ...prevQuery } = this.query;
+      const query = {
+        page: this.page,
+        start_date: dateRange.start,
+        end_date: dateRange.end,
+        ...prevQuery,
+      };
 
       return PaymentService.getAll(query)
         .then((response) => {

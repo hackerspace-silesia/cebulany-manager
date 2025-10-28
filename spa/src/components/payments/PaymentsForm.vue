@@ -39,41 +39,16 @@
           </b-form-group>
         </b-col>
         <b-col>
-          <b-form-group
-            label="Miesiąc / Rok"
-            label-size="sm"
-          >
-            <b-select
-              v-model="withMonth"
-              size="sm"
-            >
-              <option :value="true"> Miesiąc </option>
-              <option :value="false"> Rok </option>
-            </b-select>
-            <date-picker
-              v-if="withMonth"
-              v-model="month"
-              type="month"
-              value-type="format"
-              token="YYYY-MM"
-              :clearable="false"
-            />
-            <date-picker
-              v-if="!withMonth"
-              v-model="year"
-              type="year"
-              value-type="format"
-              token="YYYY"
-              :clearable="false"
-            />
-          </b-form-group>
+          <date-range-picker v-model="query.dateRange" />
         </b-col>
       </b-form-row>
     </b-form>
   </PromisedComponent>
 </template>
 <script>
+  import DateRange from '@/models/dateRange';
   import TypeSelect from '@/components/inputs/TypeSelect';
+  import DateRangePicker from '@/components/inputs/DateRangePicker';
   import linkVm from '@/helpers/linkVm'
 
   import PaymentTypeService from '@/services/paymentType'
@@ -82,24 +57,18 @@
 
   export default {
     components: {
-      TypeSelect
+      TypeSelect,
+      DateRangePicker,
     },
     data () {
-      const date = new Date();
-      const year = date.getFullYear();
-      let month = date.getMonth() + 1;
-      month = month < 10 ? `0${month}` : '' + month;
+      const dateRange = DateRange.fromQuery(this.$route.query);
       return {
         query: {
           payment_type_id: null,
           budget_id: null,
           inner_budget_id: null,
-          month: `${year}-${month}`
+          dateRange,
         },
-        month: `${year}-${month}`,
-        year: year.toString(),
-        withMonth: true,
-        promiseState: null,
         paymentTypes: [],
         budgets: [],
         innerBudgets: [],
@@ -112,15 +81,9 @@
           this.setQuery();
         }
       },
-      year (value) {
-        this.query.month = value;
-      },
-      month (value) {
-        this.query.month = value;
-      },
-      withMonth (withMonth) {
-        this.query.month = withMonth ? this.month : this.year;
-      }
+    },
+    computed: {
+
     },
     created () {
       this.setQuery();
