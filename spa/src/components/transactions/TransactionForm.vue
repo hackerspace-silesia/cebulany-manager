@@ -1,113 +1,69 @@
 <template>
-  <div class="row">
-    <div class="col-6">
-      <b-form-radio-group
-        v-model="monthOption"
-        :options="monthOptions"
-        @change="updateForm"
-      />
-      <b-form inline="inline">
-        <template v-if="monthOption == 'month'">
-          <date-picker
-            v-model="month"
-            type="month"
-            value-type="format"
-            token="YYYY-MM"
-            :clearable="false"
-            @change="updateForm"
-          />
-          &nbsp;
-          <b-button size="sm" @click="excel">Excel</b-button>
-        </template>
-        <template v-else-if="monthOption == 'date_range'">
-          <date-picker
-            v-model="dateRange"
-            type="date"
-            value-type="format"
-            token="YYYY-MM-DD"
-            range-separator=" → "
-            :clearable="false"
-            range
-            @change="updateForm"
-          />
-        </template>
-      </b-form>
-    </div>
-    <div class="col-6">
-      <b-form>
+  <b-form-row inline="inline" @submit.stop.prevent>
+    <b-col sm="4">
+      <date-range-picker v-model="dateRange">
+        <b-button size="sm" v-if="dateRange.month !== undefined" @click="excel">Excel</b-button>
+      </date-range-picker>
+    </b-col>
+    <b-col sm="8">
+      <b-form-group label="Szukaj" label-size="sm">
         <b-form-input
           v-model.trim="text"
           size="sm"
           type="text"
           placeholder="Szukaj..."
-          @change="updateForm"
         />
-      </b-form>
-    </div>
-  </div>
+      </b-form-group>
+    </b-col>
+  </b-form-row>
 </template>
 
 <script>
+  import DateRange from '@/models/dateRange';
+  import DateRangePicker from '@/components/inputs/DateRangePicker';
+
   export default {
+    components: {
+      DateRangePicker,
+    },
     data () {
-      let today = (new Date()).toISOString();
-      let monthOption = 'month';
-      let month = today.slice(0, 7);
-      let dateRange = [today.slice(0, 7) + '-01', today.slice(0, 10)];
-      const params = this.$route.params;
-      if (params.start && params.end) {
-        if (params.end === "-") {
-          monthOption = 'month';
-          month = params.start;
-        } else {
-          monthOption = 'date_range';
-          dateRange = [params.start, params.end];
-        }
-      }
+      const dateRange = DateRange.fromQuery(this.$route.query);
       return {
-        month,
         dateRange,
-        monthOption,
         text: this.$route.query.text || '',
-        monthOptions: [
-          {text: 'Miesiąc', value: 'month'},
-          {text: 'Zakres Dat', value: 'date_range'}
-        ]
       }
+    },
+    watch: {
+      text() { this.updateForm(); },
+      dateRange() { this.updateForm(); },
+      $route() { 
+        this.dateRange = DateRange.fromQuery(this.$route.query);
+        this.text = this.$route.query.text || '';
+      },
     },
     created () {
       this.updateForm();
     },
     methods: {
       updateForm () {
-        let data = {};
-        let query = {};
+        let data = {
+          date_start: this.dateRange.start,
+          date_end: this.dateRange.end,
+        }
+        let query = this.dateRange.toQuery();
         if (this.text) {
           data.text = this.text;
           query.text = this.text;
         }
-        if (this.monthOption === 'month') {
-          this.$router.replace({
-            name: 'Transactions-Range',
-            params: { start: this.month, end: "-" },
-            query,
-          });
-          data.month = this.month;
-        } else if (this.monthOption === 'date_range') {
-          const [start, end] = this.dateRange
-          this.$router.replace({
-            name: 'Transactions-Range',
-            params: { start, end },
-            query,
-          });
-          data.date_start = start;
-          data.date_end = end;
-        }
+        this.$router.replace({
+          name: 'Transactions',
+          query,
+        }).catch(()=>{});
         this.$emit('change', data);
       },
       excel () {
-        if (this.monthOption === 'month') {
-          this.$emit('excel', this.month);
+        if (this.dateRange.month !== undefined) {
+          this.$emit('excel', this.dateRange.month );
         }
       }
     }

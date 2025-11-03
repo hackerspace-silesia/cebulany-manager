@@ -34,6 +34,7 @@
             :range="true"
             @change="updateRange"
         />
+        <slot></slot>
     </b-form-group>
 </template>
 <script>

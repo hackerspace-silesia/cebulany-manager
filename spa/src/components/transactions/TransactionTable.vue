@@ -76,11 +76,11 @@
     data () {
       return {
         fields: [
-          {key: 'date', label: 'Data', class: 'text-no-wrap'},
+          {key: 'date', label: 'Data', class: 'text-nowrap'},
           {key: 'name', label: 'Nazwa'},
           {key: 'title', label: 'Tytuł'},
-          {key: 'cost', label: 'Kwota', class: 'text-no-wrap text-right'},
-          {key: 'left', label: 'Poz.', class: 'text-no-wrap text-right'},
+          {key: 'cost', label: 'Kwota', class: 'text-nowrap text-right'},
+          {key: 'left', label: 'Poz.', class: 'text-nowrap text-right'},
           {key: 'types', label: '*'}
         ],
         showModal: false,
