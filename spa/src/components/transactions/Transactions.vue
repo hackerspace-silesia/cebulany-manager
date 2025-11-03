@@ -6,10 +6,6 @@
         @change="setFormParams"
         @excel="excel"
       />
-      <TransactionLegend
-        :budgets="budgets"
-        :payment-types="paymentTypes"
-      />
       <PromisedComponent :state="promiseState">
         <TransactionTable
           :transactions="transactions"
@@ -20,17 +16,12 @@
           :sum-left="sumLeft"
         />
       </PromisedComponent>
-      <TransactionLegend
-        :budgets="budgets"
-        :payment-types="paymentTypes"
-      />
       <TransactionUploadForm @upload="uploadTransactions" />
     </b-col>
   </b-row>
 </template>
 
 <script>
-import TransactionLegend from './TransactionLegend'
 import TransactionTable from './TransactionTable'
 import TransactionForm from './TransactionForm'
 import TransactionUploadForm from './TransactionUploadForm'
@@ -43,7 +34,6 @@ import PaymentTypeService from '@/services/paymentType'
 
 export default {
   components: {
-    TransactionLegend,
     TransactionTable,
     TransactionForm,
     TransactionUploadForm
