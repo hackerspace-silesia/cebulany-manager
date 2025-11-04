@@ -3,10 +3,10 @@ import {downloadFile} from './excel';
 
 export default {
   getAll (params) {
-    return axios.get('/payment/', {params: params});
+    return axios.get('/payment/', {params});
   },
   getTable (params) {
-    return axios.get('/payment/table', {params: params});
+    return axios.get('/payment/table', {params});
   },
   getExcelTable (yearStart, yearEnd, paymentTypeId) {
     return axios.get(
@@ -14,8 +14,14 @@ export default {
       { responseType: 'blob' }
     ).then(downloadFile);
   },
+  getExcel (params) {
+    return axios.get(
+      `/excel/payment/`,
+      { responseType: 'blob', params }
+    ).then(downloadFile);
+  },
   getSummary (params) {
-    return axios.get('/payment/summary', {params: params});
+    return axios.get('/payment/summary', {params});
   },
   getExcelSummary (year) {
     return axios.get(

@@ -3,6 +3,9 @@
     <b-col>
       <h1>Płatności</h1>
       <PaymentsForm v-model="query" />
+      <b-button @click="excel">
+        Excel
+      </b-button>
       <PaymentsNavigation
         v-model="page"
         :count="count"
@@ -107,24 +110,16 @@ export default {
       group.forEach(obj => {objs[obj.id] = obj;});
       return objs;
     },
+    excel () {
+      linkVm(this, PaymentService.getExcel(this.createQuery()));
+    },
     fetchPaymentsPromise() {
-      const {dateRange, ...prevQuery } = this.query;
-      const query = {
-        page: this.page,
-        start_date: dateRange.start,
-        end_date: dateRange.end,
-        ...prevQuery,
-      };
       this.$router.replace({
         name: 'Payments',
-        query: {
-          page: this.page,
-          ...dateRange.toQuery(),
-          ...prevQuery,
-        },
+        query: this.createQueryToRouting(),
       }).catch(()=>{});
 
-      return PaymentService.getAll(query)
+      return PaymentService.getAll(this.createQuery())
         .then((response) => {
           const {data, count, total, groups, inner_transfers: innerTransfers, items_per_page: itemsPerPage} = response.data;
           this.payments = data;
@@ -136,7 +131,24 @@ export default {
           this.innerTransfers = innerTransfers;
           this.itemsPerPage = itemsPerPage;
         });
-    }
+    },
+    createQueryToRouting() {
+      const {dateRange, ...prevQuery } = this.query;
+      return {
+          page: this.page,
+          ...dateRange.toQuery(),
+          ...prevQuery,
+      };
+    },
+    createQuery() {
+      const {dateRange, ...prevQuery } = this.query;
+      return {
+        page: this.page,
+        start_date: dateRange.start,
+        end_date: dateRange.end,
+        ...prevQuery,
+      };
+    },
   }
 }
 </script>
