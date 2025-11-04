@@ -25,10 +25,8 @@
       @row-clicked="rowClicked"
     >
       <template v-slot:cell(name)="row">
-        <span :title="row.value">{{ row.value | truncate(50) }}</span>
-      </template>
-      <template v-slot:cell(title)="row">
-        <span :title="row.value">{{ row.value | truncate(50) }}</span>
+        <div v-if="row.item && row.item.name">{{ row.item.name }}</div>
+        <div v-if="row.item && row.item.title">{{ row.item.title }}</div>
       </template>
       <template v-slot:cell(cost)="row">
         <money-value :value="row.value" />
@@ -37,11 +35,14 @@
         <money-value :value="row.value" />
       </template>
       <template v-slot:cell(types)="row">
-        <span v-for="payment in row.item.payments"><span
-          class="transaction-badge"
-          :title="payment | paymentTitle"
-          :style="payment | paymentStyle"
-        >{{ payment | paymentName }}</span></span>
+        <ul v-if="row.item.payments.length > 0">
+          <li v-for="payment in row.item.payments">
+            <type-badge :type="payment.payment_type" />
+            <type-badge :type="payment.budget" />
+            <type-badge :type="payment.inner_budget" v-if="payment.inner_budget.id" />
+          </li>
+        </ul>
+        <type-badge v-if="row.item.payments.length === 0" :type="{name: '-- BRAK --'}" />
       </template>
       <template v-slot:foot(cost)="row">
         <money-value :value="sum" />
@@ -54,34 +55,19 @@
 </template>
 <script>
   import TransactionModal from './TransactionModal';
+  import TypeBadge from './TypeBadge';
 
   export default {
-    components: {TransactionModal},
-    filters: {
-      paymentStyle (payment) {
-        return {
-          backgroundColor: `#${payment.payment_type.color}`,
-          borderColor: `#${payment.budget.color}`
-        };
-      },
-      paymentTitle (payment) {
-        return payment.payment_type.name;
-      },
-      paymentName (payment) {
-        let name = payment.payment_type.name;
-        return name ? name.charAt(0).toUpperCase() : '?';
-      }
-    },
+    components: {TransactionModal, TypeBadge},
     props: ['transactions', 'sum', 'sumLeft', 'budgets', 'innerBudgets', 'paymentTypes'],
     data () {
       return {
         fields: [
           {key: 'date', label: 'Data', class: 'text-nowrap'},
-          {key: 'name', label: 'Nazwa'},
-          {key: 'title', label: 'Tytuł'},
+          {key: 'name', label: 'Nazwa & Tytuł', class: 'transaction-name'},
           {key: 'cost', label: 'Kwota', class: 'text-nowrap text-right'},
           {key: 'left', label: 'Poz.', class: 'text-nowrap text-right'},
-          {key: 'types', label: '*'}
+          {key: 'types', label: '*', class: 'transaction-payment-types'}
         ],
         showModal: false,
         modalItem: null
@@ -95,3 +81,25 @@
     }
   }
 </script>
+
+<style scoped>
+  .transaction-name > div {
+    width: 30vw;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .transaction-payment-types > ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  .transaction-payment-types > ul > li {
+    display: flex;
+  }
+  .transaction-payment-types > ul > li:not(:last-child) {
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid #bbb;
+  }
+</style>

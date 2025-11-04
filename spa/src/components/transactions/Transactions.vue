@@ -96,23 +96,3 @@ export default {
   }
 }
 </script>
-
-<style>
-  .transaction-badge {
-    display: inline-block;
-    text-align: center;
-    width: 16px;
-    margin: 0 1px;
-    border-radius: 4px;
-    color: white;
-    font-size: 7pt;
-    font-weight: bold;
-    border: solid black;
-    border-width: 3px;
-  }
-  .transaction-badge-big {
-    width: 18px;
-    font-size: 9pt;
-    border-radius: 8px;
-  }
-</style>
