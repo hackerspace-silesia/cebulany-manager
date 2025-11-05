@@ -2,7 +2,6 @@ from sqlalchemy import or_, union_all
 from sqlalchemy.orm import aliased
 
 from cebulany.models import Transaction, Payment, InnerTransfer, InnerBudget, db
-from cebulany.sql_utils import get_year_month_col, get_year_col
 
 
 class PaymentQuery:
@@ -117,15 +116,11 @@ class PaymentQuery:
     @staticmethod
     def _subsub(inner_budget_col, query, kw):
         budget_id = kw.get("budget_id")
-        if budget_id == -1:
-            query = query.filter(InnerTransfer.budget_id == None)
-        elif budget_id is not None:
+        if budget_id is not None:
             query = query.filter(InnerTransfer.budget_id == budget_id)
 
         inner_budget_id = kw.get("inner_budget_id")
-        if inner_budget_id == -1:
-            query = query.filter(inner_budget_col == None)
-        elif inner_budget_id is not None:
+        if inner_budget_id is not None:
             query = query.filter(inner_budget_col == inner_budget_id)
 
         if start := kw.get("start_date"):
@@ -143,22 +138,15 @@ class PaymentQuery:
         query = (
             db.select(InnerTransfer)
             .join(InnerTransfer.budget)
-            .join(aliased(InnerBudget), InnerTransfer.to_inner_budget, isouter=True)
-            .join(aliased(InnerBudget), InnerTransfer.from_inner_budget, isouter=True)
+            .join(aliased(InnerBudget), InnerTransfer.to_inner_budget)
+            .join(aliased(InnerBudget), InnerTransfer.from_inner_budget)
         )
         budget_id = kw.get("budget_id")
-        if budget_id == -1:
-            query = query.filter(InnerTransfer.budget_id == None)
-        elif budget_id is not None:
+        if budget_id is not None:
             query = query.filter(InnerTransfer.budget_id == budget_id)
 
         inner_budget_id = kw.get("inner_budget_id")
-        if inner_budget_id == -1:
-            query = query.filter(or_(
-                InnerTransfer.from_id == None,
-                InnerTransfer.to_id == None,
-            ))
-        elif inner_budget_id is not None:
+        if inner_budget_id is not None:
             query = query.filter(or_(
                 InnerTransfer.from_id == inner_budget_id,
                 InnerTransfer.to_id == inner_budget_id,
@@ -180,7 +168,7 @@ class PaymentQuery:
             .join(Payment.member, isouter=True)
             .join(Payment.payment_type)
             .join(Payment.budget)
-            .join(Payment.inner_budget, isouter=True)
+            .join(Payment.inner_budget)
         )
 
         query = cls._filter_by_name(query, name)
@@ -219,8 +207,6 @@ class PaymentQuery:
     def _filter_by_inner_budget_id(query, budget_id):
         if budget_id is None:
             return query
-        if budget_id == -1:
-            return query.filter(Payment.inner_budget_id == None)
         return query.filter(Payment.inner_budget_id == budget_id)
 
     @staticmethod

@@ -11,10 +11,22 @@ from openpyxl.utils import get_column_letter
 from openpyxl.cell.rich_text import CellRichText
 
 from cebulany.auth import token_required
-from cebulany.models import InnerTransfer, db, Payment, PaymentType, Budget, InnerBudget, Transaction
-from cebulany.queries import transaction
+from cebulany.models import (
+    InnerTransfer,
+    db,
+    Payment,
+    PaymentType,
+    Budget,
+    InnerBudget,
+    Transaction,
+)
 from cebulany.resources.payment import query_parser
-from cebulany.resources.excels.utils import color_text, send_excel, setup_styles, add_cell
+from cebulany.resources.excels.utils import (
+    color_text,
+    send_excel,
+    setup_styles,
+    add_cell,
+)
 from cebulany.resources.excels.blueprint import excel_page, URL_PREFIX
 from cebulany.queries.payment import PaymentQuery
 
@@ -69,10 +81,7 @@ def excel_payment():
         _fill_type_worksheet(
             workbook.create_sheet("Budżet Wewnętrzny"),
             _enhance_query(
-                PaymentQuery.get_query_group_by_inner_budget(**args).join(
-                    InnerBudget,
-                    isouter=True,
-                ),
+                PaymentQuery.get_query_group_by_inner_budget(**args).join(InnerBudget),
                 InnerBudget,
             ),
         )
@@ -82,7 +91,7 @@ def excel_payment():
 
 def _sort_key(o):
     if isinstance(o, InnerTransfer):
-        return (o.date, 0) 
+        return (o.date, 0)
     else:
         return (o.transaction.date, o.transaction.line_num)
 
@@ -134,13 +143,15 @@ def add_type_cell(sheet, type: TypeLike | None):
     return cell
 
 
-def add_type_text_block(type: TypeLike | None, default: str="-"):
+def add_type_text_block(type: TypeLike | None, default: str = "-"):
     if type is None:
         return color_text(default, bold=True)
     return color_text(type.name, type.color, bold=True)
 
 
-def _fill_payment_worksheet(sheet, payments: Iterable[Payment | InnerTransfer], args: ArgsObj, total: Decimal):
+def _fill_payment_worksheet(
+    sheet, payments: Iterable[Payment | InnerTransfer], args: ArgsObj, total: Decimal
+):
     add = partial(add_cell, sheet)
     sheet.title = "Zestawienie"
     sheet.append(["", add(f"Zestawienie {_get_title(args)}", "header")])
@@ -215,16 +226,16 @@ def _fill_payment_worksheet(sheet, payments: Iterable[Payment | InnerTransfer], 
             title_cell = CellRichText()
             if payment.from_inner_budget != args.inner_budget:
                 title_cell += [
-                    color_text(" z "), 
+                    " z ",
                     add_type_text_block(payment.from_inner_budget),
                 ]
             if payment.to_inner_budget != args.inner_budget:
                 title_cell += [
-                    color_text(" do "), 
+                    " do ",
                     add_type_text_block(payment.to_inner_budget),
                 ]
             row += [
-                title_cell,
+                add(title_cell, "wrap_text"),
                 add(payment.cost, "bad" if payment.cost < 0 else "nice"),
             ]
         else:

@@ -5,6 +5,7 @@ from openpyxl.cell import Cell
 from openpyxl.styles import NamedStyle, Font, PatternFill, Border, Side, Alignment
 from openpyxl.cell.text import InlineFont
 from openpyxl.cell.rich_text import TextBlock
+from openpyxl.cell.rich_text import CellRichText
 from flask import send_file
 
 
@@ -83,7 +84,7 @@ def setup_styles(workbook, font_name='Calibri', font_size=10):
     workbook.add_named_style(wrap_text)
 
 
-def add_cell(sheet, value='', style='ok') -> Cell:
+def add_cell(sheet, value: str | CellRichText='', style='ok') -> Cell:
     cell = Cell(sheet)
     cell.value = value
     cell.style = style

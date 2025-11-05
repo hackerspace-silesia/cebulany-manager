@@ -54,9 +54,9 @@ class Suggestion(db.Model):
 
     member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
     type_name = db.Column(db.String(300))
-    type_id = db.Column(db.Integer, db.ForeignKey('paymenttype.id'))
-    budget_id = db.Column(db.Integer, db.ForeignKey('budget.id'))
-    inner_budget_id = db.Column(db.Integer, db.ForeignKey('innerbudget.id'), nullable=True)
+    type_id = db.Column(db.Integer, db.ForeignKey('paymenttype.id'), nullable=False)
+    budget_id = db.Column(db.Integer, db.ForeignKey('budget.id'), nullable=False)
+    inner_budget_id = db.Column(db.Integer, db.ForeignKey('innerbudget.id'), nullable=False)
 
     member = relationship('Member')
     payment_type = relationship('PaymentType')
@@ -113,8 +113,8 @@ class InnerTransfer(Base):
     cost = db.Column(db.Numeric(10, 2), nullable=False)
 
     budget_id = db.Column(db.Integer, db.ForeignKey('budget.id'), nullable=False)
-    from_id = db.Column(db.Integer, db.ForeignKey('innerbudget.id'), nullable=True)
-    to_id = db.Column(db.Integer, db.ForeignKey('innerbudget.id'), nullable=True)
+    from_id = db.Column(db.Integer, db.ForeignKey('innerbudget.id'), nullable=False)
+    to_id = db.Column(db.Integer, db.ForeignKey('innerbudget.id'), nullable=False)
 
     budget = relationship(Budget, backref='inner_transforms')
     from_inner_budget = relationship(InnerBudget, backref='borrowed_inner_transforms', foreign_keys=[from_id])
@@ -131,7 +131,7 @@ class Payment(Base):
     payment_type_id = db.Column(db.Integer, db.ForeignKey('paymenttype.id'), nullable=False)
     budget_id = db.Column(db.Integer, db.ForeignKey('budget.id'), nullable=False)
     member_id = db.Column(db.Integer, db.ForeignKey('member.id'), nullable=True)
-    inner_budget_id = db.Column(db.Integer, db.ForeignKey('innerbudget.id'), nullable=True)
+    inner_budget_id = db.Column(db.Integer, db.ForeignKey('innerbudget.id'), nullable=False)
 
     member = relationship(Member, backref='payments')
     transaction = relationship(Transaction, backref='payments')
