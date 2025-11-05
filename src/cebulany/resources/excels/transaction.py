@@ -10,7 +10,7 @@ from openpyxl.cell.rich_text import TextBlock, CellRichText
 
 from cebulany.auth import token_required
 from cebulany.models import Payment, Transaction
-from cebulany.resources.excels.utils import send_excel, setup_styles, add_cell
+from cebulany.resources.excels.utils import color_text, send_excel, setup_styles, add_cell
 from cebulany.resources.excels.blueprint import excel_page, URL_PREFIX
 from cebulany.queries.transaction import TransactionQuery
 
@@ -140,16 +140,11 @@ def _to_rich_text(labels: Iterable[RichCostLabel]) -> CellRichText:
         case _:
             elements = list(chain.from_iterable(
                 [
-                    _color_text(label, colors[label]),
-                    _color_text(f" ({str(cost).replace('.', ',')} zł)", colors[label], bold=True),
+                    color_text(label, colors[label]),
+                    color_text(f" ({str(cost).replace('.', ',')} zł)", colors[label], bold=True),
                     "\n"
                 ]
                 for label, cost in accumulator.items()
             ))
             elements.pop()  # Remove last '\n'
             return CellRichText(elements)
-
-
-def _color_text(s: str, color: str, bold: bool=False):
-    font = InlineFont(sz=8, b=bold, rFont='Calibri', color=color)
-    return TextBlock(font, s)

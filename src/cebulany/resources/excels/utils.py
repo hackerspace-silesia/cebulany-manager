@@ -3,6 +3,8 @@ from tempfile import NamedTemporaryFile
 from openpyxl import Workbook
 from openpyxl.cell import Cell
 from openpyxl.styles import NamedStyle, Font, PatternFill, Border, Side, Alignment
+from openpyxl.cell.text import InlineFont
+from openpyxl.cell.rich_text import TextBlock
 from flask import send_file
 
 
@@ -86,3 +88,8 @@ def add_cell(sheet, value='', style='ok') -> Cell:
     cell.value = value
     cell.style = style
     return cell
+
+
+def color_text(s: str, color: str | None = None, bold: bool=False, font: str='Calibri', size: int=8):
+    font = InlineFont(sz=size, b=bold, rFont=font, color=color)
+    return TextBlock(font, s)
