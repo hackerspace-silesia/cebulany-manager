@@ -4,7 +4,7 @@ from flask_restful.reqparse import RequestParser
 from cebulany.queries.transaction import TransactionQuery
 from cebulany.auth import token_required
 from cebulany.models import Transaction
-from cebulany.resources.model import ModelResource, ModelResourceWithoutDelete
+from cebulany.resources.model import ModelResourceWithoutDelete
 from cebulany.resources.types import dt_type
 
 transaction_parser = RequestParser()

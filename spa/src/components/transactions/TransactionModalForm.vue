@@ -16,7 +16,6 @@
       <TypeSelect
         v-model="innerBudgetId"
         :types="innerBudgets"
-        has-null-option="hasNullOption"
       />
     </td>
     <td>

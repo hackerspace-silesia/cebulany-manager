@@ -31,7 +31,6 @@
         <type-select 
           v-model="row.item.from_id" 
           :types="innerBudgets"
-          has-null-option="hasNullOption"
           @change="update(row.item)"
         />
       </template>
@@ -39,7 +38,6 @@
         <type-select
           v-model="row.item.to_id" 
           :types="innerBudgets"
-          has-null-option="hasNullOption"
           @change="update(row.item)"
         />
       </template>
@@ -100,8 +98,8 @@
         const obj = {
           date: toIsoDate(new Date()),
           budget_id: 1,
-          from_id: null,
-          to_id: null,
+          from_id: 1,
+          to_id: 1,
           cost: 0,
         };
         this.$emit('row-update', obj);

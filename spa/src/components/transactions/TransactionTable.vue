@@ -39,7 +39,7 @@
           <li v-for="payment in row.item.payments">
             <type-badge :type="payment.payment_type" />
             <type-badge :type="payment.budget" />
-            <type-badge :type="payment.inner_budget" v-if="payment.inner_budget.id" />
+            <type-badge :type="payment.inner_budget" />
           </li>
         </ul>
         <type-badge v-if="row.item.payments.length === 0" :type="{name: '-- BRAK --'}" />

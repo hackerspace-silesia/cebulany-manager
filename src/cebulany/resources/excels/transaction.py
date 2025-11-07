@@ -5,8 +5,7 @@ from itertools import chain
 from typing import Iterable, NamedTuple
 
 from openpyxl import Workbook
-from openpyxl.cell.text import InlineFont
-from openpyxl.cell.rich_text import TextBlock, CellRichText
+from openpyxl.cell.rich_text import CellRichText
 
 from cebulany.auth import token_required
 from cebulany.models import Payment, Transaction
@@ -136,7 +135,7 @@ def _to_rich_text(labels: Iterable[RichCostLabel]) -> CellRichText:
         case 1:
             label = next(iter(accumulator))
             color = colors[label]
-            return CellRichText([_color_text(label, color)])
+            return CellRichText([color_text(label, color)])
         case _:
             elements = list(chain.from_iterable(
                 [
