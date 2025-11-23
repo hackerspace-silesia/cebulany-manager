@@ -18,14 +18,22 @@
         />
       </template>
       <template v-slot:cell(description_on_positive)="row">
-        <b-form-input
+        <b-form-textarea
           v-model.lazy.trim="row.item.description_on_positive"
+          rows="3"
+          max-rows="6"
+          wrap="hard"
+          size="sm"
           @change="update(row.item)"
         />
       </template>
       <template v-slot:cell(description_on_negative)="row">
-        <b-form-input
+        <b-form-textarea
           v-model.lazy.trim="row.item.description_on_negative"
+          rows="3"
+          max-rows="6"
+          wrap="hard"
+          size="sm"
           @change="update(row.item)"
         />
       </template>
