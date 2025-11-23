@@ -140,7 +140,12 @@ class PaymentQuery:
             .join(InnerTransfer.budget)
             .join(aliased(InnerBudget), InnerTransfer.to_inner_budget)
             .join(aliased(InnerBudget), InnerTransfer.from_inner_budget)
+            .order_by(InnerTransfer.date.desc())
         )
+        if kw.get("payment_type_id"):
+            # Transfers are not correlated with payment type.
+            return query.filter(False)
+
         budget_id = kw.get("budget_id")
         if budget_id is not None:
             query = query.filter(InnerTransfer.budget_id == budget_id)

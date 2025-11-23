@@ -8,9 +8,8 @@ from cebulany.resources.model import ModelResourceWithoutDelete
 from cebulany.resources.types import dt_type
 
 transaction_parser = RequestParser()
-transaction_parser.add_argument("date_start", type=dt_type, location="args")
-transaction_parser.add_argument("date_end", type=dt_type, location="args")
-transaction_parser.add_argument("month", location="args")
+transaction_parser.add_argument("date_start", type=dt_type, location="args", required=True)
+transaction_parser.add_argument("date_end", type=dt_type, location="args", required=True)
 transaction_parser.add_argument("text", location="args")
 transaction_parser.add_argument("ordering", location="args")
 transaction_parser.add_argument("member_id", type=int, location="args")
@@ -116,13 +115,8 @@ class TransactionResource(Resource):
     @token_required
     def get(self):
         args = transaction_parser.parse_args()
-        if args["date_start"] and args["date_end"]:
-            date_range = (args["date_start"], args["date_end"])
-        else:
-            date_range = None
         transactions = TransactionQuery.get_transactions(
-            date_range=date_range,
-            month=args["month"],
+            date_range=(args["date_start"], args["date_end"]),
             text_like=args["text"],
             ordering=args["ordering"],
             member_id=args["member_id"],

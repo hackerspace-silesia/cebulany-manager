@@ -4,7 +4,6 @@ from sqlalchemy import or_, and_
 from sqlalchemy.orm import contains_eager
 
 from cebulany.models import Transaction, Payment
-from cebulany.sql_utils import get_year_month_col
 
 
 class TransactionQuery:
@@ -12,8 +11,7 @@ class TransactionQuery:
     @classmethod
     def get_transactions(
         cls,
-        date_range: tuple[datetime, datetime] | None = None,
-        month: str | None = None,
+        date_range: tuple[datetime, datetime],
         text_like: str | None = None,
         ordering: str | None = None,
         member_id: int | None = None,
@@ -22,16 +20,10 @@ class TransactionQuery:
         query = (
             model.query.outerjoin(model.payments)
             .options(contains_eager(model.payments))
-            .order_by(model.date)
         )
-        if date_range:
-            date_start, date_end = date_range
-            query = query.filter(model.date >= date_start)
-            query = query.filter(model.date <= date_end)
-        elif month:
-            query = query.filter(get_year_month_col(model.date) == month)
-        elif not member_id:
-            raise Exception("!! :(")
+        date_start, date_end = date_range
+        query = query.filter(model.date >= date_start)
+        query = query.filter(model.date <= date_end)
 
         if member_id:
             query = query.filter(Payment.member_id == member_id)
@@ -50,6 +42,6 @@ class TransactionQuery:
         if ordering:
             query = query.order_by(ordering)
         else:
-            query = query.order_by(model.date, -model.line_num)
+            query = query.order_by(-model.line_num, model.date)
 
         return query.all()

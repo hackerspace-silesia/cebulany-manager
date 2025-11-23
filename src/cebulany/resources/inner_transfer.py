@@ -37,7 +37,7 @@ class InnerTransferListResource(ModelListResource):
             self.cls.query
             .filter(InnerTransfer.date >= args.start_date)
             .filter(InnerTransfer.date <= args.end_date)
-            .order_by("date", "id")
+            .order_by("id", "date")
         )
 
 
