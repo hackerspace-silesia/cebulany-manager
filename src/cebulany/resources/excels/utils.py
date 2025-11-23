@@ -1,3 +1,4 @@
+from decimal import Decimal
 from tempfile import NamedTemporaryFile
 
 from openpyxl import Workbook
@@ -84,7 +85,7 @@ def setup_styles(workbook, font_name='Calibri', font_size=10):
     workbook.add_named_style(wrap_text)
 
 
-def add_cell(sheet, value: str | CellRichText='', style='ok') -> Cell:
+def add_cell(sheet, value: str | Decimal | CellRichText='', style='ok') -> Cell:
     cell = Cell(sheet)
     cell.value = value
     cell.style = style

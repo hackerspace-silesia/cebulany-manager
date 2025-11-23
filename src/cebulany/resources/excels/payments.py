@@ -20,6 +20,7 @@ from cebulany.models import (
     InnerBudget,
     Transaction,
 )
+from cebulany.queries.inner_transfer import InnerTransferQuery
 from cebulany.resources.payment import query_parser
 from cebulany.resources.excels.utils import (
     color_text,
@@ -66,23 +67,49 @@ def excel_payment():
     _fill_payment_worksheet(workbook.active, payments, obj_args, total)
 
     if not obj_args.payment_type:
+        transfers = InnerTransferQuery.get_agg_query(
+            start_date=args.start_date,
+            end_date=args.end_date,
+            inner_budget_id=args.inner_budget_id,
+            budget_id=args.budget_id,
+        )
+        payment_types = _enhance_query(
+            PaymentQuery.get_query_group_by_type(**args), PaymentType
+        )
+        sheet = workbook.create_sheet("Rodzaj płatności")
         _fill_type_worksheet(
-            workbook.create_sheet("Rodzaj płatności"),
-            _enhance_query(PaymentQuery.get_query_group_by_type(**args), PaymentType),
+            sheet,
+            _types_to_rows(sheet, payment_types),
+            _inner_transfers_to_rows(
+                sheet,
+                obj_args.budget,
+                obj_args.inner_budget,
+                db.session.execute(transfers),
+            ),
         )
     if not obj_args.budget:
+        sheet = workbook.create_sheet("Budżet")
         _fill_type_worksheet(
-            workbook.create_sheet("Budżet"),
-            _enhance_query(
-                PaymentQuery.get_query_group_by_budget(**args).join(Budget), Budget
+            sheet,
+            _types_to_rows(
+                sheet,
+                _enhance_query(
+                    PaymentQuery.get_query_group_by_budget(**args).join(Budget), Budget
+                ),
             ),
         )
     if not obj_args.inner_budget:
+        sheet = workbook.create_sheet("Budżet Wewnętrzny")
         _fill_type_worksheet(
-            workbook.create_sheet("Budżet Wewnętrzny"),
-            _enhance_query(
-                PaymentQuery.get_query_group_by_inner_budget(**args).join(InnerBudget),
-                InnerBudget,
+            sheet,
+            _types_to_rows(
+                sheet,
+                _enhance_query(
+                    PaymentQuery.get_query_group_by_inner_budget(**args).join(
+                        InnerBudget
+                    ),
+                    InnerBudget,
+                ),
             ),
         )
 
@@ -100,8 +127,31 @@ def _enhance_query(query, model) -> Iterable[TypeLike]:
     name = model.name.label("name")
     color = model.color.label("color")
     query = query.add_columns(name, color).group_by(name, color)
-    print(query)
     return db.session.execute(query)
+
+
+def _types_to_rows(sheet, query: Iterable[TypeLike]):
+    for obj in query:
+        yield [
+            add_type_cell(sheet, obj),
+            add_cell(sheet, obj.cost, "bad" if obj.cost < 0 else "nice"),
+        ]
+
+
+def _inner_transfers_to_rows(
+    sheet,
+    budget: Budget | None,
+    inner_budget: InnerBudget | None,
+    transfers: Iterable[InnerTransfer],
+):
+    for obj in transfers:
+        title_cell, cost = make_inner_transfer_cell(
+            obj, budget, inner_budget, "Transfer"
+        )
+        yield [
+            add_cell(sheet, title_cell, "wrap_text_center"),
+            add_cell(sheet, cost, "bad" if cost < 0 else "nice"),
+        ]
 
 
 def _get_args_obj(args):
@@ -135,9 +185,11 @@ def _get_download_name(args: ArgsObj):
     return re.sub(r"\s+", "_", f"{name}_{start}_{end}.xlsx".replace(" ", "_"))
 
 
-def add_type_cell(sheet, type: TypeLike | None):
+def add_type_cell(sheet, type: TypeLike | str | None):
+    if isinstance(type, str):
+        return add_cell(sheet, type, "wrap_text_center")
     if type is None:
-        return add_cell(sheet, "-", "wrap_text_center")
+        return add_cell(sheet, "", "wrap_text_center")
     cell = add_cell(sheet, type.name or "-", "wrap_text_center")
     cell.font = Font(name="Calibri", bold=True, size=8, color=type.color)
     return cell
@@ -149,12 +201,84 @@ def add_type_text_block(type: TypeLike | None, default: str = "-"):
     return color_text(type.name, type.color, bold=True)
 
 
+def make_inner_transfer_cell(transfer: InnerTransfer, budget, inner_budget, prefix=""):
+    title_cell = CellRichText(prefix) if prefix else CellRichText()
+    factor = 1
+    inner_budget_id = inner_budget.id if inner_budget else None
+    if transfer.from_id != inner_budget_id:
+        if title_cell:
+            title_cell.append(" ")
+        title_cell += [
+            "z ",
+            add_type_text_block(transfer.from_inner_budget),
+        ]
+    if transfer.to_id != inner_budget_id:
+        factor = -1
+        if title_cell:
+            title_cell.append(" ")
+        title_cell += [
+            "do ",
+            add_type_text_block(transfer.to_inner_budget),
+        ]
+    budget_id = budget.id if budget else None
+    if transfer.budget_id != budget_id:
+        if title_cell:
+            title_cell.append(" ")
+        title_cell += [
+            "(",
+            add_type_text_block(transfer.budget),
+            ")",
+        ]
+
+    return title_cell, transfer.cost * factor
+
+
 def _fill_payment_worksheet(
     sheet, payments: Iterable[Payment | InnerTransfer], args: ArgsObj, total: Decimal
 ):
     add = partial(add_cell, sheet)
     sheet.title = "Zestawienie"
     sheet.append(["", add(f"Zestawienie {_get_title(args)}", "header")])
+    total_pos = Decimal("0.00")
+    total_neg = Decimal("0.00")
+
+    def make_row(
+        index: int | None,
+        date: date | None,
+        name: str | CellRichText,
+        title: str | CellRichText,
+        payment_type,
+        budget,
+        inner_budget,
+        cost: Decimal | None = None,
+        pos_cost: Decimal | None = None,
+        neg_cost: Decimal | None = None,
+        style=None,
+    ):
+        row = [
+            add(f"{index:03d}" if index else "", "left_header"),
+            add(date.strftime("%Y-%m-%d") if date else "", "left_header"),
+            add(name),
+        ]
+
+        if not args.payment_type:
+            row.append(add_type_cell(sheet, payment_type))
+        if not args.budget:
+            row.append(add_type_cell(sheet, budget))
+        if not args.inner_budget:
+            row.append(add_type_cell(sheet, inner_budget))
+
+        if pos_cost is None or neg_cost is None:
+            assert cost is not None
+            pos_cost = cost
+            neg_cost = cost
+
+        row += [
+            add(title, "wrap_text"),
+            add(pos_cost, "nice") if pos_cost > 0 else add("-", "wrap_text_center"),
+            add(neg_cost, "bad") if neg_cost < 0 else add("-", "wrap_text_center"),
+        ]
+        return row
 
     header = [
         (add("Lp.", "header"), 5),
@@ -170,7 +294,8 @@ def _fill_payment_worksheet(
 
     header += [
         (add("Tytuł", "header"), 60),
-        (add("Kwota", "header"), 15),
+        (add("Zysk", "header"), 15),
+        (add("Koszt", "header"), 15),
     ]
     sheet.append([cell for cell, _ in header])
 
@@ -188,80 +313,73 @@ def _fill_payment_worksheet(
     sheet.freeze_panes = "B1"
 
     for index, payment in enumerate(payments, start=1):
-        row = [
-            add(f"{index:03d}", "left_header"),
-        ]
         if isinstance(payment, Payment):
             transaction: Transaction = payment.transaction
-            name = payment.member.name if payment.member else payment.name
-            row += [
-                add(transaction.date.strftime("%Y-%m-%d"), "left_header"),
-                add(name),
-            ]
+            description = transaction.title
+            if transaction.additional_info:
+                description = f"{transaction.additional_info}\n{description}"
 
-            if not args.payment_type:
-                row.append(add_type_cell(sheet, payment.payment_type))
-            if not args.budget:
-                row.append(add_type_cell(sheet, payment.budget))
-            if not args.inner_budget:
-                row.append(add_type_cell(sheet, payment.inner_budget))
-
-            row += [
-                add(transaction.title, "wrap_text"),
-                add(transaction.cost, "bad" if transaction.cost < 0 else "nice"),
-            ]
+            cost = payment.cost
+            row = make_row(
+                index=index,
+                date=transaction.date,
+                name=payment.member.name if payment.member else payment.name,
+                title=description,
+                payment_type=payment.payment_type,
+                budget=payment.budget,
+                inner_budget=payment.inner_budget,
+                cost=cost,
+            )
         elif isinstance(payment, InnerTransfer):
-            row += [
-                add(payment.date.strftime("%Y-%m-%d"), "left_header"),
-                add("Transfer", "wrap_text"),
-            ]
-
-            if not args.payment_type:
-                row.append(add_type_cell(sheet, None))
-            if not args.budget:
-                row.append(add_type_cell(sheet, payment.budget))
-            if not args.inner_budget:
-                row.append(add_type_cell(sheet, None))
-
-            title_cell = CellRichText()
-            if payment.from_inner_budget != args.inner_budget:
-                title_cell += [
-                    " z ",
-                    add_type_text_block(payment.from_inner_budget),
-                ]
-            if payment.to_inner_budget != args.inner_budget:
-                title_cell += [
-                    " do ",
-                    add_type_text_block(payment.to_inner_budget),
-                ]
-            row += [
-                add(title_cell, "wrap_text"),
-                add(payment.cost, "bad" if payment.cost < 0 else "nice"),
-            ]
+            title_cell, cost = make_inner_transfer_cell(
+                payment, args.budget, args.inner_budget
+            )
+            row = make_row(
+                index=index,
+                date=payment.date,
+                name="Transfer",
+                title=title_cell,
+                payment_type=None,
+                budget=payment.budget,
+                inner_budget=None,
+                cost=cost,
+            )
         else:
-            row.append(add("???", "wrap_text"))
+            row = [add("???", "wrap_text")]
+            cost = Decimal(0)
 
+        if cost > 0:
+            total_pos += cost
+        else:
+            total_neg += cost
         sheet.append(row)
 
-    sum_row = [
-        add("", "wrap_text"),
-        add("", "wrap_text"),
-        add("RAZEM", "header"),
-    ]
-    if not args.payment_type:
-        sum_row.append(add("", "wrap_text"))
-    if not args.budget:
-        sum_row.append(add("", "wrap_text"))
-    if not args.inner_budget:
-        sum_row.append(add("", "wrap_text"))
-    sum_row += [
-        add("", "wrap_text"),
-        add(total, "bad" if total < 0 else "nice"),
-    ]
-    sheet.append(sum_row)
+    first_sum_row = make_row(
+        index=None,
+        date=None,
+        name="RAZEM",
+        title="",
+        payment_type=None,
+        budget=None,
+        inner_budget=None,
+        pos_cost=total_pos,
+        neg_cost=total_neg,
+    )
+    second_sum_row = make_row(
+        index=None,
+        date=None,
+        name="RAZEM (suma)",
+        title="",
+        payment_type=None,
+        budget=None,
+        inner_budget=None,
+        cost=total,
+    )
+    sheet.append(first_sum_row)
+    sheet.append(second_sum_row)
 
     for index in range(2, sheet.max_row + 1):
-        sheet.row_dimensions[index].height = 20.0
+        sheet.row_dimensions[index].height = 30.0
 
 
 def _get_title(args):
@@ -279,7 +397,7 @@ def _get_title(args):
     return f"{name} {start} - {end}"
 
 
-def _fill_type_worksheet(sheet, objs: Iterable[TypeLike]):
+def _fill_type_worksheet(sheet, *objs: Iterable):
     add = partial(add_cell, sheet)
 
     sheet.append([add(sheet.title, "header")])
@@ -300,13 +418,8 @@ def _fill_type_worksheet(sheet, objs: Iterable[TypeLike]):
     sheet.column_dimensions["A"].width = 30
     sheet.column_dimensions["B"].width = 10
 
-    for obj in objs:
-        print(obj)
-        sheet.append(
-            [
-                add_type_cell(sheet, obj),
-                add(obj.cost, "bad" if obj.cost < 0 else "nice"),
-            ]
-        )
+    for rows in objs:
+        for row in rows:
+            sheet.append(row)
 
     sheet.freeze_panes = "A2"

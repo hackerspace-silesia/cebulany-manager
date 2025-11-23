@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import datetime, timedelta
 from decimal import Decimal
 from functools import partial
 from itertools import chain
@@ -18,7 +19,9 @@ from cebulany.queries.transaction import TransactionQuery
 @token_required
 def excel_transaction(year: int, month: int):
     dt = f"{year}-{month:02d}"
-    transactions = TransactionQuery.get_transactions(month=dt)
+    start = datetime(year, month, 1)
+    end = datetime(year, month + 1, 1) - timedelta(days=1)
+    transactions = TransactionQuery.get_transactions(date_range=(start, end))
     workbook = gen_workbook(dt, transactions)
     download_name = f"transaction-{dt}.xlsx"
     return send_excel(workbook, download_name)
