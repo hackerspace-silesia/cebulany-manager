@@ -1,0 +1,1 @@
+from .resource import excel_payment
