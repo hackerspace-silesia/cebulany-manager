@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <MenuPanel v-if="logged" @logout="logout" /><br>
-    <b-container v-if="logged">
+    <b-container fluid v-if="logged">
       <router-view />
     </b-container>
     <b-container v-else>

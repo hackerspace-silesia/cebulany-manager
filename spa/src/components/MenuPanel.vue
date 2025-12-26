@@ -22,6 +22,9 @@
         <b-nav-item href="#/payments">
           Płatności
         </b-nav-item>
+        <b-nav-item href="#/documents">
+          Dokumenty
+        </b-nav-item>
         <b-nav-item href="#/budgets">
           Budżety
         </b-nav-item>

@@ -140,6 +140,22 @@ class Payment(Base):
     inner_budget = relationship(InnerBudget, backref='payments')
 
 
+class Document(Base):
+    id = db.Column(db.Integer, primary_key=True)
+    parent = db.Column(db.String(48), unique=False, index=True, nullable=False)
+    google_parent_id = db.Column(db.String(48), unique=False, index=True, nullable=False)
+    google_id = db.Column(db.String(48), unique=True, index=True, nullable=False)
+    filename = db.Column(db.String(100), index=True, nullable=False)
+    mime_type = db.Column(db.String(100), index=True, nullable=False)
+    link = db.Column(db.String(200), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    accounting_record = db.Column(db.String(100), index=True, default="")
+    accounting_date = db.Column(db.Date, nullable=True)
+    company_name = db.Column(db.String(100), index=False, default="")
+    description = db.Column(db.String(300), index=False, default="")
+    price = db.Column(db.Numeric(10, 2), index=False, nullable=True)
+
+
 class User(Base):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, index=True)

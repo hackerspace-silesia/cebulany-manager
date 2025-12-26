@@ -20,4 +20,4 @@ def dt_type(value):
 
 
 def month_type(value):
-    return  datetime.strptime(value, '%Y-%m')
+    return datetime.strptime(value, '%Y-%m')
