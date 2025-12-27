@@ -4,7 +4,7 @@ from flask_restful import Api
 
 from cebulany.models import db
 from cebulany.resources.user import UserResource, UserListResource, ChangePasswordResource
-from cebulany.resources.transaction import AdditionalInfoTransactionResource, TransactionResource
+from cebulany.resources.transaction import TransactionResource, TransactionsResource
 from cebulany.resources.member import MemberResource, MemberListResource
 from cebulany.resources.paid_month import PaymentTableResource
 from cebulany.resources.report import report_page
@@ -40,8 +40,8 @@ CORS(app)
 api = Api(app)
 db.init_app(app)
 
-api.add_resource(TransactionResource, API_PREFIX + '/transactions')
-api.add_resource(AdditionalInfoTransactionResource, API_PREFIX + '/transactions/<int:id>/info')
+api.add_resource(TransactionsResource, API_PREFIX + '/transactions')
+api.add_resource(TransactionResource, API_PREFIX + '/transactions/<int:id>')
 api.add_resource(MemberListResource, API_PREFIX + '/members')
 api.add_resource(MemberResource, API_PREFIX + '/members/<int:id>')
 

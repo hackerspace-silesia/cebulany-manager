@@ -42,8 +42,6 @@
 
 <script>
   import TypeSelect from '@/components/inputs/TypeSelect';
-
-  import MemberService from '@/services/members'
   import PaymentService from '@/services/payment'
   import linkVm from '@/helpers/linkVm'
 

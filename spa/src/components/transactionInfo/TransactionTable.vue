@@ -41,9 +41,6 @@
   </table>
 </template>
 <script>
-  import TransactionService from '@/services/transactions'
-  import linkVm from '@/helpers/linkVm'
-
   export default {
     props: ['item'],
     data() {
@@ -53,11 +50,7 @@
     },
     methods: {
       update() {
-        const {id, additional_info: AddtionalInfo} = this.item;
-        const promise = TransactionService.updateAdditionalInfo(id, {
-          additional_info: AddtionalInfo,
-        });
-        linkVm(this.promiseState, promise);
+        this.$emit('update', this.item);
       }
     }
   }

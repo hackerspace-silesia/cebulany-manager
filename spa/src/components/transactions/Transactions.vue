@@ -75,7 +75,7 @@ export default {
       this.fetchTransactions();
     },
     fetchTransactions () {
-      linkVm(this, TransactionService.get(this.formParams))
+      linkVm(this, TransactionService.getAll(this.formParams))
         .then((response) => {
           this.transactions = response.data.transactions;
           this.sum = response.data.sum;

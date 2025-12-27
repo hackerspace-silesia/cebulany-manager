@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Transactions from '@/components/transactions/Transactions';
+import Transaction from '@/components/transactionInfo/Transaction';
 import Members from '@/components/members/Members';
 import Budgets from '@/components/budgets/Budgets';
 import Documents from '@/components/documents/Documents';
@@ -20,6 +21,11 @@ export default new Router({
       path: '/',
       name: 'Transactions',
       component: Transactions
+    },
+    {
+      path: '/transaction/:id',
+      name: 'TransactionInfo',
+      component: Transaction
     },
     {
       path: '/members',

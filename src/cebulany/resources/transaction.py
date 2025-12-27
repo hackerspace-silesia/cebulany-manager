@@ -7,15 +7,15 @@ from cebulany.models import Transaction
 from cebulany.resources.model import ModelResourceWithoutDelete
 from cebulany.resources.types import dt_type
 
-transaction_parser = RequestParser()
-transaction_parser.add_argument("date_start", type=dt_type, location="args", required=True)
-transaction_parser.add_argument("date_end", type=dt_type, location="args", required=True)
-transaction_parser.add_argument("text", location="args")
-transaction_parser.add_argument("ordering", location="args")
-transaction_parser.add_argument("member_id", type=int, location="args")
+query_parser = RequestParser()
+query_parser.add_argument("date_start", type=dt_type, location="args", required=True)
+query_parser.add_argument("date_end", type=dt_type, location="args", required=True)
+query_parser.add_argument("text", location="args")
+query_parser.add_argument("ordering", location="args")
+query_parser.add_argument("member_id", type=int, location="args")
 
-additional_parser = RequestParser()
-additional_parser.add_argument("additional_info", required=False, type=str)
+transaction_parser = RequestParser()
+transaction_parser.add_argument("additional_info", required=False, type=str)
 
 
 member_fields = fields.Nested(
@@ -82,39 +82,30 @@ suggestion_fields = fields.Nested(
     allow_null=True,
 )
 
-
 resource_fields = {
-    "transactions": fields.List(
-        fields.Nested(
-            {
-                "id": fields.Integer(),
-                "date": fields.DateTime(dt_format="iso8601"),
-                "title": fields.String(),
-                "name": fields.String(),
-                "cost": fields.Price(decimals=2),
-                "iban": fields.String(),
-                "payments": fields.List(payment_fields),
-                "additional_info": fields.String(),
-                "suggestion": suggestion_fields,
-            }
-        )
-    ),
+    "id": fields.Integer(),
+    "date": fields.DateTime(dt_format="iso8601"),
+    "title": fields.String(),
+    "name": fields.String(),
+    "cost": fields.Price(decimals=2),
+    "iban": fields.String(),
+    "payments": fields.List(payment_fields),
+    "additional_info": fields.String(),
+    "suggestion": suggestion_fields,
+}
+
+resource_list_fields = {
+    "transactions": fields.List(fields.Nested(resource_fields)),
     "sum": fields.Price(decimals=2),
 }
 
 
-additional_info_fields = {
-    "id": fields.Integer,
-    "additional_info": fields.String,
-}
+class TransactionsResource(Resource):
 
-
-class TransactionResource(Resource):
-
-    @marshal_with(resource_fields)
+    @marshal_with(resource_list_fields)
     @token_required
     def get(self):
-        args = transaction_parser.parse_args()
+        args = query_parser.parse_args()
         transactions = TransactionQuery.get_transactions(
             date_range=(args["date_start"], args["date_end"]),
             text_like=args["text"],
@@ -127,7 +118,7 @@ class TransactionResource(Resource):
         }
 
 
-class AdditionalInfoTransactionResource(ModelResourceWithoutDelete):
+class TransactionResource(ModelResourceWithoutDelete):
     cls = Transaction
-    parser = additional_parser
-    resource_fields = additional_info_fields
+    parser = transaction_parser
+    resource_fields = resource_fields

@@ -3,7 +3,7 @@ import axios from './base';
 import {downloadFile} from './excel';
 
 export default {
-  get (params) {
+  getAll (params) {
     return axios
       .get('/transactions', {params: params})
       .then((response) => {
@@ -15,8 +15,19 @@ export default {
         return response;
       });
   },
-  updateAdditionalInfo(id, data) {
-    return axios.put(`/transactions/${id}/info`, data);
+  get (id) {
+    return axios.get(`/transactions/${id}`)
+      .then((response) => {
+        Transaction.computeLeftCost(response.data);
+        return response;
+      });
+  },
+  put (id, data) {
+    return axios.put(`/transactions/${id}`, data)
+      .then((response) => {
+        Transaction.computeLeftCost(response.data);
+        return response;
+      });
   },
   getExcelTable (month) {
     return axios.get(

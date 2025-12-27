@@ -1,20 +1,5 @@
 <template>
   <div class="transactions">
-    <b-modal
-      v-model="showModal"
-      title="Transakcja"
-      size="xl"
-      ok-only="ok-only"
-    >
-      <TransactionModal
-        v-if="showModal"
-        :item="modalItem"
-        :budgets="budgets"
-        :inner-budgets="innerBudgets"
-        :payment-types="paymentTypes"
-        :sum-left="sumLeft"
-      />
-    </b-modal>
     <b-table
       hover="hover"
       bordered="bordered"
@@ -54,11 +39,10 @@
   </div>
 </template>
 <script>
-  import TransactionModal from './TransactionModal';
   import TypeBadge from './TypeBadge';
 
   export default {
-    components: {TransactionModal, TypeBadge},
+    components: {TypeBadge},
     props: ['transactions', 'sum', 'sumLeft', 'budgets', 'innerBudgets', 'paymentTypes'],
     data () {
       return {
@@ -69,14 +53,14 @@
           {key: 'left', label: 'Poz.', class: 'text-nowrap text-right'},
           {key: 'types', label: '*', class: 'transaction-payment-types'}
         ],
-        showModal: false,
-        modalItem: null
       }
     },
     methods: {
       rowClicked (item) {
-        this.showModal = true;
-        this.modalItem = item;
+        this.$router.push({
+          name: 'TransactionInfo',
+          params: {id: item.id},
+        });
       }
     }
   }

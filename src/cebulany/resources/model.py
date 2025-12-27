@@ -31,7 +31,7 @@ class ModelListResource(Resource):
 
 
 class ModelResourceWithoutDelete(Resource):
-    cls: Base
+    cls: type[Base]
     parser: RequestParser
     resource_fields: dict[str, Raw]
     method_decorators = [token_required]
