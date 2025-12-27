@@ -72,12 +72,12 @@ payment_fields = fields.Nested(
 
 suggestion_fields = fields.Nested(
     {
-        "member_id": fields.String,
-        "type_name": fields.String,
-        "type_id": fields.Integer,
+        "name": fields.String(attribute="type_name"),
+        "member": member_fields_optional,
         "budget_id": fields.Integer,
         "inner_budget_id": fields.Integer(default=None),
-        "member": member_fields_optional,
+        "payment_type_id": fields.Integer(attribute="type_id"),
+        "member_id": fields.String,
     },
     allow_null=True,
 )

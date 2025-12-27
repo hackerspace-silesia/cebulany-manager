@@ -2,19 +2,19 @@
   <PromisedRowComponent :state="promiseState">
     <td>
       <TypeSelect
-        v-model="paymentTypeId"
+        v-model="value.payment_type_id"
         :types="paymentTypes"
       />
     </td>
     <td>
       <TypeSelect
-        v-model="budgetId"
+        v-model="value.budget_id"
         :types="budgets"
       />
     </td>
     <td>
       <TypeSelect
-        v-model="innerBudgetId"
+        v-model="value.inner_budget_id"
         :types="innerBudgets"
       />
     </td>
@@ -24,7 +24,7 @@
           size="sm"
           label="name"
           placeholder="członek"
-          :value="member"
+          :value="value.member"
           @search="getMembers"
           @input="selectMember"
           :options="memberOptions"
@@ -33,38 +33,32 @@
       </template>
       <template v-else>
         <b-form-input
-          v-model.trim="name"
+          v-model.trim.lazy="value.name"
           size="sm"
         />
       </template>
     </td>
     <td>
       <b-form-input
-        v-model="date"
+        v-model="value.date"
         size="sm"
         type="date"
       />
     </td>
     <td>
       <b-input-group
-        right="zł"
+        append="zł"
         size="sm"
       >
         <b-form-input
-          v-model.trim="cost"
+          v-model.trim.lazy="value.cost"
           size="sm"
           type="number"
         />
       </b-input-group>
     </td>
     <td>
-      <b-btn
-        size="sm"
-        variant="primary"
-        @click="addType()"
-      >
-        dodaj
-      </b-btn>
+      <slot name="actions"></slot>
     </td>
   </PromisedRowComponent>
 </template>
@@ -73,49 +67,32 @@
   import TypeSelect from '@/components/inputs/TypeSelect';
 
   import MemberService from '@/services/members'
-  import PaymentService from '@/services/payment'
-  import linkVm from '@/helpers/linkVm'
 
   export default {
     components: {TypeSelect},
-    props: ['item', 'budgets', 'innerBudgets', 'paymentTypes'],
+    props: ['value', 'transaction', 'budgets', 'innerBudgets', 'paymentTypes'],
     data () {
-      let suggestion = this.item.suggestion !== null ? this.item.suggestion : {
-        budget_id: 0,
-        inner_budget_id: 0,
-        type_id: 0,
-        type_name: '',
-        member: null,
-      };
-
       return {
         promiseState: null,
-        budgetId: suggestion.budget_id,
-        budget: this.budgets[suggestion.budget_id] || null,
-        innerBudgetId: suggestion.inner_budget_id,
-        innerBudget: this.innerBudgets[suggestion.inner_budget_id] || null,
-        paymentTypeId: suggestion.type_id,
-        paymentType: this.paymentTypes[suggestion.type_id] || null,
-        cost: (this.item.left ? Number(this.item.left) : 0).toFixed(2),
-        name: suggestion.type_name,
-        member: suggestion.member,
         memberOptions: [],
-        date: this.item.date || (new Date()).toISOString().slice(0, 10)
       }
     },
+    computed: {
+      paymentType() {
+        return this.paymentTypes[this.value.payment_type_id];
+      },
+    },
     watch: {
-      budgetId (value) {
-        this.budget = this.budgets[value];
+      'value.payment_type_id' () {
+        this.value.member = null;
+        this.value.member_id = 0;
       },
-      paymentTypeId (value) {
-        this.paymentType = this.paymentTypes[value];
-      },
-      item: {
+      transaction: {
         handler(value) {
-          this.cost = (value.left ? Number(value.left) : 0).toFixed(2);
+          this.value.cost = (value.left ? Number(value.left) : 0).toFixed(2);
         },
         deep: true,
-      }
+      },
     },
     methods: {
       getMembers (search, loading) {
@@ -128,37 +105,10 @@
           })
       },
       selectMember (value) {
-        this.member = value;
+        this.value.member_id = value.id;
+        this.value.member = value;
+        this.value.name = "-";
       },
-      addType () {
-        let name;
-        let memberId;
-        if (this.paymentType.has_members) {
-          memberId = this.member.id;
-          name = '-';
-        } else {
-          memberId = null;
-          name = this.name;
-        }
-
-        let promise = PaymentService.post({
-          transaction_id: this.item.id,
-          member_id: memberId,
-          budget_id: this.budgetId,
-          inner_budget_id: this.innerBudgetId,
-          payment_type_id: this.paymentTypeId,
-          name: name,
-          date: this.date,
-          cost: this.cost,
-        });
-
-        linkVm(this, promise).then(response => {
-          const cost = Number(response.data.cost) || 0;
-          this.item.left = (Number(this.item.left) - cost).toFixed(2);
-          this.item.payments.push(response.data);
-          this.cost = this.item.left;
-        })
-      }
     }
   }
 </script>
