@@ -7,6 +7,7 @@
       foot-clone="foot-clone"
       :items="payments"
       :fields="fields"
+      @row-clicked="showTransaction"
     >
       <template v-slot:cell(name)="row">
         <span v-if="!row.item.member">{{ row.value }}</span><span v-else>{{ row.item.member.name }}</span>
@@ -57,6 +58,12 @@
         return {
           color: this.getColor(color)
         };
+      },
+      showTransaction(item) {
+        this.$router.push({
+          name: 'TransactionInfo',
+          params: {id: item.transaction_id},
+        });
       }
     }
   }
