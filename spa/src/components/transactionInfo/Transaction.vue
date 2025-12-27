@@ -16,7 +16,7 @@
         </tr>
       </thead>
       <tbody v-if="item">
-        <TransactionForm
+        <PaymentForm
           :item="item"
           :budgets="budgets"
           :inner-budgets="innerBudgets"
@@ -40,12 +40,12 @@
   import PaymentTypeService from '@/services/paymentType'
 
   import TransactionTable from './TransactionTable';
-  import TransactionForm from './TransactionForm';
+  import PaymentForm from './PaymentForm';
   import PaymentRow from './PaymentRow';
   import linkVm from '@/helpers/linkVm'
 
   export default {
-    components: {TransactionTable, TransactionForm, PaymentRow},
+    components: {TransactionTable, PaymentForm, PaymentRow},
     data () {
       return {
         item: null,

@@ -96,7 +96,7 @@
         innerBudget: this.innerBudgets[suggestion.inner_budget_id] || null,
         paymentTypeId: suggestion.type_id,
         paymentType: this.paymentTypes[suggestion.type_id] || null,
-        cost: this.item.left || 0,
+        cost: (this.item.left ? Number(this.item.left) : 0).toFixed(2),
         name: suggestion.type_name,
         member: suggestion.member,
         memberOptions: [],
@@ -112,7 +112,7 @@
       },
       item: {
         handler(value) {
-          this.cost = value.left || 0;
+          this.cost = (value.left ? Number(value.left) : 0).toFixed(2);
         },
         deep: true,
       }
@@ -149,11 +149,12 @@
           payment_type_id: this.paymentTypeId,
           name: name,
           date: this.date,
-          cost: this.cost
+          cost: this.cost,
         });
 
         linkVm(this, promise).then(response => {
-          this.item.left -= Number(response.data.cost) || 0;
+          const cost = Number(response.data.cost) || 0;
+          this.item.left = (Number(this.item.left) - cost).toFixed(2);
           this.item.payments.push(response.data);
           this.cost = this.item.left;
         })

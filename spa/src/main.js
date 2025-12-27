@@ -14,6 +14,7 @@ import DatePicker from 'vue2-datepicker';
 import MoneyValue from './components/MoneyValue';
 import PromisedComponent from './components/PromisedComponent';
 import PromisedRowComponent from './components/PromisedRowComponent';
+import PromisedCellComponent from './components/PromisedCellComponent';
 import vSelect from 'vue-select';
 
 Vue.config.productionTip = false;
@@ -30,6 +31,7 @@ Vue.filter('truncate', (string, value) => {
 Vue.component('money-value', MoneyValue);
 Vue.component('PromisedComponent', PromisedComponent);
 Vue.component('PromisedRowComponent', PromisedRowComponent);
+Vue.component('PromisedCellComponent', PromisedCellComponent);
 Vue.component('v-select', vSelect);
 Vue.component('date-picker', DatePicker);
 

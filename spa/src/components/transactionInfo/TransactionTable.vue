@@ -28,16 +28,16 @@
         <money-value :value="item.left" />
       </td>
     </tr>
-    <PromisedRowComponent :state="promiseState">
+    <tr>
       <th>Dodatkowa informacja</th>
-      <td colspan="3">
+      <PromisedCellComponent :state="promiseState" colspan="3">
         <b-form-input 
           size="sm"
           v-model.lazy.trim="item.additional_info"
           @change="update"
         />
-      </td>
-    </PromisedRowComponent>
+      </PromisedCellComponent>
+    </tr>
   </table>
 </template>
 <script>
