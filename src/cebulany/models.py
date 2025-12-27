@@ -141,6 +141,7 @@ class Payment(Base):
 
 
 class Document(Base):
+    __abstract__ = False
     id = db.Column(db.Integer, primary_key=True)
     parent = db.Column(db.String(48), unique=False, index=True, nullable=False)
     google_parent_id = db.Column(db.String(48), unique=False, index=True, nullable=False)
@@ -156,7 +157,18 @@ class Document(Base):
     price = db.Column(db.Numeric(10, 2), index=False, nullable=True)
 
 
+class Attachment(Base):
+    __abstract__ = False
+    id = db.Column(db.Integer, primary_key=True)
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
+    document_id = db.Column(db.Integer, db.ForeignKey('document.id'), nullable=False)
+
+    transaction = relationship(Transaction, backref='attachments')
+    document = relationship(Document, backref='attachments')
+
+
 class User(Base):
+    __abstract__ = False
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(256))
