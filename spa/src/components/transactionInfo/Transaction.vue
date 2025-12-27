@@ -1,7 +1,7 @@
 <template>
   <div>
   <PromisedComponent :state="promiseState">
-    <TransactionTable :item="item" @update="update" ref="table" v-if="item" />
+    <TransactionTable :item="transaction" @update="update" ref="table" v-if="transaction" />
     <h5>Rozliczenia</h5>
     <table class="table table-bordered table-sm">
       <thead>
@@ -15,17 +15,21 @@
           <th>*</th>
         </tr>
       </thead>
-      <tbody v-if="item">
+      <tbody v-if="transaction">
         <PaymentFormAdd
-          :transaction="item"
+          :transaction="transaction"
           :budgets="budgets"
           :inner-budgets="innerBudgets"
           :payment-types="paymentTypes"
         />
-        <PaymentRow
-          v-for="payment in item.payments"
+        <PaymentFormUpdate
+          v-for="payment in transaction.payments"
           :key="payment.id"
           :payment="payment"
+          :transaction="transaction"
+          :budgets="budgets"
+          :inner-budgets="innerBudgets"
+          :payment-types="paymentTypes"
           @remove="remove"
         />
       </tbody>
@@ -41,14 +45,14 @@
 
   import TransactionTable from './TransactionTable';
   import PaymentFormAdd from './PaymentFormAdd';
-  import PaymentRow from './PaymentRow';
+  import PaymentFormUpdate from './PaymentFormUpdate.vue';
   import linkVm from '@/helpers/linkVm'
 
   export default {
-    components: {TransactionTable, PaymentFormAdd, PaymentRow},
+    components: {TransactionTable, PaymentFormAdd, PaymentFormUpdate},
     data () {
       return {
-        item: null,
+        transaction: null,
         budgets: [],
         innerBudgets: [],
         paymentTypes: [],
@@ -56,11 +60,11 @@
       };
     },
     created() {
-      const itemId = this.$route.params.id;
-      let promises = [TransactionService.get(itemId), BudgetService.getAll(), InnerBudgetService.getAll(), PaymentTypeService.getAll()];
+      const transactionId = this.$route.params.id;
+      let promises = [TransactionService.get(transactionId), BudgetService.getAll(), InnerBudgetService.getAll(), PaymentTypeService.getAll()];
       linkVm(this, Promise.all(promises))
         .then(([ItemResponse, budgetResponse, innerBudgetResponse, paymentTypeResponse]) => {
-          this.item = ItemResponse.data;
+          this.transaction = ItemResponse.data;
           this.budgets = this.transformArrayToMap(budgetResponse.data);
           this.innerBudgets = this.transformArrayToMap(innerBudgetResponse.data);
           this.paymentTypes = this.transformArrayToMap(paymentTypeResponse.data);
@@ -69,23 +73,23 @@
     methods: {
       transformArrayToMap (array) {
         let obj = {};
-        array.forEach((item) => {
-          obj[`${item.id}`] = item;
+        array.forEach((transaction) => {
+          obj[`${transaction.id}`] = transaction;
         });
         return obj;
       },
-      update (item) {
-        const {id, additional_info: AddtionalInfo} = item;
+      update (transaction) {
+        const {id, additional_info: AddtionalInfo} = transaction;
         const promise = TransactionService.put(id, {
           additional_info: AddtionalInfo,
         });
         linkVm(this.$refs.table, promise);
       },
       remove (pk) {
-          let item = this.item;
-          let oldObj = item.payments.find(obj => obj.id === pk);
-          item.left = (Number(item.left) + Number(oldObj.cost)).toFixed(2);
-          item.payments = item.payments.filter(obj => obj.id !== pk);
+          let transaction = this.transaction;
+          let oldObj = transaction.payments.find(obj => obj.id === pk);
+          transaction.left = (Number(transaction.left) + Number(oldObj.cost)).toFixed(2);
+          transaction.payments = transaction.payments.filter(obj => obj.id !== pk);
       }
     }
   }

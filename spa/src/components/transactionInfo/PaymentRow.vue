@@ -29,13 +29,6 @@
       {{ payment.cost }} zł
     </td>
     <td>
-      <b-btn
-        size="sm"
-        variant="danger"
-        @click="remove(payment.id)"
-      >
-        usuń
-      </b-btn>
     </td>
   </PromisedRowComponent>
 </template>

@@ -32,6 +32,9 @@ export default {
   post (data) {
     return axios.post('/payment/', data);
   },
+  put (id, data) {
+    return axios.put(`/payment/${id}`, data);
+  },
   delete (id) {
     return axios.delete(`/payment/${id}`);
   }

@@ -4,18 +4,21 @@
       <TypeSelect
         v-model="value.payment_type_id"
         :types="paymentTypes"
+        @input="update"
       />
     </td>
     <td>
       <TypeSelect
         v-model="value.budget_id"
         :types="budgets"
+        @input="update"
       />
     </td>
     <td>
       <TypeSelect
         v-model="value.inner_budget_id"
         :types="innerBudgets"
+        @input="update"
       />
     </td>
     <td>
@@ -34,6 +37,7 @@
       <template v-else>
         <b-form-input
           v-model.trim.lazy="value.name"
+          @change="update"
           size="sm"
         />
       </template>
@@ -41,6 +45,7 @@
     <td>
       <b-form-input
         v-model="value.date"
+        @change="update"
         size="sm"
         type="date"
       />
@@ -52,6 +57,7 @@
       >
         <b-form-input
           v-model.trim.lazy="value.cost"
+          @change="update"
           size="sm"
           type="number"
         />
@@ -70,7 +76,7 @@
 
   export default {
     components: {TypeSelect},
-    props: ['value', 'transaction', 'budgets', 'innerBudgets', 'paymentTypes'],
+    props: ['value', 'budgets', 'innerBudgets', 'paymentTypes'],
     data () {
       return {
         promiseState: null,
@@ -87,14 +93,11 @@
         this.value.member = null;
         this.value.member_id = 0;
       },
-      transaction: {
-        handler(value) {
-          this.value.cost = (value.left ? Number(value.left) : 0).toFixed(2);
-        },
-        deep: true,
-      },
     },
     methods: {
+      update() {
+        this.$emit("change", this.value);
+      },
       getMembers (search, loading) {
         loading(true);
         MemberService
@@ -108,6 +111,7 @@
         this.value.member_id = value.id;
         this.value.member = value;
         this.value.name = "-";
+        this.update();
       },
     }
   }
