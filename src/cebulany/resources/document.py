@@ -3,23 +3,32 @@ from decimal import Decimal
 from flask_restful import Resource, fields, marshal
 from flask_restful.reqparse import RequestParser
 from flask import abort
-from sqlalchemy import or_
 
 from cebulany.auth import token_required
 from cebulany.google_drive import find_files_by_date, update_file
 from cebulany.models import Document, db
+from cebulany.queries.document import DocumentQuery
 from cebulany.resources.types import dt_type, month_type
 
-resource_fields = {
+resource_fields_base = {
     "id": fields.Integer(),
     "filename": fields.String(),
-    "date": fields.DateTime(dt_format="iso8601"),
     "accounting_record": fields.String(),
     "accounting_date": fields.DateTime(dt_format="iso8601"),
     "company_name": fields.String(),
     "description": fields.String(),
     "price": fields.Fixed(decimals=2),
+}
+
+resource_fields = {
+    **resource_fields_base,
     "link": fields.String(),
+    "date": fields.DateTime(dt_format="iso8601"),
+}
+
+resource_fields_score = {
+    **resource_fields_base,
+    "score": fields.Float(),
 }
 
 parser = RequestParser()
@@ -33,6 +42,12 @@ parser.add_argument("price", required=False, type=Decimal)
 query_parser = RequestParser()
 query_parser.add_argument("parent", required=False, type=str, location="args")
 query_parser.add_argument("name", required=False, type=str, location="args")
+
+query_score_parser = RequestParser()
+query_score_parser.add_argument("parent", required=True, type=str, location="args")
+query_score_parser.add_argument("date", required=True, type=dt_type, location="args")
+query_score_parser.add_argument("price", required=True, type=Decimal, location="args")
+query_score_parser.add_argument("name", required=False, type=str, location="args")
 
 
 def sync_document(item, document: Document):
@@ -59,23 +74,27 @@ def sync_document(item, document: Document):
 
 
 class DocumentListResource(Resource):
-    cls = Document
 
     def get(self):
         args = query_parser.parse_args()
-        query = Document.query.order_by(Document.filename)
-        if args.parent:
-            query = query.filter(Document.parent == args.parent)
-        if args.name:
-            escaped = f"%%{args.name.replace("%", r"\%")}%%"
-            query = query.filter(
-                or_(
-                    Document.filename.ilike(escaped),
-                    Document.accounting_record.ilike(escaped),
-                    Document.description.ilike(escaped),
-                )
-            )
+        query = DocumentQuery.get_documents(
+            parent=args.parent,
+            name_like=args.name,
+        )
         return marshal(query.all(), resource_fields)
+
+
+class DocumentScoreResource(Resource):
+
+    def get(self):
+        args = query_score_parser.parse_args()
+        query = DocumentQuery.get_score(
+            parent=args.parent,
+            dt=args.date.date(),
+            price=args.price,
+            name_like=args.name,
+        )
+        return marshal(query.all(), resource_fields_score)
 
 
 class DocumentResource(Resource):

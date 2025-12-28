@@ -4,6 +4,9 @@ export default {
     getAll(params) {
         return axios.get('/document/', { params });
     },
+    getScore(params) {
+        return axios.get('/document/score', { params });
+    },
     sync(month) {
         return axios.post(`/document/sync/${month}`);
     },

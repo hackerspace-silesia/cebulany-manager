@@ -43,7 +43,7 @@
       </template>
       <template v-slot:cell(cost)="row">
         <b-input-group
-          right="zł"
+          append="zł"
           size="sm"
         >
           <b-form-input

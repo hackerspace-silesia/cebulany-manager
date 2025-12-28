@@ -13,7 +13,7 @@ from cebulany.resources.excels import excel_page
 from cebulany.resources.login import LoginResource
 from cebulany.resources.budget import BudgetListResource, BudgetResource
 from cebulany.resources.document import DocumentListResource, DocumentResource
-from cebulany.resources.document import DocumentSyncResource
+from cebulany.resources.document import DocumentSyncResource, DocumentScoreResource
 from cebulany.resources.inner_budget import InnerBudgetListResource
 from cebulany.resources.inner_budget import InnerBudgetResource
 from cebulany.resources.payment_type import PaymentTypeListResource
@@ -54,6 +54,7 @@ api.add_resource(BudgetResource, API_PREFIX + '/budget/<int:id>')
 api.add_resource(DocumentResource, API_PREFIX + '/document/<int:id>')
 api.add_resource(DocumentSyncResource, API_PREFIX + '/document/sync/<month>')
 api.add_resource(DocumentListResource, API_PREFIX + '/document/')
+api.add_resource(DocumentScoreResource, API_PREFIX + '/document/score')
 api.add_resource(InnerBudgetListResource, API_PREFIX + '/inner_budget/')
 api.add_resource(InnerBudgetResource, API_PREFIX + '/inner_budget/<int:id>')
 api.add_resource(PaymentTypeListResource, API_PREFIX + '/payment_type/')

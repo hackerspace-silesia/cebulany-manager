@@ -34,37 +34,59 @@
         />
       </tbody>
     </table>
+    <h5>
+      Załączniki 
+      <b-button variant="primary" @click="showModal">Dodaj</b-button>
+    </h5> 
+    <DocumentModal
+      v-if="transaction"
+      ref="documentModal"
+      :transaction="transaction"
+      @add="addAttachment"
+    />
   </PromisedComponent>
   </div>
 </template>
 <script>
   import TransactionService from '@/services/transactions';
-  import BudgetService from '@/services/budget'
-  import InnerBudgetService from '@/services/innerBudget'
-  import PaymentTypeService from '@/services/paymentType'
+  import BudgetService from '@/services/budget';
+  import InnerBudgetService from '@/services/innerBudget';
+  import PaymentTypeService from '@/services/paymentType';
 
   import TransactionTable from './TransactionTable';
   import PaymentFormAdd from './PaymentFormAdd';
   import PaymentFormUpdate from './PaymentFormUpdate.vue';
-  import linkVm from '@/helpers/linkVm'
+  import DocumentModal from './DocumentModal.vue';
+  import linkVm from '@/helpers/linkVm';
 
   export default {
-    components: {TransactionTable, PaymentFormAdd, PaymentFormUpdate},
+    components: {TransactionTable, PaymentFormAdd, PaymentFormUpdate, DocumentModal},
     data () {
       return {
         transaction: null,
         budgets: [],
         innerBudgets: [],
         paymentTypes: [],
+        documents: [],
         promiseState: null,
       };
     },
     created() {
       const transactionId = this.$route.params.id;
-      let promises = [TransactionService.get(transactionId), BudgetService.getAll(), InnerBudgetService.getAll(), PaymentTypeService.getAll()];
+      let promises = [
+        TransactionService.get(transactionId),
+        BudgetService.getAll(),
+        InnerBudgetService.getAll(),
+        PaymentTypeService.getAll(),
+      ];
       linkVm(this, Promise.all(promises))
-        .then(([ItemResponse, budgetResponse, innerBudgetResponse, paymentTypeResponse]) => {
-          this.transaction = ItemResponse.data;
+        .then(([
+          transactionResponse,
+          budgetResponse,
+          innerBudgetResponse,
+          paymentTypeResponse,
+        ]) => {
+          this.transaction = transactionResponse.data;
           this.budgets = this.transformArrayToMap(budgetResponse.data);
           this.innerBudgets = this.transformArrayToMap(innerBudgetResponse.data);
           this.paymentTypes = this.transformArrayToMap(paymentTypeResponse.data);
@@ -90,7 +112,14 @@
           let oldObj = transaction.payments.find(obj => obj.id === pk);
           transaction.left = (Number(transaction.left) + Number(oldObj.cost)).toFixed(2);
           transaction.payments = transaction.payments.filter(obj => obj.id !== pk);
-      }
+      },
+      showModal() {
+        this.$refs.documentModal.show();
+      },
+      addAttachment(obj) {
+        this.$refs.documentModal.hide();
+        console.log(obj);
+      },
     }
   }
 </script>
