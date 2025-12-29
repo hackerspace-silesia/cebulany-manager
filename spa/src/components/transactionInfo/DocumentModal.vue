@@ -1,10 +1,14 @@
 <template>
   <b-modal ref="modal" title="Dodaj załącznik" size="xl" hide-footer>
     <b-form>
-      <b-form-group label="Numer / Firma / Nazwa Pliku">
+      <b-form-group label-cols="3" label="Dane przelewu" size="sm">
+        <span v-if="transaction.name">{{ transaction.name }}<br /></span>
+        {{ transaction.title }}
+      </b-form-group>
+      <b-form-group label-cols="3" label="Numer / Firma / Nazwa Pliku" size="sm">
         <b-form-input v-model.trim="name" size="sm" />
       </b-form-group>
-      <b-form-group label="Kwota">
+      <b-form-group label-cols="3" label="Kwota" size="sm">
         <b-input-group append="zł" size="sm">
           <b-form-input v-model.trim="price" size="sm" type="number" />
         </b-input-group>
@@ -19,6 +23,7 @@
             <th>Numer</th>
             <th>Firma</th>
             <th>Data</th>
+            <th>Opis</th>
             <th>Kwota</th>
             <th>Prawdopobieństwo</th>
             <th>*</th>
@@ -30,8 +35,9 @@
             <td>{{ doc.accounting_record }}</td>
             <td>{{ doc.company_name }}</td>
             <td>{{ doc.accounting_date }}</td>
+            <td>{{ doc.description || '-' }}</td>
             <td><money-value :value="doc.price" /></td>
-            <td v-if="isNaN(doc.score)"> - </td>
+            <td v-if="isNaN(doc.score) || doc.score === scoreTotal"> - </td>
             <td v-else> {{ (100 - 100 * (doc.score / scoreTotal)).toFixed(2) }}% </td>
             <td>
               <b-button 
@@ -62,9 +68,6 @@
         price: this.transaction.cost,
       };
     },
-    created() {
-      this.getAll();
-    },
     watch: {
       name() {
         this.getAll();
@@ -84,7 +87,8 @@
 
         linkVm(this, promise)
           .then((documentResponse) => {
-            this.documents = documentResponse.data;
+            const documentIds = this.transaction.attachments.map(a => a.document.id);
+            this.documents = documentResponse.data.filter(doc => !documentIds.includes(doc.id));
             this.scoreTotal = this.documents.reduce((total, doc) => total + (isNaN(doc.score) ? 0 : doc.score), 0);
           });
       },
@@ -93,6 +97,7 @@
       },
       show() {
         this.$refs.modal.show();
+        this.getAll();
       },
       hide() {
         this.$refs.modal.hide();

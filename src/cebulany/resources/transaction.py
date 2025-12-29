@@ -7,6 +7,8 @@ from cebulany.models import Transaction
 from cebulany.resources.model import ModelResourceWithoutDelete
 from cebulany.resources.types import dt_type
 
+from cebulany.resources.document import resource_fields_base as document_fields
+
 query_parser = RequestParser()
 query_parser.add_argument("date_start", type=dt_type, location="args", required=True)
 query_parser.add_argument("date_end", type=dt_type, location="args", required=True)
@@ -74,6 +76,13 @@ payment_fields = fields.Nested(
     }
 )
 
+attachment_fields = fields.Nested(
+    {
+        "id": fields.Integer,
+        "document": fields.Nested(document_fields),
+    }
+)
+
 suggestion_fields = fields.Nested(
     {
         "name": fields.String(attribute="type_name"),
@@ -86,7 +95,7 @@ suggestion_fields = fields.Nested(
     allow_null=True,
 )
 
-resource_fields = {
+resource_fields_base = {
     "id": fields.Integer(),
     "date": fields.DateTime(dt_format="iso8601"),
     "title": fields.String(),
@@ -94,12 +103,17 @@ resource_fields = {
     "cost": fields.Price(decimals=2),
     "iban": fields.String(),
     "payments": fields.List(payment_fields),
+}
+
+resource_fields = {
+    **resource_fields_base,
+    "attachments": fields.List(attachment_fields),
     "additional_info": fields.String(),
     "suggestion": suggestion_fields,
 }
 
 resource_list_fields = {
-    "transactions": fields.List(fields.Nested(resource_fields)),
+    "transactions": fields.List(fields.Nested(resource_fields_base)),
     "sum": fields.Price(decimals=2),
 }
 
