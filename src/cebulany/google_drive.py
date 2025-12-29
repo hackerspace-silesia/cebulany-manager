@@ -9,7 +9,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/drive.metadata.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/drive.metadata"]
 ALL_FIELDS = [
     "id",
     "name",
@@ -140,7 +140,7 @@ def _login():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file("/data/credentials.json", SCOPES)
-            creds = flow.run_local_server(port=0)
+            creds = flow.run_local_server(port=8081, open_browser=False)
         # Save the credentials for the next run
         with open(FILENAME, "w") as token:
             token.write(creds.to_json())
