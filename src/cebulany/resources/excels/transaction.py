@@ -9,7 +9,8 @@ from openpyxl import Workbook
 from openpyxl.cell.rich_text import CellRichText
 
 from cebulany.auth import token_required
-from cebulany.models import Payment, Transaction
+from cebulany.models import Document, Payment, Transaction
+from cebulany.queries.document import DocumentQuery
 from cebulany.resources.excels.utils import color_text, send_excel, setup_styles, add_cell
 from cebulany.resources.excels.blueprint import excel_page, URL_PREFIX
 from cebulany.queries.transaction import TransactionQuery
@@ -22,17 +23,50 @@ def excel_transaction(year: int, month: int):
     start = datetime(year, month, 1)
     end = datetime(year, month + 1, 1) - timedelta(days=1)
     transactions = TransactionQuery.get_transactions(date_range=(start, end))
-    workbook = gen_workbook(dt, transactions)
+    documents = DocumentQuery.get_documents(parent=dt).all()
+    workbook = gen_workbook(dt, transactions, documents)
     download_name = f"transaction-{dt}.xlsx"
     return send_excel(workbook, download_name)
 
 
-def gen_workbook(dt: str, transactions: list[Transaction]):
+def gen_workbook(dt: str, transactions: list[Transaction], documents: Iterable[Document]):
     workbook = Workbook()
     setup_styles(workbook, font_size=8)
     fill_worksheet(workbook.active, dt, transactions)
+    fill_attachments(workbook.create_sheet("Załączniki"), documents)
 
     return workbook
+
+
+def fill_attachments(sheet, documents: Iterable[Document]):
+    add = partial(add_cell, sheet)
+    sheet.append(
+        [
+            add("Nazwa pliku", "header"),
+            add("Numer", "header"),
+            add("Podmiot", "header"),
+            add("Data", "header"),
+            add("Kwota", "header"),
+            add("Komentarz", "header"),
+        ]
+    )
+
+    sheet.column_dimensions["A"].width = 40.0
+    sheet.column_dimensions["B"].width = 30.0
+    sheet.column_dimensions["C"].width = 40.0
+    sheet.column_dimensions["D"].width = 10.0
+    sheet.column_dimensions["E"].width = 10.0
+    sheet.column_dimensions["F"].width = 50.0
+
+    for document in documents:
+        sheet.append([
+            add(document.filename, "left_header"),
+            add(document.accounting_record, "wrap_text"),
+            add(document.company_name, "wrap_text"),
+            add(document.accounting_date and document.accounting_date.strftime("%Y-%m-%d"), "wrap_text"),
+            add(document.price, "ok"),
+            add(document.description, "wrap_text"),
+        ])
 
 
 def fill_worksheet(sheet, dt: str, transactions: list[Transaction]):
@@ -42,10 +76,11 @@ def fill_worksheet(sheet, dt: str, transactions: list[Transaction]):
     sheet.append(
         [
             add("L.p", "header"),
-            add("data", "header"),
+            add("Data", "header"),
             add("Kontrahent / Numer rachunku", "header"),
             add("Opis / Typ transakcji", "header"),
             add("Kwota", "header"),
+            add("Numer dokumentu", "header"),
             add("Rodzaj", "header"),
             add("Źródło finansowania wydatku", "header"),
         ]
@@ -64,22 +99,25 @@ def fill_worksheet(sheet, dt: str, transactions: list[Transaction]):
     sheet.column_dimensions["D"].width = 40.0
     sheet.column_dimensions["E"].width = 15.0
     sheet.column_dimensions["F"].width = 30.0
-    sheet.column_dimensions["G"].width = 40.0
+    sheet.column_dimensions["G"].width = 30.0
+    sheet.column_dimensions["H"].width = 40.0
     sheet.freeze_panes = "B1"
 
     for index, transaction in enumerate(transactions, start=1):
         ps = transaction.payments
         payment_type = _to_rich_text(_format_payment_type(p) for p in ps)
         budget = _to_rich_text(_format_budget(p) for p in ps)
-        info = f"{transaction.additional_info} {transaction.name}".strip()
+        if transaction.additional_info:
+            budget.append(transaction.additional_info)
 
         sheet.append(
             [
                 add(f"{index:03d}", "left_header"),
                 add(transaction.date.strftime("%Y-%m-%d"), "left_header"),
-                add(info, "wrap_text"),
+                add(transaction.name, "wrap_text"),
                 add(transaction.title, "wrap_text"),
                 add(transaction.cost, "bad" if transaction.cost < 0 else "nice"),
+                add(_get_attachments(transaction), "wrap_text"),
                 add(payment_type, "wrap_text_center"),
                 add(budget, "wrap_text_center"),
             ]
@@ -87,6 +125,20 @@ def fill_worksheet(sheet, dt: str, transactions: list[Transaction]):
 
     for index in range(2, sheet.max_row + 1):
         sheet.row_dimensions[index].height = 40.0
+
+
+def _get_attachments(transaction: Transaction):
+    atts = list(transaction.attachments)
+    
+    def cb(doc: Document):
+        s = []
+        if doc.company_name:
+            s.append(doc.company_name)
+        if doc.accounting_record:
+            s.append(doc.accounting_record)
+        return " ".join(s)
+
+    return "; ".join(cb(att.document) for att in atts)
 
 
 class RichCostLabel(NamedTuple):
