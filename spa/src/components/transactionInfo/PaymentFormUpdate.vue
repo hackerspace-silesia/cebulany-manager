@@ -30,7 +30,13 @@
     props: ['payment', 'transaction', 'budgets', 'innerBudgets', 'paymentTypes'],
     methods: {
       update () {
-        let promise = PaymentService.put(this.payment.id, {transaction_id: this.transaction.id, ...this.payment});
+        const payment = {transaction_id: this.transaction.id, ...this.payment};
+        if (!payment.member_id) {
+          // During update member_id = 0 creates Integrity error in Sqlalchemy
+          // I don't have time to fix this in backend.
+          delete payment.member_id;
+        }
+        let promise = PaymentService.put(this.payment.id, payment);
         linkVm(this.$refs.parent, promise).then(response => {
           Transaction.computeLeftCost(this.transaction);
         })

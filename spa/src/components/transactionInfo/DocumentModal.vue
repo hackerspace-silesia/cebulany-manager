@@ -21,7 +21,7 @@
           <tr>
             <th>Dokument</th>
             <th>Numer</th>
-            <th>Firma</th>
+            <th>Podmiot</th>
             <th>Data</th>
             <th>Opis</th>
             <th>Kwota</th>
