@@ -65,6 +65,9 @@
       </template>
       <template v-slot:cell(link)="row">
         <b-btn @click="show(row.item)" size="sm">Link</b-btn>
+        <br />
+        <b-badge v-if="row.item._state === 'loading'" pill variant="warning">Loading</b-badge>
+        <b-badge v-if="row.item._state === 'error'" pill variant="loading">Error</b-badge>
       </template>
     </b-table>
   </div>
@@ -91,6 +94,12 @@
       rowClass (item, type) {
         if (!item || type !== 'row' || !this.itemToShow) {
           return;
+        }
+        if (item._state === 'loading') {
+          return 'table-secondary';
+        }
+        if (item._state === 'error') {
+          return 'table-error';
         }
         if (item.id === this.itemToShow.id) {
           return 'table-primary';

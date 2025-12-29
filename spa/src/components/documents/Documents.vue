@@ -82,7 +82,12 @@ export default {
       this.itemToShow = null;
     },
     update (data) {
-      DocumentService.update(data.id, data);
+      this.$set(data, '_state', 'loading');
+      DocumentService.update(data.id, data).then(() => {
+        this.$set(data, '_state', 'ok');
+      }).catch(() => {
+        this.$set(data, '_state', 'error');
+      });
     },
   }
 }
