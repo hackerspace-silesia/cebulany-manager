@@ -61,20 +61,15 @@ def update_file(
 ):
     service = build("drive", "v3", credentials=_login())
 
-    properties = {}
-    if accounting_record:
-        properties["accounting_record"] = accounting_record
-    if accounting_date:
-        properties["accounting_date"] = accounting_date.isoformat()
-    if company_name:
-        properties["company_name"] = company_name
-    if price:
-        properties["price"] = str(price)
-
     body = {
         "name": filename,
         "description": description,
-        "properties": properties,
+        "properties": {
+            "accounting_record": accounting_record if accounting_record else None,
+            "accouting_date": accounting_date and accounting_date.isoformat(),
+            "company_name": company_name if company_name else None,
+            "price": str(price) if price else None,
+        },
     }
 
     return (
