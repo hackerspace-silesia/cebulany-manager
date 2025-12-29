@@ -1,5 +1,5 @@
 <template>
-  <table class="table table-bordered table-sm">
+  <table class="table table-bordered">
     <tr>
       <th>Nazwa</th>
       <td colspan="3">

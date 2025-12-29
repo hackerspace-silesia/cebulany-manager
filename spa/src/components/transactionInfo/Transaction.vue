@@ -1,49 +1,21 @@
 <template>
   <div>
   <PromisedComponent :state="promiseState">
-    <TransactionTable :item="transaction" @update="update" ref="table" v-if="transaction" />
-    <h5>Rozliczenia</h5>
-    <table class="table table-bordered table-sm">
-      <thead>
-        <tr>
-          <th>Typ</th>
-          <th>Budżet</th>
-          <th>Budżet wew.</th>
-          <th>Nazwa</th>
-          <th>Data</th>
-          <th>Kwota</th>
-          <th>*</th>
-        </tr>
-      </thead>
-      <tbody v-if="transaction">
-        <PaymentFormAdd
-          :transaction="transaction"
-          :budgets="budgets"
-          :inner-budgets="innerBudgets"
-          :payment-types="paymentTypes"
-        />
-        <PaymentFormUpdate
-          v-for="payment in transaction.payments"
-          :key="payment.id"
-          :payment="payment"
-          :transaction="transaction"
-          :budgets="budgets"
-          :inner-budgets="innerBudgets"
-          :payment-types="paymentTypes"
-          @remove="remove"
-        />
-      </tbody>
-    </table>
-    <h5>
-      Załączniki 
-      <b-button variant="primary" @click="showModal">Dodaj</b-button>
-    </h5> 
-    <DocumentModal
-      v-if="transaction"
-      ref="documentModal"
-      :transaction="transaction"
-      @add="addAttachment"
-    />
+    <template v-if="transaction">
+      <TransactionTable :item="transaction" @update="update" ref="table"/>
+      <PaymentTable 
+        :transaction="transaction"
+        :budgets="budgets"
+        :inner-budgets="innerBudgets"
+        :payment-types="paymentTypes"
+      />
+      <AttachmentTable 
+        :transaction="transaction"
+      />
+    </template>
+    <template v-else>
+      Something is wrong.
+    </template>
   </PromisedComponent>
   </div>
 </template>
@@ -54,13 +26,12 @@
   import PaymentTypeService from '@/services/paymentType';
 
   import TransactionTable from './TransactionTable';
-  import PaymentFormAdd from './PaymentFormAdd';
-  import PaymentFormUpdate from './PaymentFormUpdate.vue';
-  import DocumentModal from './DocumentModal.vue';
+  import PaymentTable from './PaymentTable';
+  import AttachmentTable from './AttachmentTable';
   import linkVm from '@/helpers/linkVm';
 
   export default {
-    components: {TransactionTable, PaymentFormAdd, PaymentFormUpdate, DocumentModal},
+    components: {TransactionTable, AttachmentTable, PaymentTable},
     data () {
       return {
         transaction: null,
@@ -106,19 +77,6 @@
           additional_info: AddtionalInfo,
         });
         linkVm(this.$refs.table, promise);
-      },
-      remove (pk) {
-          let transaction = this.transaction;
-          let oldObj = transaction.payments.find(obj => obj.id === pk);
-          transaction.left = (Number(transaction.left) + Number(oldObj.cost)).toFixed(2);
-          transaction.payments = transaction.payments.filter(obj => obj.id !== pk);
-      },
-      showModal() {
-        this.$refs.documentModal.show();
-      },
-      addAttachment(obj) {
-        this.$refs.documentModal.hide();
-        console.log(obj);
       },
     }
   }
