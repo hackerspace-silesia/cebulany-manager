@@ -16,6 +16,18 @@ import InnerTransfers from '@/components/innerTransfers/InnerTransfers.vue';
 Vue.use(Router);
 
 export default new Router({
+  scrollBehavior(to, from, savedPosition) {
+    console.log(savedPosition);
+    if (savedPosition) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(savedPosition);
+        }, 500)
+      });
+    } else {
+      return { top: 0 };
+    }
+  },
   routes: [
     {
       path: '/',
