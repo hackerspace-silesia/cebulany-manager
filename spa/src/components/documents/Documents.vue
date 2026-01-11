@@ -19,6 +19,7 @@
           :item-to-show="itemToShow"
           @row-update="update"
           @row-show="showIframe"
+          @row-remove="remove"
         />
       </PromisedComponent>
     </b-col>
@@ -83,11 +84,24 @@ export default {
     },
     update (data) {
       this.$set(data, '_state', 'loading');
-      DocumentService.update(data.id, data).then(() => {
-        this.$set(data, '_state', 'ok');
-      }).catch(() => {
+      DocumentService.update(data.id, data)
+      .then(({data: newData}) => {
+        const index = this.documents.findIndex(doc => doc.id === data.id);
+        this.$set(this.documents, index, {...newData, '_state': 'ok'});
+      })
+      .catch(() => {
         this.$set(data, '_state', 'error');
-      });
+      })
+    },
+    remove (data) {
+      this.$set(data, '_state', 'loading');
+      DocumentService.remove(data.id)
+      .then(() => {
+        this.documents = this.documents.filter(doc => doc.id !== data.id);
+      })
+      .catch(() => {
+        this.$set(data, '_state', 'error');
+      })
     },
   }
 }
@@ -101,5 +115,8 @@ export default {
   .sticky-iframe iframe {
     width: 100%;
     height: calc(100vh - 200px);
+  }
+  .documents .form-group {
+    margin-bottom: 4px;
   }
 </style>

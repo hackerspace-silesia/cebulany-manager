@@ -1,7 +1,9 @@
 from datetime import date, datetime
 from decimal import Decimal
+from cebulany.resources.model import ModelResource
 from flask_restful import Resource, fields, marshal
 from flask_restful.reqparse import RequestParser
+from sqlalchemy.orm import load_only
 from flask import abort
 
 from cebulany.auth import token_required
@@ -17,6 +19,7 @@ resource_fields_base = {
     "accounting_date": fields.DateTime(dt_format="iso8601"),
     "company_name": fields.String(),
     "description": fields.String(),
+    "deleted_from_google": fields.Boolean(),
     "price": fields.Fixed(decimals=2),
 }
 
@@ -57,6 +60,7 @@ def sync_document(item, document: Document):
     document.date = datetime.fromisoformat(item["modifiedTime"])
     document.mime_type = item.get("mimeType")
     document.description = item.get("description")
+    document.deleted_from_google = False
 
     properties = item.get("properties", {})
     document.accounting_record = properties.get("accounting_record")
@@ -74,6 +78,7 @@ def sync_document(item, document: Document):
 
 
 class DocumentListResource(Resource):
+    method_decorators = [token_required]
 
     def get(self):
         args = query_parser.parse_args()
@@ -85,6 +90,7 @@ class DocumentListResource(Resource):
 
 
 class DocumentScoreResource(Resource):
+    method_decorators = [token_required]
 
     def get(self):
         args = query_score_parser.parse_args()
@@ -97,14 +103,16 @@ class DocumentScoreResource(Resource):
         return marshal(query.all(), resource_fields_score)
 
 
-class DocumentResource(Resource):
-    method_decorators = [token_required]
+class DocumentResource(ModelResource):
+    cls = Document
+
+    def get(self, id):
+        abort(405)
 
     def put(self, id):
         document = Document.query.get(id)
         if document is None:
             abort(404)
-
 
         data = parser.parse_args()
         item = update_file(
@@ -128,16 +136,28 @@ class DocumentSyncResource(Resource):
 
     def post(self, month: str):
         dt = month_type(month)
+        parent = f"{dt.year:04d}-{dt.month:02d}"
+        documents = {
+            doc.google_id: doc
+            for doc in db.session.scalars(
+                db.select(Document)
+                .options(load_only(Document.id, Document.google_id))
+                .filter_by(parent=parent)
+            ).all()
+        }
         for item in find_files_by_date(dt.year, dt.month):
             google_id = item["id"]
-            document = Document.query.filter_by(google_id=google_id).first()
+            document = documents.pop(google_id)
             if document is None:
                 document = Document(
                     google_id=google_id,
                     google_parent_id=item["parents"][-1],
-                    parent=f"{dt.year:04d}-{dt.month:02d}",
+                    parent=parent,
                 )
             sync_document(item, document)
+            db.session.add(document)
+        for document in documents.values():
+            document.deleted_from_google = True
             db.session.add(document)
         db.session.commit()
 

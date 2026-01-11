@@ -67,8 +67,9 @@
           @change="update(row.item)"
         />
       </template>
-      <template v-slot:cell(link)="row">
-        <b-btn @click="show(row.item)" size="sm">Link</b-btn>
+      <template v-slot:cell(actions)="row">
+        <b-btn @click="show(row.item)" variant="primary" size="sm">Podgląd</b-btn>
+        <b-btn @click="remove(row.item)" variant="danger" size="sm">Usuń</b-btn>
         <br />
         <b-badge v-if="row.item._state === 'loading'" pill variant="warning">Loading</b-badge>
         <b-badge v-if="row.item._state === 'error'" pill variant="loading">Error</b-badge>
@@ -84,13 +85,16 @@
         fields: [
           {key: 'additional', label: 'Pola'},
           {key: 'description', label: 'Opis'},
-          {key: 'link', label: 'Podgląd'},
+          {key: 'actions', label: 'Akcje'},
         ]
       }
     },
     methods: {
       update (row) {
         this.$emit('row-update', row);
+      },
+      remove (row) {
+        this.$emit('row-remove', row);
       },
       show (item) {
         this.$emit('row-show', {id: item.id, label: item.filename, link: item.link});
@@ -118,17 +122,20 @@
         this.update(row);
       },
       rowClass (item, type) {
-        if (!item || type !== 'row' || !this.itemToShow) {
+        if (!item || type !== 'row') {
           return;
         }
         if (item._state === 'loading') {
           return 'table-secondary';
         }
         if (item._state === 'error') {
-          return 'table-error';
+          return 'table-warning';
         }
-        if (item.id === this.itemToShow.id) {
+        if (this.itemToShow && item.id === this.itemToShow.id) {
           return 'table-primary';
+        }
+        if (item.deleted_from_google) {
+          return 'table-danger';
         }
       },
     }

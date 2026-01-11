@@ -155,6 +155,7 @@ class Document(Base):
     company_name = db.Column(db.String(100), index=False, default="")
     description = db.Column(db.String(300), index=False, default="")
     price = db.Column(db.Numeric(10, 2), index=False, nullable=True)
+    deleted_from_google = db.Column(db.Boolean, nullable=False, default=False)
 
 
 class Attachment(Base):
