@@ -5,6 +5,9 @@
     @input="$emit('input', $event)"
     @change="$emit('change', $event)"
   >
+    <button>
+      <selectedcontent></selectedcontent>
+    </button>
     <option
       v-if="hasNullOption"
       :value="null"
@@ -13,10 +16,11 @@
     </option>
     <option
       v-for="type in types"
-      :style="type | colorOption"
       :value="type.id"
     >
-      {{ type.name }}
+      <span :style="type | colorOption">
+        {{ type.name }}
+      </span>
     </option>
   </b-form-select>
 </template>
@@ -25,7 +29,7 @@
   export default {
     filters: {
       colorOption (obj) {
-        return {backgroundColor: `#${obj.color}`};
+        return {color: `#${obj.color}`};
       }
     },
     props: {
@@ -37,5 +41,8 @@
 </script>
 
 <style scoped>
-  option {color: white;}
+  select, ::picker(select) {
+    appearance: base-select;
+  }
+  option, selectedcontent {font-weight: bold;}
 </style>
