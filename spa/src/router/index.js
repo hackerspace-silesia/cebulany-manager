@@ -17,7 +17,6 @@ Vue.use(Router);
 
 export default new Router({
   scrollBehavior(to, from, savedPosition) {
-    console.log(savedPosition);
     if (savedPosition) {
       return new Promise((resolve, reject) => {
         setTimeout(() => {

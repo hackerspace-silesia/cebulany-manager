@@ -103,11 +103,11 @@ resource_fields_base = {
     "cost": fields.Price(decimals=2),
     "iban": fields.String(),
     "payments": fields.List(payment_fields),
+    "attachments": fields.List(attachment_fields),
 }
 
 resource_fields = {
     **resource_fields_base,
-    "attachments": fields.List(attachment_fields),
     "additional_info": fields.String(),
     "suggestion": suggestion_fields,
 }

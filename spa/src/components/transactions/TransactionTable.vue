@@ -19,6 +19,13 @@
       <template v-slot:cell(left)="row">
         <money-value :value="row.value" />
       </template>
+      <template v-slot:cell(attachments)="row">
+        <ul>
+          <li v-for="attachment in row.item.attachments">
+            <attachment-badge :document="attachment.document" />
+          </li>
+        </ul>
+      </template>
       <template v-slot:cell(types)="row">
         <ul v-if="row.item.payments.length > 0">
           <li v-for="payment in row.item.payments">
@@ -40,9 +47,10 @@
 </template>
 <script>
   import TypeBadge from './TypeBadge';
+  import AttachmentBadge from './AttachmentBadge';
 
   export default {
-    components: {TypeBadge},
+    components: {TypeBadge, AttachmentBadge},
     props: ['transactions', 'sum', 'sumLeft', 'budgets', 'innerBudgets', 'paymentTypes'],
     data () {
       return {
@@ -51,7 +59,8 @@
           {key: 'name', label: 'Nazwa & Tytuł', class: 'transaction-name'},
           {key: 'cost', label: 'Kwota', class: 'text-nowrap text-right'},
           {key: 'left', label: 'Poz.', class: 'text-nowrap text-right'},
-          {key: 'types', label: '*', class: 'transaction-payment-types'}
+          {key: 'attachments', label: '*', class: 'badges'},
+          {key: 'types', label: '*', class: 'badges'}
         ],
       }
     },
@@ -68,20 +77,20 @@
 
 <style scoped>
   .transaction-name > div {
-    width: 30vw;
+    width: 60vw;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-  .transaction-payment-types > ul {
+  .badges > ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
   }
-  .transaction-payment-types > ul > li {
+  .badges > ul > li {
     display: flex;
   }
-  .transaction-payment-types > ul > li:not(:last-child) {
+  .badges > ul > li:not(:last-child) {
     padding-bottom: 4px;
     margin-bottom: 4px;
     border-bottom: 1px solid #bbb;

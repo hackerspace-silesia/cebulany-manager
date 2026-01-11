@@ -3,7 +3,6 @@ export function downloadFile(response) {
   const url = window.URL.createObjectURL(new Blob([response.data]));
   const link = document.createElement('a');
   const contentDisposition = response.headers['content-disposition'] || '';
-  console.log(contentDisposition);
   const match = contentDisposition.match(/filename="?([\w_.-]+)"?/);
   const filename = match ? match[1] : 'file.xlsx';
   link.href = url;

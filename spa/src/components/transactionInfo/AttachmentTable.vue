@@ -24,7 +24,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="att in transaction.attachments" :key="att.id">
+          <tr v-for="att in transaction.attachments" :key="att.id":class="{'text-danger': att.document.deleted_from_google}" >
             <th>{{ att.document.filename }}</th>
             <td>{{ att.document.accounting_record }}</td>
             <td>{{ att.document.company_name }}</td>
