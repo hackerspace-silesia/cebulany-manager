@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col>
-      <h1>Budżety</h1>
+      <h1>Dokumenty</h1>
       <b-form>
         <date-picker
           v-model="month"

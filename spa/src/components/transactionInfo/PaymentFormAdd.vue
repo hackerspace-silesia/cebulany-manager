@@ -52,7 +52,13 @@
     },
     methods: {
       addType () {
-        let promise = PaymentService.post({transaction_id: this.transaction.id, ...this.payment});
+        const payload = {transaction_id: this.transaction.id, ...this.payment};
+        if (!payload.member_id) {
+          // During update member_id = 0 creates Integrity error in Sqlalchemy
+          // I don't have time to fix this in backend.
+          delete payload.member_id;
+        }
+        let promise = PaymentService.post(payload);
 
         linkVm(this.$refs.parent, promise).then(response => {
           this.transaction.payments.push(response.data);

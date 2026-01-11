@@ -105,6 +105,7 @@ class DocumentResource(Resource):
         if document is None:
             abort(404)
 
+
         data = parser.parse_args()
         item = update_file(
             id=document.google_id,

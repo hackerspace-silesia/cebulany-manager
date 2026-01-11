@@ -12,11 +12,15 @@
       <template v-slot:cell(additional)="row">
         <b-form>
           <b-form-group label-cols="2" label="Nazwa pliku">
-            <b-form-input
-              v-model.lazy.trim="row.item.filename"
-              size="sm"
-              @change="update(row.item)"
-            />
+            <b-input-group size="sm">
+              <b-form-input
+                v-model.lazy.trim="row.item.filename"
+                @change="update(row.item)"
+              />
+              <b-input-group-append>
+                <b-button variant="info" @click="generateFilename(row.item)">Generuj</b-button>
+              </b-input-group-append>
+            </b-input-group>
           </b-form-group>
           <b-form-group label-cols="2" label="Numer dok.">
             <b-form-input
@@ -90,6 +94,28 @@
       },
       show (item) {
         this.$emit('row-show', {id: item.id, label: item.filename, link: item.link});
+      },
+      generateFilename (row) {
+        const suffix = row.filename.split(".").pop();
+        if (!suffix) {
+          return;
+        }
+        const scrape = (s) => (s || '').trim().replaceAll(/\W+/g, "_").toLowerCase();
+        let name = '';
+        function putToName(s) {
+          const scraped = scrape(s);
+          if (!scraped) {
+            return;
+          }
+          if (name) {
+            name += '_';
+          }
+          name += scraped;
+        }
+        putToName(row.company_name);
+        putToName(row.accounting_record);
+        row.filename = `${name}.${suffix}`
+        this.update(row);
       },
       rowClass (item, type) {
         if (!item || type !== 'row' || !this.itemToShow) {

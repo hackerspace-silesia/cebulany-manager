@@ -1,5 +1,6 @@
+import calendar
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
 from functools import partial
 from itertools import chain
@@ -21,7 +22,7 @@ from cebulany.queries.transaction import TransactionQuery
 def excel_transaction(year: int, month: int):
     dt = f"{year}-{month:02d}"
     start = datetime(year, month, 1)
-    end = datetime(year, month + 1, 1) - timedelta(days=1)
+    end = datetime(year, month, calendar.monthrange(year, month)[1])
     transactions = TransactionQuery.get_transactions(date_range=(start, end))
     documents = DocumentQuery.get_documents(parent=dt).all()
     workbook = gen_workbook(dt, transactions, documents)
@@ -108,7 +109,8 @@ def fill_worksheet(sheet, dt: str, transactions: list[Transaction]):
         payment_type = _to_rich_text(_format_payment_type(p) for p in ps)
         budget = _to_rich_text(_format_budget(p) for p in ps)
         if transaction.additional_info:
-            budget.append(transaction.additional_info)
+            budget.insert(0, "\n")
+            budget.insert(0, transaction.additional_info)
 
         sheet.append(
             [

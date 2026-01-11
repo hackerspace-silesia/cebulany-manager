@@ -66,7 +66,7 @@ def update_file(
         "description": description,
         "properties": {
             "accounting_record": accounting_record if accounting_record else None,
-            "accouting_date": accounting_date and accounting_date.isoformat(),
+            "accounting_date": accounting_date and accounting_date.isoformat(),
             "company_name": company_name if company_name else None,
             "price": str(price) if price else None,
         },
