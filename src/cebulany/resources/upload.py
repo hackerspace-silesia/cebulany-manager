@@ -4,8 +4,9 @@ from flask.blueprints import Blueprint
 from flask import request, abort
 
 from cebulany.auth import token_required
-from cebulany.export_data import fill_transactions
-from cebulany.pdf import parse
+from cebulany.app import db
+from cebulany.accounting_report_parser.pdf import parse
+from cebulany.models import Transaction
 
 URL_PREFIX = environ.get('CEBULANY_APP_URL_PREFIX', '')
 
@@ -23,8 +24,21 @@ def upload_transactions():
     if file.filename == '':
         abort(400, 'No selected file')
 
-    
+
     lines = parse(file.stream)
     fill_transactions(lines)
 
     return 'OK', 200
+
+
+def fill_transactions(data):
+    for record in data:
+        transaction_query = (
+            db.session.query(Transaction)
+            .filter_by(ref_id=record['ref_id'])
+        )
+        if transaction_query.first() is None:
+            db.session.add(Transaction(**record))
+        else:
+            transaction_query.update(record)
+    db.session.commit()
