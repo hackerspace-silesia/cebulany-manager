@@ -16,6 +16,8 @@ services:
   backend:
     image: cebulany-manager-backend
     container_name: "backend"
+    env_file:
+      - ".env"
     environment:
       FLASK_APP: cebulany.app
       DATABASE_URI: postgresql://cebula:foo@db:5432/cebula

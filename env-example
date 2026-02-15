@@ -1,0 +1,3 @@
+DATABASE_URI=postgresql://cebula:foo@db:5432/cebula
+GOOGLE_DRIVE_INVOICES_ID=XXXX
+TOTP_SUPPORT=0

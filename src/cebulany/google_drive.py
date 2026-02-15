@@ -1,6 +1,7 @@
 from datetime import date
 from decimal import Decimal
 from functools import partial
+from os import environ
 import os.path
 
 from google.auth.transport.requests import Request
@@ -19,6 +20,7 @@ ALL_FIELDS = [
     "properties",
     "parents",
 ]
+INVOICES_ID = environ["GOOGLE_DRIVE_INVOICES_ID"].strip()
 DIR_MIMETYPE = "application/vnd.google-apps.folder"
 
 

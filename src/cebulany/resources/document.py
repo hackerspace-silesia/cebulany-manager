@@ -147,7 +147,7 @@ class DocumentSyncResource(Resource):
         }
         for item in find_files_by_date(dt.year, dt.month):
             google_id = item["id"]
-            document = documents.pop(google_id)
+            document = documents.pop(google_id, None)
             if document is None:
                 document = Document(
                     google_id=google_id,
