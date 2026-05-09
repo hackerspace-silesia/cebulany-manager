@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, date
 import re
-from typing import IO
+from typing import IO, Iterable, TypedDict
 
 from py_pdf_parser.loaders import load
 from py_pdf_parser.exceptions import NoElementFoundError
@@ -15,13 +15,68 @@ LA_PARAMS = dict(
 )
 
 
+class Record(TypedDict):
+    line_num: int
+    date: date
+    iban: str
+    name: str
+    title: str
+    cost: Decimal
+    ref_id: str
+
+
 def parse(filename: IO):
-    document = load(filename, la_params=LA_PARAMS)
+    try:
+        document = _validate(filename)
+    except Exception as exp:
+        raise SystemError(f"document name: {filename.name}") from exp
+
     for page in document.pages:
         yield from _parse_page(page)
 
 
-def _parse_page(page):
+def _validate(filename):
+    document = load(filename)
+    first_page = document.pages[0] 
+    expected = {
+        "pos": Decimal(_get_value("Uznania:", first_page)),
+        "neg": Decimal(_get_value("Obciążenia:", first_page)),
+        "count": int(_get_value("Liczba transakcji:", first_page)),
+    }
+
+    computed = {
+        "pos": Decimal(0),
+        "neg": Decimal(0),
+        "count": 0,
+    }
+
+    document = load(filename, la_params=LA_PARAMS)
+    for page in document.pages:
+        for record in _parse_page(page):
+            computed["count"] += 1
+            value = record["cost"]
+            computed["pos" if value > 0 else "neg"] += abs(value)
+
+    assert expected == computed, f"expected: {expected}; computed: {computed}"
+    return document
+
+
+def _get_value(label, page) -> str:
+    label_el = page.elements.filter_by_text_contains(label).extract_single_element()
+
+    if match := re.search(rf"{label}\s+([\d\s,]+)(\s+PLN)?", label_el.text(), re.MULTILINE):
+        return match.group(1).replace(',', '.').replace(' ', '')
+    
+    els = list(page.elements.to_the_right_of(label_el, tolerance=1.0))
+    els.sort(key=lambda el: el.bounding_box.x0)
+    if len(els) > 0:
+        if match := re.fullmatch(r"([\d\s,]+)(\s+PLN)?", els[0].text()):
+            return match.group(1).replace(',', '.').replace(' ', '')
+
+    raise ValueError(';'.join([label_el.text(), els[0].text()]))
+
+
+def _parse_page(page) -> Iterable[Record]:
     try:
         lp_el = page.elements.filter_by_text_equal("Lp.").extract_single_element()
     except NoElementFoundError:

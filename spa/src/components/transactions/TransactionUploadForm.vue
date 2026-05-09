@@ -10,7 +10,7 @@
           <b-form-file
             v-model="file"
             size="sm"
-            accept=".pdf"
+            accept=".pdf,.zip"
           />&nbsp;
           <b-button type="submit">
             Wrzuć
