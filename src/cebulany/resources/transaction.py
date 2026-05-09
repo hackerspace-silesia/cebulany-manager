@@ -1,4 +1,5 @@
-from flask_restful import Resource, fields, marshal_with
+from flask import abort
+from flask_restful import Resource, marshal, fields, marshal_with
 from flask_restful.reqparse import RequestParser
 
 from cebulany.queries.transaction import TransactionQuery
@@ -6,6 +7,7 @@ from cebulany.auth import token_required
 from cebulany.models import Transaction
 from cebulany.resources.model import ModelResourceWithoutDelete
 from cebulany.resources.types import dt_type
+from cebulany.app import db
 
 from cebulany.resources.document import resource_fields_base as document_fields
 
@@ -110,6 +112,8 @@ resource_fields = {
     **resource_fields_base,
     "additional_info": fields.String(),
     "suggestion": suggestion_fields,
+    "next_id": fields.Integer(),
+    "prev_id": fields.Integer(),
 }
 
 resource_list_fields = {
@@ -140,3 +144,15 @@ class TransactionResource(ModelResourceWithoutDelete):
     cls = Transaction
     parser = transaction_parser
     resource_fields = resource_fields
+
+    def get(self, id):
+        model = self.cls
+        obj = model.query.get(id)
+        if obj is None:
+            abort(404)
+
+        next = TransactionQuery.get_next_transaction(obj)
+        prev = TransactionQuery.get_prev_transaction(obj)
+        obj.next_id = next.id if next else None
+        obj.prev_id = prev.id if prev else None
+        return marshal(obj, self.resource_fields)

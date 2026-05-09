@@ -29,28 +29,37 @@
     components: {PaymentForm},
     props: ['transaction', 'budgets', 'innerBudgets', 'paymentTypes'],
     data () {
-      const payment = this.transaction.suggestion !== null ? structuredClone(this.transaction.suggestion) : {
-        budget_id: 0,
-        inner_budget_id: 0,
-        payment_type_id: 0,
-        member_id: 0,
-        member: null,
-        name: '-',
-      };
-      payment.date = this.transaction.date || (new Date()).toISOString().slice(0, 10);
-      payment.cost = (this.transaction.left ? Number(this.transaction.left) : 0).toFixed(2);
-
-      return { payment };
+      return { payment: this.createTemplatePayment(this.transaction) };
     },
     watch: {
       transaction: {
         handler(value) {
-          this.payment.cost = (value.left ? Number(value.left) : 0).toFixed(2);
+          this.payment = this.createTemplatePayment(value);
         },
-        deep: true,
+      },
+      'transaction.left': {
+        handler(value) {
+          this.payment.cost = this.getPaymentCost(value);
+        },
       },
     },
     methods: {
+      createTemplatePayment(transaction) {
+          const payment = transaction.suggestion !== null ? structuredClone(transaction.suggestion) : {
+            budget_id: 0,
+            inner_budget_id: 0,
+            payment_type_id: 0,
+            member_id: 0,
+            member: null,
+            name: '-',
+          };
+          payment.date = transaction.date || (new Date()).toISOString().slice(0, 10);
+          payment.cost = this.getPaymentCost(transaction.left);
+          return payment;
+      },
+      getPaymentCost(left) {
+        return (left ? Number(left) : 0).toFixed(2);
+      },
       addType () {
         const payload = {transaction_id: this.transaction.id, ...this.payment};
         if (!payload.member_id) {

@@ -2,7 +2,7 @@
   <div>
   <PromisedComponent :state="promiseState">
     <template v-if="transaction">
-      <TransactionTable :item="transaction" @update="update" ref="table"/>
+      <TransactionTable :item="transaction" @update="update" @reload="reload" ref="table"/>
       <PaymentTable 
         :transaction="transaction"
         :budgets="budgets"
@@ -38,7 +38,6 @@
         budgets: [],
         innerBudgets: [],
         paymentTypes: [],
-        documents: [],
         promiseState: null,
       };
     },
@@ -77,6 +76,16 @@
           additional_info: AddtionalInfo,
         });
         linkVm(this.$refs.table, promise);
+      },
+      reload(transactionId) {
+        this.$router.replace({
+          name: 'TransactionInfo',
+          params: {id: transactionId},
+        }).catch(()=>{});
+        linkVm(this, TransactionService.get(transactionId))
+          .then(transactionResponse => {
+            this.transaction = transactionResponse.data;
+          })
       },
     }
   }

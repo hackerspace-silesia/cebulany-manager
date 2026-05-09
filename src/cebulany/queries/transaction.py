@@ -42,6 +42,26 @@ class TransactionQuery:
         if ordering:
             query = query.order_by(ordering)
         else:
-            query = query.order_by(-model.line_num, model.date)
+            query = query.order_by(model.date, model.line_num.desc())
 
         return query.all()
+
+    @classmethod
+    def get_next_transaction(cls, obj: Transaction):
+        model = Transaction
+        return (
+            model.query
+            .where((model.date > obj.date) | ((model.date == obj.date) & (model.line_num < obj.line_num)))
+            .order_by(model.date, model.line_num.desc())
+            .first()
+        )
+
+    @classmethod
+    def get_prev_transaction(cls, obj: Transaction):
+        model = Transaction
+        return (
+            model.query
+            .where((model.date < obj.date) | ((model.date == obj.date) & (model.line_num > obj.line_num)))
+            .order_by(model.date.desc(), model.line_num)
+            .first()
+        )

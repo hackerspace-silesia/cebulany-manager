@@ -4,6 +4,14 @@
       <th>Nazwa</th>
       <td colspan="3">
         {{ item.name }}
+        <b-btn-group class="float-right">
+          <b-btn v-if="item.prev_id" variant="info" @click="prev">
+            Poprzedni
+          </b-btn>
+          <b-btn v-if="item.next_id" variant="success" @click="next">
+            Następny
+          </b-btn>
+        </b-btn-group>
       </td>
     </tr>
     <tr>
@@ -51,7 +59,13 @@
     methods: {
       update() {
         this.$emit('update', this.item);
-      }
+      },
+      prev() {
+        this.$emit('reload', this.item.prev_id);
+      },
+      next() {
+        this.$emit('reload', this.item.next_id);
+      },
     }
   }
 </script>
