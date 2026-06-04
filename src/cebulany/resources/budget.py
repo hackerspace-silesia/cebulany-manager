@@ -1,26 +1,31 @@
-from flask_restful import fields
-from flask_restful.reqparse import RequestParser
+from fastapi.routing import APIRouter
+from pydantic import BaseModel
 
+from cebulany.deps import SessionDep
 from cebulany.models import Budget
-from cebulany.resources.model import ModelListResource, ModelResource
 
-resource_fields = {
-    'id': fields.Integer(),
-    'name': fields.String(),
-    'color': fields.String(),
-    'show_details_in_report': fields.Boolean(),
-    'show_count_in_report': fields.Boolean(),
-    'description_on_negative': fields.String(),
-    'description_on_positive': fields.String(),
-}
+from ._sql_utils import get_all, get_by_id
 
-parser = RequestParser()
-parser.add_argument('name', required=True)
-parser.add_argument('color', required=True, type=str)
-parser.add_argument('show_details_in_report', required=False, type=bool)
-parser.add_argument('show_count_in_report', required=False, type=bool)
-parser.add_argument('description_on_negative', required=False, type=str)
-parser.add_argument('description_on_positive', required=False, type=str)
+router = APIRouter(prefix="/budget")
+
+class BudgetModel(BaseModel):
+    id: int
+    name: str
+    color: str
+    show_details_in_report: bool
+    show_count_in_report: bool
+    description_on_negative: str
+    description_on_positive: str
+
+
+@router.get("/")
+def list(session: SessionDep) -> list[BudgetModel]:
+    return await get_all[Budget, BudgetModel](session)
+
+
+@router.get("/{id:int}")
+def get(session: SessionDep) -> BudgetModel:
+    return await get_by_id[Budget, BudgetModel](session)
 
 
 class BudgetListResource(ModelListResource):
